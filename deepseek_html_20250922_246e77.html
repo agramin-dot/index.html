@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اپلیکیشن تصحیح پاسخنامه</title>
+    <meta name="theme-color" content="#4a00e0">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #4a00e0;
+            --secondary: #8e2de2;
+            --accent: #00b09b;
+            --light: #f5f7fa;
+            --dark: #333;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            text-align: center;
+            padding: 25px 20px;
+            position: relative;
+        }
+        
+        header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        
+        .logo {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+        
+        .tabs {
+            display: flex;
+            background: var(--light);
+            overflow: hidden;
+        }
+        
+        .tab-btn {
+            flex: 1;
+            padding: 15px;
+            background: #e9ecef;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .tab-btn.active {
+            background: white;
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 25px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .camera-section {
+            margin-bottom: 25px;
+        }
+        
+        #camera-view {
+            width: 100%;
+            height: 350px;
+            background-color: #f1f1f1;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        #camera-view video, #camera-view canvas, #camera-view img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+        
+        .camera-overlay {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            border: 2px dashed var(--primary);
+            border-radius: 8px;
+            pointer-events: none;
+        }
+        
+        .placeholder-text {
+            color: #888;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #3a00b0;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .btn-success {
+            background: var(--accent);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #008f7a;
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #bd2130;
+        }
+        
+        .answer-key-section {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+        }
+        
+        .answer-key-section h3 {
+            margin-bottom: 15px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .answer-inputs {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+        }
+        
+        .answer-input {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .answer-input label {
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        
+        .answer-input select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: white;
+        }
+        
+        .results-section {
+            background: #f0f9ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .results-section h3 {
+            margin-bottom: 15px;
+            color: var(--accent);
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .score-display {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .answers-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .answer-item {
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .correct {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .incorrect {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .history-section {
+            margin-top: 25px;
+        }
+        
+        .history-section h3 {
+            margin-bottom: 15px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .history-item {
+            background: #f1f1f1;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .history-score {
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+        
+        .loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            border-radius: 10px;
+            z-index: 10;
+            display: none;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .a4-container {
+            width: 100%;
+            max-width: 794px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            min-height: 1123px;
+        }
+        
+        .a5-page {
+            width: 48%;
+            height: 700px;
+            background: white;
+            padding: 15px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #ddd;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .double-a5 {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        
+        .answer-sheet-header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary);
+        }
+        
+        .answer-sheet-header h1 {
+            font-size: 20px;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+        
+        .answer-sheet-header p {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .student-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .info-item {
+            display: flex;
+            align-items: center;
+        }
+        
+        .info-item label {
+            width: 100px;
+            font-weight: bold;
+            color: #444;
+        }
+        
+        .info-item span {
+            flex: 1;
+            border-bottom: 1px dashed #999;
+            padding: 0 5px;
+            height: 25px;
+        }
+        
+        .questions-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .question {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .question-number {
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #444;
+        }
+        
+        .options {
+            display: flex;
+            width: 100%;
+            justify-content: space-around;
+        }
+        
+        .option {
+            width: 22px;
+            height: 22px;
+            border: 1.5px solid #333;
+            border-radius: 3px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .option:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .option.selected {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .instructions {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            font-size: 12px;
+        }
+        
+        .instructions h3 {
+            font-size: 13px;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+        
+        .instructions ul {
+            padding-right: 15px;
+            line-height: 1.6;
+        }
+        
+        .sheet-footer {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 11px;
+            color: #777;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+        }
+        
+        .sheet-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .config-panel {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .config-panel h3 {
+            margin-bottom: 15px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .config-form {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .form-group input, .form-group select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #888;
+            font-size: 0.9rem;
+            border-top: 1px solid #eee;
+            margin-top: 20px;
+        }
+        
+        @media (max-width: 900px) {
+            .double-a5 {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .a5-page {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+            
+            .config-form {
+                grid-template-columns: 1fr;
+            }
+            
+            .answer-inputs, .answers-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .answer-inputs, .answers-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .questions-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .controls, .sheet-controls {
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+            }
+        }
+        
+        @media print {
+            body {
+                background: none;
+                padding: 0;
+            }
+            
+            .container {
+                box-shadow: none;
+                max-width: 100%;
+            }
+            
+            header, .tabs, .config-panel, .sheet-controls, footer, .no-print {
+                display: none;
+            }
+            
+            .tab-content {
+                display: block !important;
+                padding: 0;
+            }
+            
+            .a4-container {
+                box-shadow: none;
+                padding: 0;
+                max-width: 100%;
+                min-height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">✓</div>
+            <h1>اپلیکیشن تصحیح پاسخنامه چهارگزینه‌ای</h1>
+            <p>پاسخنامه‌های خود را با دوربین گوشی اسکن و تصحیح کنید</p>
+        </header>
+        
+        <div class="tabs">
+            <button class="tab-btn active" onclick="openTab('app')">
+                📷 اپلیکیشن تصحیح
+            </button>
+            <button class="tab-btn" onclick="openTab('sheet')">
+                📝 پاسخنامه A5
+            </button>
+        </div>
+        
+        <div id="app" class="tab-content active">
+            <div class="camera-section">
+                <div id="camera-view">
+                    <div class="placeholder-text">
+                        <p>📷 برای شروع، دوربین را فعال کنید</p>
+                        <p>پاسخنامه را درون کادر قرار دهید و عکس بگیرید</p>
+                    </div>
+                    <div class="camera-overlay"></div>
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>در حال پردازش تصویر</p>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <button id="start-camera" class="btn-primary">
+                        فعال کردن دوربین
+                    </button>
+                    <button id="capture" class="btn-secondary" disabled>
+                        عکس‌برداری
+                    </button>
+                    <button id="process" class="btn-success" disabled>
+                        پردازش پاسخ‌ها
+                    </button>
+                    <button id="reset" class="btn-danger">
+                        بازنشانی
+                    </button>
+                </div>
+            </div>
+            
+            <div class="answer-key-section">
+                <h3>🔑 تعیین کلید پاسخ صحیح</h3>
+                <div class="answer-inputs" id="answer-key-inputs">
+                    <!-- Answer key inputs will be generated here -->
+                </div>
+            </div>
+            
+            <div class="results-section" id="results-section">
+                <h3>📊 نتایج تصحیح</h3>
+                <div class="score-display">
+                    <span id="score">0</span> از <span id="total">20</span>
+                </div>
+                <div class="answers-grid" id="answers-grid">
+                    <!-- Results will be generated here -->
+                </div>
+            </div>
+            
+            <div class="history-section">
+                <h3>🕒 تاریخچه تصحیح‌ها</h3>
+                <div class="history-list" id="history-list">
+                    <!-- History items will be added here -->
+                </div>
+            </div>
+        </div>
+        
+        <div id="sheet" class="tab-content">
+            <div class="config-panel">
+                <h3>⚙️ تنظیمات پاسخنامه</h3>
+                <div class="config-form">
+                    <div class="form-group">
+                        <label for="exam-title">عنوان آزمون:</label>
+                        <input type="text" id="exam-title" value="آزمون پایانی ریاضی">
+                    </div>
+                    <div class="form-group">
+                        <label for="course-name">نام درس:</label>
+                        <input type="text" id="course-name" value="ریاضی عمومی">
+                    </div>
+                    <div class="form-group">
+                        <label for="exam-date">تاریخ برگزاری:</label>
+                        <input type="text" id="exam-date" value="۱۴۰۳/۰۳/۱۵">
+                    </div>
+                    <div class="form-group">
+                        <label for="question-count">تعداد سوالات:</label>
+                        <select id="question-count">
+                            <option value="10">۱۰ سوال</option>
+                            <option value="20" selected>۲۰ سوال</option>
+                            <option value="30">۳۰ سوال</option>
+                            <option value="40">۴۰ سوال</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="a4-container">
+                <div class="double-a5">
+                    <div class="a5-page">
+                        <div class="answer-sheet-header">
+                            <h1 id="sheet-title">آزمون پایانی ریاضی</h1>
+                            <p id="sheet-details">درس: ریاضی عمومی | تاریخ: ۱۴۰۳/۰۳/۱۵</p>
+                        </div>
+                        
+                        <div class="student-info">
+                            <div class="info-item">
+                                <label>نام و نام خانوادگی:</label>
+                                <span></span>
+                            </div>
+                            <div class="info-item">
+                                <label>شماره دانشجویی:</label>
+                                <span></span>
+                            </div>
+                            <div class="info-item">
+                                <label>کد ملی:</label>
+                                <span></span>
+                            </div>
+                            <div class="info-item">
+                                <label>تعداد سوالات:</label>
+                                <span>۲۰</span>
+                            </div>
+                        </div>
+                        
+                        <div class="questions-grid" id="questions-container-1">
+                            <!-- Questions 1 to 10 will be generated here -->
+                        </div>
+                        
+                        <div class="instructions">
+                            <h3>راهنما:</h3>
+                            <ul>
+                                <li>لطفاً با خودکار مشکی یا آبی پاسخ دهید</li>
+                                <li>برای هر سوال فقط یک گزینه را انتخاب کنید</li>
+                                <li>در صورت انتخاب بیش از یک گزینه، پاسخ نادرست محاسبه خواهد شد</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="sheet-footer">
+                            <p>پاسخنامه توسط اپلیکیشن تصحیح پاسخنامه چهارگزینه‌ای قابل پردازش است</p>
+                        </div>
+                    </div>
+                    
+                    <div class="a5-page">
+                        <div class="answer-sheet-header">
+                            <h1 id="sheet-title-2">آزمون پایانی ریاضی</h1>
+                            <p id="sheet-details-2">درس: ریاضی عمومی | تاریخ: ۱۴۰۳/۰۳/۱۵</p>
+                        </div>
+                        
+                        <div class="student-info">
+                            <div class="info-item">
+                                <label>نام و نام خانوادگی:</label>
+                                <span></span>
+                            </div>
+                            <div class="info-item">
+                                <label>شماره دانشجویی:</label>
+                                <span></span>
+                            </div>
+                            <div class="info-item">
+                                <label>کد ملی:</label>
+                                <span></span>
+                            </div>
+                            <div class="info-item">
+                                <label>تعداد سوالات:</label>
+                                <span>۲۰</span>
+                            </div>
+                        </div>
+                        
+                        <div class="questions-grid" id="questions-container-2">
+                            <!-- Questions 11 to 20 will be generated here -->
+                        </div>
+                        
+                        <div class="instructions">
+                            <h3>راهنما:</h3>
+                            <ul>
+                                <li>لطفاً با خودکار مشکی یا آبی پاسخ دهید</li>
+                                <li>برای هر سوال فقط یک گزینه را انتخاب کنید</li>
+                                <li>در صورت انتخاب بیش از یک گزینه، پاسخ نادرست محاسبه خواهد شد</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="sheet-footer">
+                            <p>پاسخنامه توسط اپلیکیشن تصحیح پاسخنامه چهارگزینه‌ای قابل پردازش است</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="sheet-controls">
+                <button onclick="updateAnswerSheet()" class="btn-primary">
+                    به‌روزرسانی پاسخنامه
+                </button>
+                <button onclick="window.print()" class="btn-secondary">
+                    چاپ پاسخنامه
+                </button>
+                <button onclick="fillRandomAnswers()" class="btn-success">
+                    پر کردن تصادفی پاسخ‌ها
+                </button>
+                <button onclick="clearAllAnswers()" class="btn-danger">
+                    پاک کردن همه پاسخ‌ها
+                </button>
+            </div>
+        </div>
+        
+        <footer>
+            <p>ساخته شده با ❤️ | نسخه ۲.۰.۰ | قابل استفاده در GitHub Pages</p>
+        </footer>
+    </div>
+
+    <script>
+        // Tab navigation
+        function openTab(tabId) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabId).classList.add('active');
+            
+            // Update active tab button
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            event.currentTarget.classList.add('active');
+        }
+        
+        // Answer sheet functionality
+        function toggleOption(element) {
+            // Clear all options in the same question
+            const options = element.parentElement.querySelectorAll('.option');
+            options.forEach(opt => opt.classList.remove('selected'));
+            
+            // Select the clicked option
+            element.classList.add('selected');
+        }
+        
+        // Fill random answers for testing
+        function fillRandomAnswers() {
+            const allOptions = document.querySelectorAll('.options');
+            
+            allOptions.forEach(options => {
+                // Clear previous selection
+                const opts = options.querySelectorAll('.option');
+                opts.forEach(opt => opt.classList.remove('selected'));
+                
+                // Select a random option
+                const randomIndex = Math.floor(Math.random() * 4);
+                opts[randomIndex].classList.add('selected');
+            });
+        }
+        
+        // Clear all answers
+        function clearAllAnswers() {
+            const allOptions = document.querySelectorAll('.option');
+            allOptions.forEach(opt => opt.classList.remove('selected'));
+        }
+        
+        // Update answer sheet based on configuration
+        function updateAnswerSheet() {
+            const examTitle = document.getElementById('exam-title').value;
+            const courseName = document.getElementById('course-name').value;
+            const examDate = document.getElementById('exam-date').value;
+            const questionCount = parseInt(document.getElementById('question-count').value);
+            
+            // Update headers
+            document.getElementById('sheet-title').textContent = examTitle;
+            document.getElementById('sheet-title-2').textContent = examTitle;
+            document.getElementById('sheet-details').textContent = `درس: ${courseName} | تاریخ: ${examDate}`;
+            document.getElementById('sheet-details-2').textContent = `درس: ${courseName} | تاریخ: ${examDate}`;
+            
+            // Update question counts
+            document.querySelectorAll('.student-info span:last-child').forEach(span => {
+                span.textContent = questionCount;
+            });
+            
+            // Regenerate questions
+            generateQuestions(questionCount);
+            
+            // Regenerate answer key inputs
+            initializeAnswerKey(questionCount);
+            
+            alert('پاسخنامه با موفقیت به‌روزرسانی شد!');
+        }
+        
+        // Generate questions for answer sheet
+        function generateQuestions(count) {
+            const halfCount = Math.ceil(count / 2);
+            
+            // First container (questions 1 to half)
+            const container1 = document.getElementById('questions-container-1');
+            container1.innerHTML = '';
+            
+            for (let i = 1; i <= halfCount; i++) {
+                const question = document.createElement('div');
+                question.className = 'question';
+                
+                question.innerHTML = `
+                    <div class="question-number">${i}</div>
+                    <div class="options">
+                        <div class="option" onclick="toggleOption(this)">1</div>
+                        <div class="option" onclick="toggleOption(this)">2</div>
+                        <div class="option" onclick="toggleOption(this)">3</div>
+                        <div class="option" onclick="toggleOption(this)">4</div>
+                    </div>
+                `;
+                
+                container1.appendChild(question);
+            }
+            
+            // Second container (questions half+1 to count)
+            const container2 = document.getElementById('questions-container-2');
+            container2.innerHTML = '';
+            
+            for (let i = halfCount + 1; i <= count; i++) {
+                const question = document.createElement('div');
+                question.className = 'question';
+                
+                question.innerHTML = `
+                    <div class="question-number">${i}</div>
+                    <div class="options">
+                        <div class="option" onclick="toggleOption(this)">1</div>
+                        <div class="option" onclick="toggleOption(this)">2</div>
+                        <div class="option" onclick="toggleOption(this)">3</div>
+                        <div class="option" onclick="toggleOption(this)">4</div>
+                    </div>
+                `;
+                
+                container2.appendChild(question);
+            }
+        }
+        
+        // Initialize answer key inputs
+        function initializeAnswerKey(count) {
+            const container = document.getElementById('answer-key-inputs');
+            container.innerHTML = '';
+            
+            for (let i = 1; i <= count; i++) {
+                const answerInput = document.createElement('div');
+                answerInput.className = 'answer-input';
+                
+                const label = document.createElement('label');
+                label.textContent = i;
+                
+                const select = document.createElement('select');
+                select.id = `answer-${i}`;
+                select.innerHTML = `
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                `;
+                
+                // Set default answer key (for demo purposes)
+                if (i % 4 === 0) select.value = '1';
+                else if (i % 4 === 1) select.value = '2';
+                else if (i % 4 === 2) select.value = '3';
+                else select.value = '4';
+                
+                answerInput.appendChild(label);
+                answerInput.appendChild(select);
+                container.appendChild(answerInput);
+            }
+        }
+        
+        // App functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elements
+            const cameraView = document.getElementById('camera-view');
+            const startCameraBtn = document.getElementById('start-camera');
+            const captureBtn = document.getElementById('capture');
+            const processBtn = document.getElementById('process');
+            const resetBtn = document.getElementById('reset');
+            const loadingOverlay = document.querySelector('.loading');
+            const resultsSection = document.getElementById('results-section');
+            const answersGrid = document.getElementById('answers-grid');
+            const historyList = document.getElementById('history-list');
+            const scoreElement = document.getElementById('score');
+            const totalElement = document.getElementById('total');
+            
+            let stream = null;
+            let video = null;
+            let canvas = null;
+            let capturedImage = null;
+            let answerKey = [];
+            
+            // Initialize the app
+            const initialQuestionCount = 20;
+            generateQuestions(initialQuestionCount);
+            initializeAnswerKey(initialQuestionCount);
+            
+            // Check camera support
+            function checkCameraSupport() {
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    alert('مرورگر شما از دوربین پشتیبانی نمی‌کند. لطفاً از مرورگرهای مدرن مانند Chrome استفاده کنید.');
+                    return false;
+                }
+                return true;
+            }
+            
+            // Request camera permission
+            startCameraBtn.addEventListener('click', async function() {
+                if (!checkCameraSupport()) return;
+                
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia({ 
+                        video: { 
+                            facingMode: 'environment',
+                            width: { ideal: 1280 },
+                            height: { ideal: 720 }
+                        }, 
+                        audio: false 
+                    });
+                    
+                    cameraView.innerHTML = '';
+                    video = document.createElement('video');
+                    video.srcObject = stream;
+                    video.autoplay = true;
+                    video.playsInline = true;
+                    
+                    // Add video to camera view
+                    cameraView.appendChild(video);
+                    cameraView.appendChild(document.createElement('div')).className = 'camera-overlay';
+                    
+                    // Create canvas for capturing images
+                    canvas = document.createElement('canvas');
+                    canvas.style.display = 'none';
+                    cameraView.appendChild(canvas);
+                    
+                    // Enable capture button
+                    captureBtn.disabled = false;
+                    startCameraBtn.disabled = true;
+                    startCameraBtn.textContent = 'دوربین فعال است';
+                    
+                } catch (error) {
+                    console.error('Error accessing camera:', error);
+                    alert('خطا در دسترسی به دوربین. لطفاً مجوز دوربین را بررسی کنید. ' + error.message);
+                }
+            });
+            
+            // Capture image
+            captureBtn.addEventListener('click', function() {
+                if (!video) return;
+                
+                const context = canvas.getContext('2d');
+                
+                // Set canvas dimensions to match video
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                
+                // Draw the current video frame to the canvas
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                
+                // Convert canvas to image
+                capturedImage = new Image();
+                capturedImage.src = canvas.toDataURL('image/png');
+                capturedImage.style.width = '100%';
+                capturedImage.style.height = '100%';
+                capturedImage.style.objectFit = 'cover';
+                
+                // Replace video with captured image
+                cameraView.innerHTML = '';
+                cameraView.appendChild(capturedImage);
+                cameraView.appendChild(document.createElement('div')).className = 'camera-overlay';
+                
+                // Stop the video stream
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                }
+                
+                // Enable process button
+                processBtn.disabled = false;
+                captureBtn.disabled = true;
+            });
+            
+            // Process answers
+            processBtn.addEventListener('click', function() {
+                // Show loading
+                loadingOverlay.style.display = 'flex';
+                
+                // Get answer key from inputs
+                const questionCount = parseInt(document.getElementById('question-count').value);
+                answerKey = [];
+                for (let i = 1; i <= questionCount; i++) {
+                    answerKey.push(document.getElementById(`answer-${i}`).value);
+                }
+                
+                // Simulate processing delay
+                setTimeout(() => {
+                    // Simulate answer detection (in a real app, this would use image processing)
+                    const detectedAnswers = simulateAnswerDetection(answerKey);
+                    
+                    // Calculate results
+                    calculateResults(detectedAnswers, answerKey);
+                    
+                    // Hide loading
+                    loadingOverlay.style.display = 'none';
+                    
+                    // Show results section
+                    resultsSection.style.display = 'block';
+                    
+                    // Add to history
+                    addToHistory(detectedAnswers, answerKey);
+                }, 2000);
+            });
+            
+            // Reset button
+            resetBtn.addEventListener('click', function() {
+                // Stop the video stream if active
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                }
+                
+                // Reset camera view
+                cameraView.innerHTML = `
+                    <div class="placeholder-text">
+                        <p>📷 برای شروع، دوربین را فعال کنید</p>
+                        <p>پاسخنامه را درون کادر قرار دهید و عکس بگیرید</p>
+                    </div>
+                    <div class="camera-overlay"></div>
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>در حال پردازش تصویر</p>
+                    </div>
+                `;
+                
+                // Reset buttons
+                startCameraBtn.disabled = false;
+                startCameraBtn.textContent = 'فعال کردن دوربین';
+                captureBtn.disabled = true;
+                processBtn.disabled = true;
+                
+                // Hide results
+                resultsSection.style.display = 'none';
+                
+                stream = null;
+                video = null;
+                capturedImage = null;
+            });
+            
+            // Simulate answer detection
+            function simulateAnswerDetection(answerKey) {
+                const detectedAnswers = [];
+                for (let i = 0; i < answerKey.length; i++) {
+                    // 80% chance of correct answer, 20% chance of random wrong answer
+                    if (Math.random() > 0.2) {
+                        detectedAnswers.push(answerKey[i]);
+                    } else {
+                        const options = ['1', '2', '3', '4'];
+                        const wrongOptions = options.filter(opt => opt !== answerKey[i]);
+                        detectedAnswers.push(wrongOptions[Math.floor(Math.random() * wrongOptions.length)]);
+                    }
+                }
+                return detectedAnswers;
+            }
+            
+            // Calculate and display results
+            function calculateResults(detectedAnswers, answerKey) {
+                let correctCount = 0;
+                
+                // Clear previous results
+                answersGrid.innerHTML = '';
+                
+                for (let i = 0; i < detectedAnswers.length; i++) {
+                    const isCorrect = detectedAnswers[i] === answerKey[i];
+                    if (isCorrect) correctCount++;
+                    
+                    const answerItem = document.createElement('div');
+                    answerItem.className = `answer-item ${isCorrect ? 'correct' : 'incorrect'}`;
+                    answerItem.innerHTML = `
+                        <div>سوال ${i + 1}</div>
+                        <div>پاسخ: ${detectedAnswers[i]}</div>
+                        <div>${isCorrect ? '✓' : '✗'}</div>
+                    `;
+                    
+                    answersGrid.appendChild(answerItem);
+                }
+                
+                // Update score
+                scoreElement.textContent = correctCount;
+                totalElement.textContent = answerKey.length;
+            }
+            
+            // Add to history
+            function addToHistory(detectedAnswers, answerKey) {
+                const correctCount = detectedAnswers.filter((answer, i) => answer === answerKey[i]).length;
+                const total = answerKey.length;
+                const percentage = Math.round((correctCount / total) * 100);
+                
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                historyItem.innerHTML = `
+                    <div>تاریخ: ${new Date().toLocaleString('fa-IR')}</div>
+                    <div class="history-score">${correctCount}/${total} (${percentage}%)</div>
+                `;
+                
+                historyList.prepend(historyItem);
+            }
+        });
+    </script>
+</body>
+</html>
