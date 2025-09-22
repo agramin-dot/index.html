@@ -1,0 +1,427 @@
+﻿<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اپلیکیشن تصحیح پاسخنامه</title>
+    <meta name="theme-color" content="#4a00e0">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #4a00e0;
+            --secondary: #8e2de2;
+            --accent: #00b09b;
+            --light: #f5f7fa;
+            --dark: #333;
+            --success: #28a745;
+            --danger: #dc3545;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            text-align: center;
+            padding: 25px 20px;
+            position: relative;
+        }
+        
+        .camera-section {
+            padding: 20px;
+        }
+        
+        #camera-view {
+            width: 100%;
+            height: 300px;
+            background-color: #f1f1f1;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+            border: 2px dashed #ccc;
+        }
+        
+        #camera-view video, #camera-view canvas, #camera-view img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-width: 160px;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #3a00b0;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .btn-success {
+            background: var(--accent);
+            color: white;
+        }
+        
+        .permission-note {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: center;
+        }
+        
+        .answers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            padding: 20px;
+        }
+        
+        .answer-item {
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .correct {
+            background: #d4edda;
+            border-color: #c3e6cb;
+        }
+        
+        .incorrect {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        
+        .hosting-info {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .hosting-info a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>اپلیکیشن تصحیح پاسخنامه</h1>
+            <p>پاسخنامه‌ها را با دوربین اسکن و تصحیح کنید</p>
+        </header>
+        
+        <div class="hosting-info">
+            <h3>راهنمای میزبانی رایگان</h3>
+            <p>برای استفاده از قابلیت دوربین، این کد را در یکی از سرویس‌های زیر میزبانی کنید:</p>
+            <p>
+                <a href="https://pages.github.com/" target="_blank">GitHub Pages</a> | 
+                <a href="https://www.netlify.com/" target="_blank">Netlify</a> | 
+                <a href="https://vercel.com/" target="_blank">Vercel</a>
+            </p>
+        </div>
+        
+        <div class="camera-section">
+            <div class="permission-note">
+                <strong>توجه:</strong> برای استفاده از دوربین، لطفاً مجوز دسترسی را تأیید کنید.
+                در مرورگر کروم، روی علامت قفل در نوار آدرس کلیک و مجوز دوربین را فعال نمایید.
+            </div>
+            
+            <div id="camera-view">
+                <div style="text-align: center; padding: 20px;">
+                    <p>📷 دوربین در حال راه‌اندازی...</p>
+                    <p>اگر پنجره مجوز نمایش داده نشد، لطفاً مرورگر را ریستارت کنید.</p>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <button id="start-camera" class="btn-primary">فعال کردن دوربین</button>
+                <button id="capture" class="btn-secondary" disabled>عکس‌برداری</button>
+                <button id="reset" class="btn-success" disabled>بازنشانی</button>
+            </div>
+            
+            <div class="answers-grid" id="answers-container">
+                <!-- نتایج اینجا نمایش داده می‌شوند -->
+            </div>
+        </div>
+        
+        <footer>
+            <p>ساخته شده با ❤️ | برای استفاده از دوربین، این صفحه را در یک سرویس میزبانی HTTPS بارگذاری کنید</p>
+        </footer>
+    </div>
+
+    <script>
+        // بررسی پشتیبانی از دوربین
+        function checkCameraSupport() {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                alert('مرورگر شما از دوربین پشتیبانی نمی‌کند. لطفاً از مرورگرهای مدرن مانند Chrome استفاده کنید.');
+                return false;
+            }
+            return true;
+        }
+        
+        // درخواست مجوز دوربین
+        async function setupCamera() {
+            if (!checkCameraSupport()) return;
+            
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: 'environment',
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    },
+                    audio: false
+                });
+                
+                const video = document.createElement('video');
+                video.srcObject = stream;
+                video.autoplay = true;
+                video.playsInline = true;
+                
+                const cameraView = document.getElementById('camera-view');
+                cameraView.innerHTML = '';
+                cameraView.appendChild(video);
+                
+                document.getElementById('capture').disabled = false;
+                document.getElementById('start-camera').disabled = true;
+                
+                // ذخیره استریم برای استفاده بعدی
+                window.cameraStream = stream;
+                
+            } catch (error) {
+                console.error('خطا در دسترسی به دوربین:', error);
+                showCameraError(error);
+            }
+        }
+        
+        // نمایش خطای دوربین
+        function showCameraError(error) {
+            const cameraView = document.getElementById('camera-view');
+            cameraView.innerHTML = `
+                <div style="text-align: center; padding: 20px;">
+                    <h3>خطا در دسترسی به دوربین</h3>
+                    <p>لطفاً موارد زیر را بررسی کنید:</p>
+                    <ol style="text-align: right; margin: 15px; padding-right: 20px;">
+                        <li>این صفحه باید از طریق HTTPS بارگذاری شده باشد</li>
+                        <li>مجوز دوربین را در مرورگر تأیید کنید</li>
+                        <li>مرورگر خود را به آخرین نسخه به‌روزرسانی کنید</li>
+                        <li>از مرورگرهای Chrome یا Firefox استفاده کنید</li>
+                    </ol>
+                    <p>خطای دقیق: ${error.message || 'نامشخص'}</p>
+                    <button onclick="window.location.reload()" class="btn-primary">تلاش مجدد</button>
+                </div>
+            `;
+        }
+        
+        // عکس‌برداری
+        function capturePhoto() {
+            const video = document.querySelector('video');
+            if (!video) return;
+            
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            const imageData = canvas.toDataURL('image/png');
+            
+            // نمایش تصویر گرفته شده
+            const img = document.createElement('img');
+            img.src = imageData;
+            img.style.width = '100%';
+            img.style.height = '100%';
+            img.style.objectFit = 'cover';
+            
+            const cameraView = document.getElementById('camera-view');
+            cameraView.innerHTML = '';
+            cameraView.appendChild(img);
+            
+            // متوقف کردن دوربین
+            if (window.cameraStream) {
+                window.cameraStream.getTracks().forEach(track => track.stop());
+            }
+            
+            document.getElementById('reset').disabled = false;
+            document.getElementById('capture').disabled = true;
+            
+            // شبیه‌سازی پردازش تصویر
+            simulateImageProcessing();
+        }
+        
+        // بازنشانی دوربین
+        function resetCamera() {
+            const cameraView = document.getElementById('camera-view');
+            cameraView.innerHTML = `
+                <div style="text-align: center; padding: 20px;">
+                    <p>📷 دوربین در حال راه‌اندازی...</p>
+                    <p>برای شروع، دکمه "فعال کردن دوربین" را بزنید.</p>
+                </div>
+            `;
+            
+            document.getElementById('start-camera').disabled = false;
+            document.getElementById('capture').disabled = true;
+            document.getElementById('reset').disabled = true;
+            
+            // پاک کردن نتایج
+            document.getElementById('answers-container').innerHTML = '';
+        }
+        
+        // شبیه‌سازی پردازش تصویر
+        function simulateImageProcessing() {
+            const loading = document.createElement('div');
+            loading.innerHTML = `
+                <div style="text-align: center; padding: 20px;">
+                    <p>🔍 در حال پردازش تصویر...</p>
+                    <p>لطفاً چند ثانیه منتظر بمانید.</p>
+                </div>
+            `;
+            
+            const cameraView = document.getElementById('camera-view');
+            cameraView.appendChild(loading);
+            
+            setTimeout(() => {
+                const answers = [];
+                for (let i = 1; i <= 20; i++) {
+                    answers.push(Math.floor(Math.random() * 4) + 1);
+                }
+                
+                displayResults(answers);
+            }, 3000);
+        }
+        
+        // نمایش نتایج
+        function displayResults(answers) {
+            const answersContainer = document.getElementById('answers-container');
+            answersContainer.innerHTML = '';
+            
+            answers.forEach((answer, index) => {
+                const answerItem = document.createElement('div');
+                answerItem.className = 'answer-item';
+                
+                // شبیه‌سازی پاسخ صحیح (گزینه 2 برای همه سوالات)
+                const correctAnswer = 2;
+                const isCorrect = answer === correctAnswer;
+                
+                if (isCorrect) {
+                    answerItem.classList.add('correct');
+                    answerItem.innerHTML = `
+                        <div>سوال ${index + 1}</div>
+                        <div>✓ ${answer}</div>
+                    `;
+                } else {
+                    answerItem.classList.add('incorrect');
+                    answerItem.innerHTML = `
+                        <div>سوال ${index + 1}</div>
+                        <div>✗ ${answer} (صحیح: ${correctAnswer})</div>
+                    `;
+                }
+                
+                answersContainer.appendChild(answerItem);
+            });
+        }
+        
+        // راهنمای نصب PWA
+        function showPWAInstallPrompt() {
+            if (window.deferredPrompt) {
+                window.deferredPrompt.prompt();
+                window.deferredPrompt.userChoice.then(choiceResult => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('User accepted the install prompt');
+                    }
+                    window.deferredPrompt = null;
+                });
+            }
+        }
+        
+        // رویدادهای دکمه‌ها
+        document.getElementById('start-camera').addEventListener('click', setupCamera);
+        document.getElementById('capture').addEventListener('click', capturePhoto);
+        document.getElementById('reset').addEventListener('click', resetCamera);
+        
+        // بررسی پشتیبانی از دوربین هنگام بارگذاری صفحه
+        window.addEventListener('load', () => {
+            if (checkCameraSupport()) {
+                document.getElementById('start-camera').disabled = false;
+            }
+            
+            // نمایش اطلاعات میزبانی اگر از HTTPS استفاده نمی‌شود
+            if (location.protocol !== 'https:') {
+                document.querySelector('.hosting-info').style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
