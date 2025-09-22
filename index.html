@@ -414,7 +414,7 @@
             margin: 0 auto;
             background: white;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            padding: 5mm;
+            padding: 8mm;
             position: relative;
             overflow: hidden;
             min-height: 200mm;
@@ -424,21 +424,21 @@
             text-align: center;
             font-size: 14px;
             font-weight: bold;
-            margin-bottom: 3px;
+            margin-bottom: 5px;
             color: var(--primary);
         }
         
         .answer-sheet-header {
             text-align: center;
-            margin-bottom: 8px;
-            padding-bottom: 3px;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
             border-bottom: 1px solid var(--primary);
         }
         
         .answer-sheet-header h1 {
             font-size: 16px;
             color: var(--primary);
-            margin-bottom: 2px;
+            margin-bottom: 3px;
         }
         
         .answer-sheet-header p {
@@ -449,9 +449,9 @@
         .student-info {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 3px;
-            margin-bottom: 8px;
-            font-size: 11px;
+            gap: 5px;
+            margin-bottom: 10px;
+            font-size: 12px;
         }
         
         .info-item {
@@ -460,63 +460,62 @@
         }
         
         .info-item label {
-            width: 90px;
+            width: 100px;
             font-weight: bold;
             color: #444;
-            font-size: 10px;
+            font-size: 11px;
         }
         
         .info-item span {
             flex: 1;
             border-bottom: 1px dashed #999;
             padding: 0 3px;
-            height: 16px;
+            height: 18px;
         }
         
         /* Ultra compact two column questions layout */
         .questions-two-column {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 4px;
-            margin-top: 8px;
+            gap: 8px;
+            margin-top: 10px;
         }
         
         .question-column {
             display: flex;
             flex-direction: column;
-            gap: 3px;
+            gap: 6px;
         }
         
         .question-vertical {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 1px 0;
-            height: 20px;
+            padding: 3px 0;
         }
         
         .question-number {
-            font-size: 10px;
+            font-size: 11px;
             font-weight: bold;
             color: #444;
-            width: 15px;
+            width: 18px;
             text-align: left;
         }
         
         .options-horizontal {
             display: flex;
-            gap: 3px;
+            gap: 6px;
         }
         
         .option {
-            width: 14px;
-            height: 14px;
+            width: 16px;
+            height: 16px;
             border: 1px solid #333;
             border-radius: 2px;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 8px;
+            font-size: 9px;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -533,32 +532,32 @@
         }
         
         .instructions {
-            margin-top: 10px;
-            padding: 4px;
+            margin-top: 15px;
+            padding: 6px;
             border: 1px solid #ddd;
             border-radius: 4px;
             background-color: #f9f9f9;
-            font-size: 9px;
+            font-size: 10px;
         }
         
         .instructions h3 {
-            font-size: 10px;
+            font-size: 11px;
             color: var(--primary);
-            margin-bottom: 2px;
+            margin-bottom: 4px;
         }
         
         .instructions ul {
             padding-right: 10px;
-            line-height: 1.3;
+            line-height: 1.4;
         }
         
         .sheet-footer {
-            margin-top: 8px;
+            margin-top: 12px;
             text-align: center;
-            font-size: 8px;
+            font-size: 9px;
             color: #777;
             border-top: 1px solid #eee;
-            padding-top: 3px;
+            padding-top: 5px;
         }
         
         .sheet-controls {
@@ -628,7 +627,7 @@
             }
             
             .a5-container {
-                padding: 4mm;
+                padding: 6mm;
             }
             
             .questions-two-column {
@@ -658,18 +657,18 @@
             }
             
             .options-horizontal {
-                gap: 2px;
+                gap: 4px;
             }
             
             .option {
-                width: 12px;
-                height: 12px;
-                font-size: 7px;
+                width: 14px;
+                height: 14px;
+                font-size: 8px;
             }
             
             .question-number {
-                width: 14px;
-                font-size: 9px;
+                width: 16px;
+                font-size: 10px;
             }
         }
         
@@ -713,7 +712,7 @@
             
             .a5-container {
                 box-shadow: none !important;
-                padding: 4mm !important;
+                padding: 8mm !important;
                 max-width: 100% !important;
                 min-height: 200mm !important;
                 margin: 0 !important;
@@ -729,73 +728,81 @@
                 padding: 0;
             }
             
-            /* Ultra compact for print */
-            .school-name {
-                font-size: 12px !important;
-                margin-bottom: 2px !important;
-            }
-            
-            .answer-sheet-header {
-                margin-bottom: 6px !important;
-            }
-            
-            .answer-sheet-header h1 {
-                font-size: 14px !important;
-            }
-            
-            .answer-sheet-header p {
-                font-size: 10px !important;
-            }
-            
-            .student-info {
-                margin-bottom: 6px !important;
-                gap: 2px !important;
-                font-size: 9px !important;
-            }
-            
-            .info-item label {
-                width: 80px !important;
-                font-size: 9px !important;
-            }
-            
+            /* حفظ چیدمان دو ستونی در حالت چاپ */
             .questions-two-column {
-                gap: 3px !important;
-                margin-top: 6px !important;
+                display: grid !important;
+                grid-template-columns: 1fr 1fr !important;
+                gap: 8px !important;
+                margin-top: 10px !important;
             }
             
             .question-column {
-                gap: 2px !important;
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 6px !important;
             }
             
             .question-vertical {
-                padding: 0 !important;
-                height: 16px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                padding: 3px 0 !important;
             }
             
             .question-number {
-                font-size: 8px !important;
-                width: 12px !important;
+                font-size: 11px !important;
+                width: 18px !important;
             }
             
             .options-horizontal {
-                gap: 2px !important;
+                display: flex !important;
+                gap: 6px !important;
             }
             
             .option {
-                width: 12px !important;
-                height: 12px !important;
-                font-size: 7px !important;
+                width: 16px !important;
+                height: 16px !important;
+                font-size: 9px !important;
+            }
+            
+            /* Ultra compact for print */
+            .school-name {
+                font-size: 14px !important;
+                margin-bottom: 5px !important;
+            }
+            
+            .answer-sheet-header {
+                margin-bottom: 10px !important;
+            }
+            
+            .answer-sheet-header h1 {
+                font-size: 16px !important;
+            }
+            
+            .answer-sheet-header p {
+                font-size: 12px !important;
+            }
+            
+            .student-info {
+                margin-bottom: 10px !important;
+                gap: 5px !important;
+                font-size: 12px !important;
+            }
+            
+            .info-item label {
+                width: 100px !important;
+                font-size: 11px !important;
             }
             
             .instructions {
-                margin-top: 8px !important;
-                padding: 3px !important;
-                font-size: 8px !important;
+                margin-top: 15px !important;
+                padding: 6px !important;
+                font-size: 10px !important;
             }
             
             .sheet-footer {
-                margin-top: 6px !important;
-                font-size: 7px !important;
+                margin-top: 12px !important;
+                font-size: 9px !important;
             }
         }
     </style>
@@ -919,15 +926,15 @@
                 <div class="config-form">
                     <div class="form-group">
                         <label for="school-name">نام مدرسه:</label>
-                        <input type="text" id="school-name" value="دبیرستان نمونه دولتی امام صادق">
+                        <input type="text" id="school-name" value="هنرستان فنی ماندگار شهید بهشتی">
                     </div>
                     <div class="form-group">
                         <label for="exam-title">عنوان آزمون:</label>
-                        <input type="text" id="exam-title" value="آزمون پایانی ریاضی">
+                        <input type="text" id="exam-title" value="آزمون پایان پودمان">
                     </div>
                     <div class="form-group">
                         <label for="course-name">نام درس:</label>
-                        <input type="text" id="course-name" value="ریاضی عمومی">
+                        <input type="text" id="course-name" value="شیمی فنی">
                     </div>
                     <div class="form-group">
                         <label for="exam-date">تاریخ برگزاری:</label>
@@ -946,11 +953,11 @@
             </div>
             
             <div class="a5-container">
-                <div class="school-name" id="school-name-display">دبیرستان نمونه دولتی امام صادق</div>
+                <div class="school-name" id="school-name-display">هنرستان فنی ماندگار شهید بهشتی دورود</div>
                 
                 <div class="answer-sheet-header">
-                    <h1 id="sheet-title">آزمون پایانی ریاضی</h1>
-                    <p id="sheet-details">درس: ریاضی عمومی | تاریخ: ۱۴۰۳/۰۳/۱۵</p>
+                    <h1 id="sheet-title">آزمون پایان پودمان</h1>
+                    <p id="sheet-details">درس:شیمی فنی | تاریخ: ۱۴۰۳/۰۳/۱۵</p>
                 </div>
                 
                 <div class="student-info">
