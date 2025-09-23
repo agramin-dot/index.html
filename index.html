@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>اپلیکیشن تصحیح پاسخنامه پیشرفته - نسخه بهبود یافته</title>
+    <title>اپلیکیشن تصحیح پاسخنامه پیشرفته</title>
     <meta name="theme-color" content="#4a00e0">
     <style>
         * {
@@ -872,7 +872,7 @@
     <div class="container">
         <header>
             <div class="logo">✓</div>
-            <h1>اپلیکیشن تصحیح پاسخنامه پیشرفته - نسخه بهبود یافته</h1>
+            <h1>اپلیکیشن تصحیح پاسخنامه پیشرفته</h1>
             <p>سیستم تصحیح خودکار با تشخیص نشانگر و عکس‌برداری خودکار</p>
         </header>
         
@@ -942,7 +942,7 @@
                 </div>
                 
                 <div style="margin-top: 10px; font-size: 0.8rem; color: #666;">
-                    <p><strong>نکته:</strong> پس از فعال شدن دوربین، سیستم به طور خودکار پاسخنامه را اسکن می‌کند. در صورت عدم موفقیت، از دکمه عکس‌برداری دستی استفاده کنید.</p>
+                    <p><strong>نکته:</strong> پس از فعال شدن دوربین، سیستم به طور خودکار پاسخنامه را اسکن می‌کند.</p>
                 </div>
             </div>
             
@@ -1195,9 +1195,8 @@
         let exams = JSON.parse(localStorage.getItem('exams')) || [];
         let selectedExam = null;
         let autoCaptureInterval = null;
-        let isAutoCaptureEnabled = false;
         let captureAttempts = 0;
-        const maxCaptureAttempts = 30; // حداکثر تلاش برای تشخیص خودکار
+        const maxCaptureAttempts = 30;
         
         // Create a new exam
         function createExam() {
@@ -1211,21 +1210,11 @@
             }
             
             const answerKey = [];
-            let hasEmptyAnswers = false;
             
             for (let i = 1; i <= count; i++) {
                 const select = document.getElementById(`new-exam-answer-inputs-answer-${i}`);
                 if (select) {
-                    if (!select.value) {
-                        hasEmptyAnswers = true;
-                    }
                     answerKey.push(select.value || '');
-                }
-            }
-            
-            if (hasEmptyAnswers) {
-                if (!confirm('برخی سوالات پاسخ ندارند. آیا می‌خواهید ادامه دهید؟')) {
-                    return;
                 }
             }
             
@@ -1393,7 +1382,6 @@
             const container = document.getElementById(containerId);
             container.innerHTML = '';
             
-            // ایجاد یک grid برای نمایش بهتر
             container.style.cssText = 'display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;';
             
             for (let i = 1; i <= count; i++) {
@@ -1560,11 +1548,11 @@
                 const studentAnswer = studentAnswers[i] || '';
                 
                 // بهبود دقت بر اساس کیفیت تشخیص نشانگر
-                const baseAccuracy = 0.85; // افزایش دقت پایه
+                const baseAccuracy = 0.85;
                 const markerBoost = markerDetectionQuality * 0.15;
-                const accuracy = Math.min(0.98, baseAccuracy + markerBoost); // حداکثر دقت 98%
+                const accuracy = Math.min(0.98, baseAccuracy + markerBoost);
                 
-                let confidence = Math.random() * 15 + 85; // افزایش دقت کلی
+                let confidence = Math.random() * 15 + 85;
                 if (markerDetectionQuality < 0.5) {
                     confidence = Math.random() * 20 + 80;
                 }
@@ -1588,8 +1576,7 @@
                     detectedAnswer = studentAnswer;
                     confidence += 5;
                 } else {
-                    // اگر تشخیص نادرست باشد، شانس بیشتری برای تشخیص صحیح وجود دارد
-                    if (Math.random() < 0.3) { // 30% شانس تشخیص صحیح حتی با خطا
+                    if (Math.random() < 0.3) {
                         status = 'correct';
                         correctCount++;
                         detectedAnswer = correctAnswer;
@@ -1603,7 +1590,7 @@
                     confidence -= 10;
                 }
                 
-                confidence = Math.max(60, Math.min(100, confidence)); // محدوده دقت 60-100%
+                confidence = Math.max(60, Math.min(100, confidence));
                 
                 results.push({
                     question: questionNumber,
@@ -1639,12 +1626,10 @@
             const options = ['الف', 'ب', 'ج', 'د', ''];
             const studentAnswers = [];
             
-            // افزایش نرخ پاسخ‌دهی با کیفیت بهتر نشانگر
             const baseAnswerRate = 0.85;
             const markerBoost = markerQuality * 0.1;
             const answerRate = Math.min(0.95, baseAnswerRate + markerBoost);
             
-            // افزایش احتمال پاسخ صحیح با کیفیت بهتر نشانگر
             const baseCorrectBias = 0.3;
             const correctBiasBoost = markerQuality * 0.3;
             const correctBias = Math.min(0.7, baseCorrectBias + correctBiasBoost);
@@ -1652,10 +1637,8 @@
             for (let i = 0; i < questionCount; i++) {
                 if (Math.random() < answerRate) {
                     if (Math.random() < correctBias) {
-                        // پاسخ صحیح
                         studentAnswers.push(options[i % 4]);
                     } else {
-                        // پاسخ تصادفی
                         const randomIndex = Math.floor(Math.random() * 4);
                         studentAnswers.push(options[randomIndex]);
                     }
@@ -1669,10 +1652,9 @@
         
         // بهبود شبیه‌سازی تشخیص نشانگر
         function simulateMarkerDetection(imageData) {
-            // شبیه‌سازی کیفیت بر اساس تراز بودن و شرایط نوری
-            const alignment = 0.8 + Math.random() * 0.2; // بهبود تراز
-            const lighting = 0.7 + Math.random() * 0.3; // بهبود شرایط نوری
-            const focus = 0.75 + Math.random() * 0.25; // بهبود فوکوس
+            const alignment = 0.8 + Math.random() * 0.2;
+            const lighting = 0.7 + Math.random() * 0.3;
+            const focus = 0.75 + Math.random() * 0.25;
             
             const quality = (alignment + lighting + focus) / 3;
             return Math.round(quality * 100) / 100;
@@ -1690,24 +1672,19 @@
             autoCaptureInterval = setInterval(() => {
                 captureAttempts++;
                 
-                // شبیه‌سازی تشخیص نشانگرها با بهبود الگوریتم
-                const markerQuality = 0.6 + Math.random() * 0.4; // افزایش کیفیت پایه
+                const markerQuality = 0.6 + Math.random() * 0.4;
                 
-                // نمایش وضعیت تشخیص
                 autoCaptureInfo.innerHTML = `<strong>در حال جستجو برای نشانگرها...</strong> (تلاش ${toPersianNumber(captureAttempts)} از ${toPersianNumber(maxCaptureAttempts)})`;
                 
-                // اگر کیفیت تشخیص بالا باشد یا به حداکثر تلاش رسیده باشیم، عکس بگیر
                 if (markerQuality > 0.85 || captureAttempts >= maxCaptureAttempts) {
                     clearInterval(autoCaptureInterval);
                     
-                    // نمایش دکمه عکس‌برداری دستی اگر تشخیص خودکار موفق نبود
                     if (markerQuality <= 0.85 && captureAttempts >= maxCaptureAttempts) {
                         autoCaptureInfo.innerHTML = '<strong>تشخیص خودکار ناموفق بود. لطفاً از دکمه عکس‌برداری دستی استفاده کنید.</strong>';
                         document.getElementById('capture-manual').style.display = 'block';
                         return;
                     }
                     
-                    // اگر آزمونی انتخاب شده باشد، عکس بگیر و پردازش کن
                     if (selectedExam) {
                         autoCaptureInfo.innerHTML = '<strong>نشانگرها شناسایی شدند! در حال عکس‌برداری...</strong>';
                         setTimeout(() => {
@@ -1730,7 +1707,6 @@
             
             const imageData = canvas.toDataURL('image/jpeg', 0.9);
             
-            // نمایش تصویر گرفته شده
             const image = new Image();
             image.src = imageData;
             image.style.width = '100%';
@@ -1739,16 +1715,13 @@
             cameraView.innerHTML = '';
             cameraView.appendChild(image);
             
-            // توقف دوربین
             if (window.stream) {
                 window.stream.getTracks().forEach(track => track.stop());
             }
             
-            // مخفی کردن دکمه‌ها
             document.getElementById('start-camera').style.display = 'none';
             document.getElementById('capture-manual').style.display = 'none';
             
-            // شروع پردازش
             processImage(imageData);
         }
         
@@ -1789,7 +1762,6 @@
                         loadingOverlay.style.display = 'none';
                         document.getElementById('results-section').style.display = 'block';
                         
-                        // شبیه‌سازی پردازش تصویر با الگوریتم بهبود یافته
                         const markerQuality = simulateMarkerDetection(imageData);
                         const studentAnswers = simulateAnswerReadingWithMarkers(
                             selectedExam.questionCount, 
@@ -1802,7 +1774,6 @@
                             markerQuality
                         );
                         
-                        // نمایش نتایج
                         displayResults(gradingResult);
                     }, 500);
                 }
@@ -1909,7 +1880,6 @@
             const startCameraBtn = document.getElementById('start-camera');
             const captureManualBtn = document.getElementById('capture-manual');
             const resetBtn = document.getElementById('reset');
-            const autoCaptureInfo = document.getElementById('auto-capture-info');
             
             let stream = null;
             
@@ -1954,8 +1924,7 @@
                     });
                     
                     startCameraBtn.disabled = true;
-                    autoCaptureInfo.style.display = 'block';
-                    autoCaptureInfo.innerHTML = '<strong>سیستم فعال شد:</strong> در حال جستجو برای نشانگرها...';
+                    document.getElementById('auto-capture-info').style.display = 'block';
                     
                     // نمایش دکمه عکس‌برداری دستی
                     captureManualBtn.style.display = 'block';
@@ -1996,8 +1965,7 @@
                         });
                         
                         startCameraBtn.disabled = true;
-                        autoCaptureInfo.style.display = 'block';
-                        autoCaptureInfo.innerHTML = '<strong>سیستم فعال شد:</strong> در حال جستجو برای نشانگرها...';
+                        document.getElementById('auto-capture-info').style.display = 'block';
                         
                         // نمایش دکمه عکس‌برداری دستی
                         captureManualBtn.style.display = 'block';
@@ -2051,7 +2019,7 @@
                 startCameraBtn.disabled = false;
                 startCameraBtn.style.display = 'block';
                 captureManualBtn.style.display = 'none';
-                autoCaptureInfo.style.display = 'none';
+                document.getElementById('auto-capture-info').style.display = 'none';
                 document.getElementById('results-section').style.display = 'none';
                 stream = null;
                 captureAttempts = 0;
