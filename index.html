@@ -22,7 +22,7 @@
             --success: #28a745;
             --danger: #dc3545;
             --warning: #ffc107;
-            --marker-color: #ff3b30;
+            --marker-color: #000000; /* تغییر از قرمز به سیاه */
         }
         
         body {
@@ -276,6 +276,17 @@
             background: #e0a800;
         }
         
+        .auto-capture-info {
+            background: #e8f5e9;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #2e7d32;
+            display: none;
+        }
+        
         .results-section {
             background: #f0f9ff;
             padding: 20px;
@@ -451,7 +462,7 @@
             min-height: 200mm;
         }
         
-        /* Markers for answer sheet */
+        /* Markers for answer sheet - سیاه برای چاپ */
         .sheet-marker {
             position: absolute;
             width: 15px;
@@ -535,41 +546,44 @@
             height: 18px;
         }
         
-        /* Questions layout */
-        .questions-container {
-            margin-top: 10px;
-        }
-        
-        .questions-grid {
+        /* طراحی جدید دو ستونی برای سوالات */
+        .questions-two-column {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 5px;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
         }
         
-        .question-row {
+        .question-column {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .question-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 3px 0;
+            padding: 5px 0;
             border-bottom: 1px dotted #eee;
         }
         
         .question-number {
-            font-size: 11px;
+            font-size: 12px;
             font-weight: bold;
             color: #444;
-            width: 20px;
+            width: 25px;
             text-align: center;
         }
         
         .options-container {
             display: flex;
-            gap: 8px;
+            gap: 10px;
         }
         
-        .option-circle {
-            width: 18px;
-            height: 18px;
+        .option-bubble {
+            width: 20px;
+            height: 20px;
             border: 1.5px solid #333;
             border-radius: 50%;
             display: flex;
@@ -580,58 +594,13 @@
             position: relative;
         }
         
-        .option-circle.filled::after {
+        .option-bubble.filled::after {
             content: '';
             position: absolute;
-            width: 12px;
-            height: 12px;
+            width: 14px;
+            height: 14px;
             background: #000;
             border-radius: 50%;
-        }
-        
-        .bubble-columns {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 5px;
-            margin-top: 15px;
-        }
-        
-        .bubble-column {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 3px;
-        }
-        
-        .bubble-row {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        .bubble-number {
-            font-size: 10px;
-            width: 15px;
-            text-align: center;
-        }
-        
-        .bubble {
-            width: 16px;
-            height: 16px;
-            border: 1px solid #333;
-            border-radius: 50%;
-            position: relative;
-        }
-        
-        .bubble.filled::after {
-            content: '';
-            position: absolute;
-            width: 12px;
-            height: 12px;
-            background: #000;
-            border-radius: 50%;
-            top: 2px;
-            left: 2px;
         }
         
         .instructions {
@@ -820,6 +789,26 @@
                 box-sizing: border-box !important;
                 background: white !important;
                 font-size: 14px !important;
+                color: black !important; /* تضمین چاپ سیاه و سفید */
+            }
+            
+            /* تمام رنگ‌ها برای چاپ سیاه و سفید بهینه شده‌اند */
+            .sheet-marker {
+                background: black !important;
+                border-color: white !important;
+                box-shadow: 0 0 0 2px black !important;
+            }
+            
+            .school-name, .answer-sheet-header h1 {
+                color: black !important;
+            }
+            
+            .option-bubble {
+                border-color: black !important;
+            }
+            
+            .option-bubble.filled::after {
+                background: black !important;
             }
             
             @page {
@@ -833,22 +822,17 @@
                 height: 12px !important;
             }
             
-            .questions-grid {
-                gap: 3px !important;
+            .questions-two-column {
+                gap: 5px !important;
             }
             
-            .question-row {
-                padding: 2px 0 !important;
+            .question-item {
+                padding: 3px 0 !important;
             }
             
-            .option-circle {
+            .option-bubble {
                 width: 16px !important;
                 height: 16px !important;
-            }
-            
-            .bubble {
-                width: 14px !important;
-                height: 14px !important;
             }
         }
         
@@ -862,12 +846,8 @@
                 padding: 6mm;
             }
             
-            .questions-grid {
+            .questions-two-column {
                 grid-template-columns: 1fr;
-            }
-            
-            .bubble-columns {
-                grid-template-columns: repeat(2, 1fr);
             }
         }
         
@@ -883,10 +863,6 @@
             .student-info {
                 grid-template-columns: 1fr;
             }
-            
-            .bubble-columns {
-                grid-template-columns: 1fr;
-            }
         }
     </style>
 </head>
@@ -895,7 +871,7 @@
         <header>
             <div class="logo">✓</div>
             <h1>اپلیکیشن تصحیح پاسخنامه پیشرفته</h1>
-            <p>سیستم تصحیح خودکار با دقت بالا با استفاده از نشانگرهای بصری</p>
+            <p>سیستم تصحیح خودکار با تشخیص نشانگر و عکس‌برداری خودکار</p>
         </header>
         
         <div class="tabs">
@@ -925,13 +901,15 @@
             </div>
             
             <div class="camera-section">
-                <h3>📷 اسکن پاسخنامه دانشجو</h3>
-                <p style="margin-bottom: 10px; color: #666; font-size: 0.9rem;">لطفاً پاسخنامه را طوری قرار دهید که چهار نشانگر قرمز رنگ در چهار گوشه دیده شوند</p>
+                <h3>📷 اسکن خودکار پاسخنامه</h3>
+                <div class="auto-capture-info" id="auto-capture-info">
+                    <strong>سیستم فعال شد:</strong> با قرارگیری پاسخنامه در کادر، به طور خودکار عکس گرفته و پردازش می‌شود
+                </div>
                 
                 <div id="camera-view">
                     <div class="placeholder-text">
                         <p>برای شروع، دوربین را فعال کنید</p>
-                        <p>پاسخنامه را طوری قرار دهید که نشانگرهای قرمز در چهار گوشه دیده شوند</p>
+                        <p>پاسخنامه را طوری قرار دهید که نشانگرهای سیاه در چهار گوشه دیده شوند</p>
                     </div>
                     <div class="camera-overlay"></div>
                     <div class="marker-indicator top-left"></div>
@@ -942,7 +920,7 @@
                     <div class="alignment-guide alignment-vertical"></div>
                     <div class="loading">
                         <div class="spinner"></div>
-                        <p>در حال پردازش تصویر و شناسایی نشانگرها</p>
+                        <p id="processing-text">در حال پردازش تصویر و شناسایی نشانگرها</p>
                         <div class="progress-bar">
                             <div class="progress" id="processing-progress"></div>
                         </div>
@@ -953,15 +931,13 @@
                     <button id="start-camera" class="btn-primary">
                         فعال کردن دوربین
                     </button>
-                    <button id="capture" class="btn-secondary" disabled>
-                        عکس‌برداری
-                    </button>
-                    <button id="process" class="btn-success" disabled>
-                        پردازش خودکار
-                    </button>
                     <button id="reset" class="btn-danger">
                         بازنشانی
                     </button>
+                </div>
+                
+                <div style="margin-top: 10px; font-size: 0.8rem; color: #666;">
+                    <p><strong>نکته:</strong> پس از فعال شدن دوربین، سیستم به طور خودکار پاسخنامه را اسکن می‌کند. نیازی به فشار دادن دکمه‌های اضافی نیست.</p>
                 </div>
             </div>
             
@@ -1088,7 +1064,7 @@
             
             <!-- Single answer sheet for web view -->
             <div class="a5-container">
-                <!-- Markers for alignment -->
+                <!-- Markers for alignment - سیاه برای چاپ بهتر -->
                 <div class="sheet-marker tl"></div>
                 <div class="sheet-marker tr"></div>
                 <div class="sheet-marker bl"></div>
@@ -1120,15 +1096,9 @@
                     </div>
                 </div>
                 
-                <div class="questions-container">
-                    <div class="questions-grid" id="questions-grid">
-                        <!-- Questions will be generated here -->
-                    </div>
-                    
-                    <!-- Bubble sheet for easier scanning -->
-                    <div class="bubble-columns" id="bubble-columns">
-                        <!-- Bubble answers will be generated here -->
-                    </div>
+                <!-- طراحی جدید دو ستونی -->
+                <div class="questions-two-column" id="questions-two-column">
+                    <!-- Questions will be generated here in two columns -->
                 </div>
                 
                 <div class="instructions">
@@ -1186,7 +1156,7 @@
         </div>
         
         <footer class="no-print">
-            <p>ساخته شده با ❤️ | نسخه ۵.۰.۰ | سیستم تصحیح خودکار با نشانگرهای بصری</p>
+            <p>ساخته شده با ❤️ | نسخه ۵.۱.۰ | سیستم تصحیح خودکار با عکس‌برداری اتوماتیک</p>
         </footer>
     </div>
 
@@ -1219,6 +1189,8 @@
         // Exam management functionality
         let exams = JSON.parse(localStorage.getItem('exams')) || [];
         let selectedExam = null;
+        let autoCaptureInterval = null;
+        let isAutoCaptureEnabled = false;
         
         // Create a new exam
         function createExam() {
@@ -1461,10 +1433,10 @@
             initializeAnswerKey('new-exam-answer-inputs', count);
         }
         
-        // Generate questions for answer sheet
+        // Generate questions for answer sheet (two columns)
         function generateQuestions(count) {
-            const grid = document.getElementById('questions-grid');
-            grid.innerHTML = '';
+            const container = document.getElementById('questions-two-column');
+            container.innerHTML = '';
             
             const questionsPerColumn = Math.ceil(count / 2);
             const options = ['الف', 'ب', 'ج', 'د'];
@@ -1477,78 +1449,33 @@
                 const endQuestion = Math.min((col + 1) * questionsPerColumn, count);
                 
                 for (let i = startQuestion; i <= endQuestion; i++) {
-                    const questionRow = document.createElement('div');
-                    questionRow.className = 'question-row';
+                    const questionItem = document.createElement('div');
+                    questionItem.className = 'question-item';
                     
-                    questionRow.innerHTML = `
+                    questionItem.innerHTML = `
                         <div class="question-number">${toPersianNumber(i)}</div>
                         <div class="options-container">
                             ${options.map(opt => `
-                                <div class="option-circle">${opt}</div>
+                                <div class="option-bubble">${opt}</div>
                             `).join('')}
                         </div>
                     `;
                     
-                    column.appendChild(questionRow);
+                    column.appendChild(questionItem);
                 }
                 
-                grid.appendChild(column);
-            }
-            
-            // Generate bubble sheet
-            generateBubbleSheet(count);
-        }
-        
-        // Generate bubble answer sheet
-        function generateBubbleSheet(count) {
-            const bubbleColumns = document.getElementById('bubble-columns');
-            bubbleColumns.innerHTML = '';
-            
-            const questionsPerColumn = Math.ceil(count / 4);
-            const options = ['الف', 'ب', 'ج', 'د'];
-            
-            for (let col = 0; col < 4; col++) {
-                const bubbleColumn = document.createElement('div');
-                bubbleColumn.className = 'bubble-column';
-                
-                const startQuestion = col * questionsPerColumn + 1;
-                const endQuestion = Math.min((col + 1) * questionsPerColumn, count);
-                
-                for (let i = startQuestion; i <= endQuestion; i++) {
-                    const bubbleRow = document.createElement('div');
-                    bubbleRow.className = 'bubble-row';
-                    
-                    bubbleRow.innerHTML = `
-                        <div class="bubble-number">${toPersianNumber(i)}</div>
-                        ${options.map(opt => `
-                            <div class="bubble" data-question="${i}" data-option="${opt}"></div>
-                        `).join('')}
-                    `;
-                    
-                    bubbleColumn.appendChild(bubbleRow);
-                }
-                
-                bubbleColumns.appendChild(bubbleColumn);
+                container.appendChild(column);
             }
         }
         
         // Simulate a filled answer sheet
         function simulateFilledSheet() {
-            const bubbles = document.querySelectorAll('.bubble');
+            const bubbles = document.querySelectorAll('.option-bubble');
             bubbles.forEach(bubble => {
                 if (Math.random() > 0.7) {
                     bubble.classList.add('filled');
                 } else {
                     bubble.classList.remove('filled');
-                }
-            });
-            
-            const circles = document.querySelectorAll('.option-circle');
-            circles.forEach(circle => {
-                if (Math.random() > 0.7) {
-                    circle.classList.add('filled');
-                } else {
-                    circle.classList.remove('filled');
                 }
             });
             
@@ -1623,16 +1550,15 @@
                 const studentAnswer = studentAnswers[i] || '';
                 
                 // Simulate marker-based accuracy improvement
-                const baseAccuracy = 0.7; // Base accuracy without markers
-                const markerBoost = markerDetectionQuality * 0.3; // Up to 30% improvement with good markers
+                const baseAccuracy = 0.7;
+                const markerBoost = markerDetectionQuality * 0.3;
                 const accuracy = baseAccuracy + markerBoost;
                 
-                let confidence = Math.random() * 20 + 80; // 80-100% confidence with markers
+                let confidence = Math.random() * 20 + 80;
                 if (markerDetectionQuality < 0.5) {
-                    confidence = Math.random() * 30 + 70; // 70-100% confidence with poor markers
+                    confidence = Math.random() * 30 + 70;
                 }
                 
-                // Determine if the reading is correct based on accuracy
                 const isCorrectlyRead = Math.random() < accuracy;
                 
                 let status, detectedAnswer;
@@ -1642,7 +1568,6 @@
                     detectedAnswer = '';
                     emptyCount++;
                 } else if (isCorrectlyRead) {
-                    // Correctly read the answer
                     if (studentAnswer === correctAnswer) {
                         status = 'correct';
                         correctCount++;
@@ -1651,24 +1576,23 @@
                         wrongCount++;
                     }
                     detectedAnswer = studentAnswer;
-                    confidence += 5; // Bonus for correct detection
+                    confidence += 5;
                 } else {
-                    // Misread the answer
                     const wrongOptions = ['الف', 'ب', 'ج', 'د'].filter(opt => opt !== studentAnswer);
                     const randomWrong = wrongOptions[Math.floor(Math.random() * wrongOptions.length)];
                     
                     if (randomWrong === correctAnswer) {
-                        status = 'correct'; // Accidentally correct
+                        status = 'correct';
                         correctCount++;
                     } else {
                         status = 'wrong';
                         wrongCount++;
                     }
                     detectedAnswer = randomWrong;
-                    confidence -= 15; // Penalty for misdetection
+                    confidence -= 15;
                 }
                 
-                confidence = Math.max(50, Math.min(100, confidence)); // Keep between 50-100%
+                confidence = Math.max(50, Math.min(100, confidence));
                 
                 results.push({
                     question: questionNumber,
@@ -1682,18 +1606,17 @@
                 confidenceScores.push(confidence);
             }
             
-            // Calculate average confidence
             const avgConfidence = confidenceScores.reduce((a, b) => a + b, 0) / confidenceScores.length;
             
-            // Calculate score out of 20
-            const rawScore = (correctCount - wrongCount) * (20 / examKey.length);
+            // Calculate score out of 20 (1 point for correct, -1 for wrong)
+            const rawScore = correctCount - wrongCount;
             const score = Math.max(0, Math.min(20, rawScore));
             
             return {
                 correctCount,
                 wrongCount,
                 emptyCount,
-                score: Math.round(score * 100) / 100, // Round to 2 decimal places
+                score: Math.round(score * 100) / 100,
                 results,
                 accuracy: Math.round(avgConfidence * 10) / 10
             };
@@ -1705,18 +1628,16 @@
             const studentAnswers = [];
             
             for (let i = 0; i < questionCount; i++) {
-                // Higher chance of correct reading with good marker detection
                 const baseAnswerRate = 0.8;
-                const markerBoost = markerQuality * 0.15; // Up to 15% improvement
+                const markerBoost = markerQuality * 0.15;
                 const answerRate = baseAnswerRate + markerBoost;
                 
                 if (Math.random() < answerRate) {
-                    // If answered, higher chance of correct option with good markers
-                    const correctBias = 0.1 + (markerQuality * 0.2); // 10-30% bias toward correct option
+                    const correctBias = 0.1 + (markerQuality * 0.2);
                     const optionIndex = Math.random() < correctBias ? 0 : Math.floor(Math.random() * 4);
                     studentAnswers.push(options[optionIndex]);
                 } else {
-                    studentAnswers.push(''); // Empty answer
+                    studentAnswers.push('');
                 }
             }
             
@@ -1725,15 +1646,195 @@
         
         // Simulate marker detection quality based on image
         function simulateMarkerDetection(imageData) {
-            // In a real app, this would analyze the image for markers
-            // For simulation, we'll return a quality score based on random factors
-            const alignment = 0.7 + Math.random() * 0.3; // 0.7-1.0
-            const lighting = 0.6 + Math.random() * 0.4; // 0.6-1.0
-            const focus = 0.5 + Math.random() * 0.5; // 0.5-1.0
+            // Simulate detection based on alignment and quality
+            const alignment = 0.7 + Math.random() * 0.3;
+            const lighting = 0.6 + Math.random() * 0.4;
+            const focus = 0.5 + Math.random() * 0.5;
             
-            // Calculate overall quality
             const quality = (alignment + lighting + focus) / 3;
             return Math.round(quality * 100) / 100;
+        }
+        
+        // Auto-capture functionality
+        function startAutoCapture(videoElement) {
+            if (autoCaptureInterval) {
+                clearInterval(autoCaptureInterval);
+            }
+            
+            let captureAttempts = 0;
+            const maxAttempts = 50; // حدود 10 ثانیه
+            
+            autoCaptureInterval = setInterval(() => {
+                captureAttempts++;
+                
+                // شبیه‌سازی تشخیص نشانگرها
+                const markerQuality = 0.5 + Math.random() * 0.5;
+                
+                // اگر کیفیت تشخیص بالا باشد، عکس بگیر
+                if (markerQuality > 0.7 || captureAttempts > maxAttempts) {
+                    clearInterval(autoCaptureInterval);
+                    
+                    // اگر آزمونی انتخاب شده باشد، عکس بگیر و پردازش کن
+                    if (selectedExam) {
+                        captureAndProcess(videoElement);
+                    } else {
+                        document.getElementById('auto-capture-info').innerHTML = 
+                            '<strong>خطا:</strong> لطفاً ابتدا یک آزمون انتخاب کنید';
+                    }
+                }
+            }, 200);
+        }
+        
+        // Capture and process image
+        function captureAndProcess(videoElement) {
+            const canvas = document.createElement('canvas');
+            canvas.width = videoElement.videoWidth;
+            canvas.height = videoElement.videoHeight;
+            const context = canvas.getContext('2d');
+            context.drawImage(videoElement, 0, 0);
+            
+            const imageData = canvas.toDataURL('image/jpeg', 0.9);
+            
+            // نمایش تصویر گرفته شده
+            const image = new Image();
+            image.src = imageData;
+            image.style.width = '100%';
+            
+            const cameraView = document.getElementById('camera-view');
+            cameraView.innerHTML = '';
+            cameraView.appendChild(image);
+            
+            // توقف دوربین
+            if (window.stream) {
+                window.stream.getTracks().forEach(track => track.stop());
+            }
+            
+            // شروع پردازش
+            processImage(imageData);
+        }
+        
+        // Process the captured image
+        function processImage(imageData) {
+            if (!selectedExam) {
+                alert('لطفاً یک آزمون انتخاب کنید.');
+                return;
+            }
+            
+            const loadingOverlay = document.querySelector('.loading');
+            const progressBar = document.getElementById('processing-progress');
+            const processingText = document.getElementById('processing-text');
+            
+            loadingOverlay.style.display = 'flex';
+            progressBar.style.width = '0%';
+            
+            const steps = [
+                'در حال شناسایی نشانگرها',
+                'در حال تراز کردن تصویر',
+                'در حال شناسایی حباب‌های پاسخ',
+                'در حال تطبیق با کلید آزمون',
+                'در حال محاسبه نتایج'
+            ];
+            
+            let currentStep = 0;
+            const totalSteps = steps.length;
+            
+            const processInterval = setInterval(() => {
+                currentStep++;
+                progressBar.style.width = `${(currentStep / totalSteps) * 100}%`;
+                processingText.textContent = steps[currentStep - 1];
+                
+                if (currentStep >= totalSteps) {
+                    clearInterval(processInterval);
+                    
+                    setTimeout(() => {
+                        loadingOverlay.style.display = 'none';
+                        document.getElementById('results-section').style.display = 'block';
+                        
+                        // شبیه‌سازی پردازش تصویر
+                        const markerQuality = simulateMarkerDetection(imageData);
+                        const studentAnswers = simulateAnswerReadingWithMarkers(
+                            selectedExam.questionCount, 
+                            markerQuality
+                        );
+                        
+                        const gradingResult = gradeExamWithMarkers(
+                            studentAnswers, 
+                            selectedExam.answerKey,
+                            markerQuality
+                        );
+                        
+                        // نمایش نتایج
+                        displayResults(gradingResult);
+                    }, 500);
+                }
+            }, 600);
+        }
+        
+        // Display grading results
+        function displayResults(gradingResult) {
+            document.getElementById('score').textContent = toPersianNumber(gradingResult.correctCount);
+            document.getElementById('total').textContent = toPersianNumber(selectedExam.questionCount);
+            document.getElementById('calculated-score').textContent = toPersianNumber(gradingResult.score);
+            document.getElementById('accuracy').textContent = toPersianNumber(gradingResult.accuracy) + '%';
+            
+            const answersGrid = document.getElementById('answers-grid');
+            answersGrid.innerHTML = '';
+            
+            gradingResult.results.forEach(result => {
+                const answerItem = document.createElement('div');
+                answerItem.className = 'answer-item';
+                
+                if (result.status === 'correct') {
+                    answerItem.classList.add('correct');
+                    answerItem.title = `سوال ${result.question}: پاسخ صحیح (دقت: ${result.confidence}%)`;
+                } else if (result.status === 'wrong') {
+                    answerItem.classList.add('incorrect');
+                    answerItem.title = `سوال ${result.question}: پاسخ نادرست. پاسخ صحیح: "${result.correctAnswer}" (دقت: ${result.confidence}%)`;
+                } else {
+                    answerItem.classList.add('empty');
+                    answerItem.title = `سوال ${result.question}: بدون پاسخ (دقت: ${result.confidence}%)`;
+                }
+                
+                answerItem.innerHTML = `
+                    ${toPersianNumber(result.question)}
+                    <div class="confidence-indicator">${result.confidence}%</div>
+                `;
+                answersGrid.appendChild(answerItem);
+            });
+            
+            const detailedResults = document.getElementById('detailed-results');
+            detailedResults.style.display = 'block';
+            
+            const correctAnswers = gradingResult.results.filter(r => r.status === 'correct');
+            const wrongAnswers = gradingResult.results.filter(r => r.status === 'wrong');
+            const emptyAnswers = gradingResult.results.filter(r => r.status === 'empty');
+            
+            document.getElementById('correct-answers-list').innerHTML = 
+                correctAnswers.map(a => `
+                    <div>${toPersianNumber(a.question)}: ${a.detectedAnswer} (${a.confidence}%)</div>
+                `).join('');
+            
+            document.getElementById('wrong-answers-list').innerHTML = 
+                wrongAnswers.map(a => `
+                    <div>${toPersianNumber(a.question)}: ${a.detectedAnswer} → ${a.correctAnswer} (${a.confidence}%)</div>
+                `).join('');
+            
+            document.getElementById('empty-answers-list').innerHTML = 
+                emptyAnswers.map(a => `
+                    <div>${toPersianNumber(a.question)}: بدون پاسخ (${a.confidence}%)</div>
+                `).join('');
+            
+            // اضافه کردن به تاریخچه
+            const historyItem = document.createElement('div');
+            historyItem.className = 'history-item';
+            historyItem.innerHTML = `
+                <div>${selectedExam.name} | ${new Date().toLocaleString('fa-IR')}</div>
+                <div class="history-score">
+                    ${toPersianNumber(gradingResult.correctCount)}/${toPersianNumber(selectedExam.questionCount)} 
+                    (نمره: ${toPersianNumber(gradingResult.score)})
+                </div>
+            `;
+            document.getElementById('history-list').prepend(historyItem);
         }
         
         // Initialize the app
@@ -1761,16 +1862,10 @@
             
             // Camera functionality
             const startCameraBtn = document.getElementById('start-camera');
-            const captureBtn = document.getElementById('capture');
-            const processBtn = document.getElementById('process');
             const resetBtn = document.getElementById('reset');
-            const cameraView = document.getElementById('camera-view');
-            const loadingOverlay = document.querySelector('.loading');
-            const resultsSection = document.getElementById('results-section');
-            const progressBar = document.getElementById('processing-progress');
+            const autoCaptureInfo = document.getElementById('auto-capture-info');
             
             let stream = null;
-            let currentImageData = null;
             
             startCameraBtn.addEventListener('click', async function() {
                 try {
@@ -1783,15 +1878,17 @@
                     };
                     
                     stream = await navigator.mediaDevices.getUserMedia(constraints);
+                    window.stream = stream;
+                    
                     const video = document.createElement('video');
                     video.srcObject = stream;
                     video.autoplay = true;
+                    
+                    const cameraView = document.getElementById('camera-view');
                     cameraView.innerHTML = '';
                     cameraView.appendChild(video);
-                    captureBtn.disabled = false;
-                    startCameraBtn.disabled = true;
                     
-                    // Add overlay and markers
+                    // اضافه کردن عناصر overlay
                     const overlay = document.createElement('div');
                     overlay.className = 'camera-overlay';
                     cameraView.appendChild(overlay);
@@ -1809,17 +1906,31 @@
                         guide.className = `alignment-guide ${type}`;
                         cameraView.appendChild(guide);
                     });
+                    
+                    startCameraBtn.disabled = true;
+                    autoCaptureInfo.style.display = 'block';
+                    autoCaptureInfo.innerHTML = '<strong>سیستم فعال شد:</strong> در حال جستجو برای نشانگرها...';
+                    
+                    // شروع جستجوی خودکار برای نشانگرها
+                    setTimeout(() => {
+                        startAutoCapture(video);
+                    }, 1000);
+                    
                 } catch (error) {
                     console.error('Error accessing camera:', error);
+                    
                     try {
+                        // Fallback به هر دوربین در دسترس
                         stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                        window.stream = stream;
+                        
                         const video = document.createElement('video');
                         video.srcObject = stream;
                         video.autoplay = true;
+                        
+                        const cameraView = document.getElementById('camera-view');
                         cameraView.innerHTML = '';
                         cameraView.appendChild(video);
-                        captureBtn.disabled = false;
-                        startCameraBtn.disabled = true;
                         
                         const overlay = document.createElement('div');
                         overlay.className = 'camera-overlay';
@@ -1831,172 +1942,37 @@
                             marker.className = `marker-indicator ${pos}`;
                             cameraView.appendChild(marker);
                         });
+                        
+                        startCameraBtn.disabled = true;
+                        autoCaptureInfo.style.display = 'block';
+                        autoCaptureInfo.innerHTML = '<strong>سیستم فعال شد:</strong> در حال جستجو برای نشانگرها...';
+                        
+                        setTimeout(() => {
+                            startAutoCapture(video);
+                        }, 1000);
+                        
                     } catch (fallbackError) {
                         alert('خطا در دسترسی به دوربین: ' + fallbackError.message);
                     }
                 }
             });
             
-            captureBtn.addEventListener('click', function() {
-                if (!stream) return;
-                
-                const video = cameraView.querySelector('video');
-                const canvas = document.createElement('canvas');
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                const context = canvas.getContext('2d');
-                context.drawImage(video, 0, 0);
-                
-                // Store image data for processing
-                currentImageData = canvas.toDataURL('image/jpeg', 0.9);
-                
-                const image = new Image();
-                image.src = currentImageData;
-                image.style.width = '100%';
-                cameraView.innerHTML = '';
-                cameraView.appendChild(image);
-                
-                stream.getTracks().forEach(track => track.stop());
-                processBtn.disabled = false;
-                captureBtn.disabled = true;
-            });
-            
-            processBtn.addEventListener('click', function() {
-                if (!selectedExam) {
-                    alert('لطفاً یک آزمون انتخاب کنید.');
-                    return;
-                }
-                
-                if (!currentImageData) {
-                    alert('لطفاً ابتدا از پاسخنامه عکس بگیرید.');
-                    return;
-                }
-                
-                loadingOverlay.style.display = 'flex';
-                progressBar.style.width = '0%';
-                
-                // Simulate processing steps
-                const steps = [
-                    'در حال شناسایی نشانگرها',
-                    'در حال تراز کردن تصویر',
-                    'در حال شناسایی حباب‌های پاسخ',
-                    'در حال تطبیق با کلید آزمون',
-                    'در حال محاسبه نتایج'
-                ];
-                
-                let currentStep = 0;
-                const totalSteps = steps.length;
-                
-                const processInterval = setInterval(() => {
-                    currentStep++;
-                    progressBar.style.width = `${(currentStep / totalSteps) * 100}%`;
-                    
-                    if (currentStep <= totalSteps) {
-                        loadingOverlay.querySelector('p').textContent = steps[currentStep - 1];
-                    }
-                    
-                    if (currentStep >= totalSteps) {
-                        clearInterval(processInterval);
-                        
-                        setTimeout(() => {
-                            loadingOverlay.style.display = 'none';
-                            resultsSection.style.display = 'block';
-                            
-                            // Simulate marker detection quality
-                            const markerQuality = simulateMarkerDetection(currentImageData);
-                            
-                            // Simulate reading answers with marker-based improvement
-                            const studentAnswers = simulateAnswerReadingWithMarkers(
-                                selectedExam.questionCount, 
-                                markerQuality
-                            );
-                            
-                            // Grade the exam with marker-based accuracy
-                            const gradingResult = gradeExamWithMarkers(
-                                studentAnswers, 
-                                selectedExam.answerKey,
-                                markerQuality
-                            );
-                            
-                            // Display results
-                            document.getElementById('score').textContent = toPersianNumber(gradingResult.correctCount);
-                            document.getElementById('total').textContent = toPersianNumber(selectedExam.questionCount);
-                            document.getElementById('calculated-score').textContent = toPersianNumber(gradingResult.score);
-                            document.getElementById('accuracy').textContent = toPersianNumber(gradingResult.accuracy) + '%';
-                            
-                            // Generate answer grid with confidence indicators
-                            const answersGrid = document.getElementById('answers-grid');
-                            answersGrid.innerHTML = '';
-                            
-                            gradingResult.results.forEach(result => {
-                                const answerItem = document.createElement('div');
-                                answerItem.className = 'answer-item';
-                                
-                                if (result.status === 'correct') {
-                                    answerItem.classList.add('correct');
-                                    answerItem.title = `سوال ${result.question}: پاسخ صحیح (دقت: ${result.confidence}%)`;
-                                } else if (result.status === 'wrong') {
-                                    answerItem.classList.add('incorrect');
-                                    answerItem.title = `سوال ${result.question}: پاسخ نادرست. پاسخ صحیح: "${result.correctAnswer}" (دقت: ${result.confidence}%)`;
-                                } else {
-                                    answerItem.classList.add('empty');
-                                    answerItem.title = `سوال ${result.question}: بدون پاسخ (دقت: ${result.confidence}%)`;
-                                }
-                                
-                                answerItem.innerHTML = `
-                                    ${toPersianNumber(result.question)}
-                                    <div class="confidence-indicator">${result.confidence}%</div>
-                                `;
-                                answersGrid.appendChild(answerItem);
-                            });
-                            
-                            // Display detailed results
-                            const detailedResults = document.getElementById('detailed-results');
-                            detailedResults.style.display = 'block';
-                            
-                            const correctAnswers = gradingResult.results.filter(r => r.status === 'correct');
-                            const wrongAnswers = gradingResult.results.filter(r => r.status === 'wrong');
-                            const emptyAnswers = gradingResult.results.filter(r => r.status === 'empty');
-                            
-                            document.getElementById('correct-answers-list').innerHTML = 
-                                correctAnswers.map(a => `
-                                    <div>${toPersianNumber(a.question)}: ${a.detectedAnswer} (${a.confidence}%)</div>
-                                `).join('');
-                            
-                            document.getElementById('wrong-answers-list').innerHTML = 
-                                wrongAnswers.map(a => `
-                                    <div>${toPersianNumber(a.question)}: ${a.detectedAnswer} → ${a.correctAnswer} (${a.confidence}%)</div>
-                                `).join('');
-                            
-                            document.getElementById('empty-answers-list').innerHTML = 
-                                emptyAnswers.map(a => `
-                                    <div>${toPersianNumber(a.question)}: بدون پاسخ (${a.confidence}%)</div>
-                                `).join('');
-                            
-                            // Add to history
-                            const historyItem = document.createElement('div');
-                            historyItem.className = 'history-item';
-                            historyItem.innerHTML = `
-                                <div>${selectedExam.name} | ${new Date().toLocaleString('fa-IR')}</div>
-                                <div class="history-score">
-                                    ${toPersianNumber(gradingResult.correctCount)}/${toPersianNumber(selectedExam.questionCount)} 
-                                    (نمره: ${toPersianNumber(gradingResult.score)})
-                                </div>
-                            `;
-                            document.getElementById('history-list').prepend(historyItem);
-                        }, 500);
-                    }
-                }, 600);
-            });
-            
             resetBtn.addEventListener('click', function() {
+                if (autoCaptureInterval) {
+                    clearInterval(autoCaptureInterval);
+                    autoCaptureInterval = null;
+                }
+                
                 if (stream) {
                     stream.getTracks().forEach(track => track.stop());
+                    window.stream = null;
                 }
+                
+                const cameraView = document.getElementById('camera-view');
                 cameraView.innerHTML = `
                     <div class="placeholder-text">
                         <p>برای شروع، دوربین را فعال کنید</p>
-                        <p>پاسخنامه را طوری قرار دهید که نشانگرهای قرمز در چهار گوشه دیده شوند</p>
+                        <p>پاسخنامه را طوری قرار دهید که نشانگرهای سیاه در چهار گوشه دیده شوند</p>
                     </div>
                     <div class="camera-overlay"></div>
                     <div class="marker-indicator top-left"></div>
@@ -2007,17 +1983,16 @@
                     <div class="alignment-guide alignment-vertical"></div>
                     <div class="loading">
                         <div class="spinner"></div>
-                        <p>در حال پردازش تصویر و شناسایی نشانگرها</p>
+                        <p id="processing-text">در حال پردازش تصویر و شناسایی نشانگرها</p>
                         <div class="progress-bar">
                             <div class="progress" id="processing-progress"></div>
                         </div>
                     </div>
                 `;
+                
                 startCameraBtn.disabled = false;
-                captureBtn.disabled = true;
-                processBtn.disabled = true;
-                resultsSection.style.display = 'none';
-                currentImageData = null;
+                autoCaptureInfo.style.display = 'none';
+                document.getElementById('results-section').style.display = 'none';
                 stream = null;
             });
         });
