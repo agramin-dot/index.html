@@ -812,7 +812,7 @@
             }
         }
         
-        /* Print Styles - 4 answer sheets per A4 page - FIXED */
+        /* Print Styles - 2 answer sheets per A4 page - FIXED */
         @media print {
             body, html {
                 background: white !important;
@@ -839,19 +839,19 @@
             .print-grid-container {
                 display: grid !important;
                 grid-template-columns: 1fr 1fr !important;
-                grid-template-rows: 1fr 1fr !important;
+                grid-template-rows: 1fr !important;
                 width: 210mm !important;
                 height: 297mm !important;
-                gap: 2mm !important;
-                padding: 5mm !important;
+                gap: 5mm !important;
+                padding: 10mm !important;
                 margin: 0 !important;
                 box-sizing: border-box !important;
             }
             
             .a5-print-item {
-                width: 99mm !important;
-                height: 138mm !important;
-                padding: 3mm !important;
+                width: 95mm !important;
+                height: 277mm !important;
+                padding: 5mm !important;
                 border: 1px dashed #ccc !important;
                 box-sizing: border-box !important;
                 background: white !important;
@@ -869,15 +869,15 @@
             .questions-two-column {
                 display: grid !important;
                 grid-template-columns: 1fr 1fr !important;
-                gap: 1px !important;
-                margin-top: 2px !important;
+                gap: 2px !important;
+                margin-top: 5px !important;
                 justify-content: center !important;
             }
             
             .question-column {
                 display: flex !important;
                 flex-direction: column !important;
-                gap: 1px !important;
+                gap: 2px !important;
                 margin: 0 auto !important;
                 width: 90% !important;
             }
@@ -891,22 +891,22 @@
             }
             
             .question-number {
-                font-size: 12px !important;
-                width: 16px !important;
+                font-size: 14px !important;
+                width: 18px !important;
                 margin-left: 0 !important;
             }
             
             .options-horizontal {
                 display: flex !important;
-                gap: 1px !important;
+                gap: 2px !important;
                 margin-right: 0 !important;
-                margin-left: 1px !important;
+                margin-left: 2px !important;
             }
             
             .option {
-                width: 16px !important;
-                height: 16px !important;
-                font-size: 10px !important;
+                width: 18px !important;
+                height: 18px !important;
+                font-size: 12px !important;
                 border: 0.5px solid #333 !important;
                 border-radius: 1px !important;
                 display: flex !important;
@@ -914,105 +914,105 @@
                 align-items: center !important;
             }
             
-            /* Ultra compact for print */
+            /* تنظیمات فونت برای چاپ */
             .school-name {
-                font-size: 16px !important;
-                margin-bottom: 1px !important;
+                font-size: 18px !important;
+                margin-bottom: 3px !important;
             }
             
             .answer-sheet-header {
-                margin-bottom: 2px !important;
-                padding-bottom: 1px !important;
+                margin-bottom: 5px !important;
+                padding-bottom: 3px !important;
             }
             
             .answer-sheet-header h1 {
-                font-size: 18px !important;
+                font-size: 20px !important;
                 margin: 0 !important;
             }
             
             .answer-sheet-header p {
-                font-size: 12px !important;
+                font-size: 14px !important;
                 margin: 0 !important;
             }
             
             .student-info {
-                margin-bottom: 2px !important;
-                gap: 1px !important;
-                font-size: 12px !important;
+                margin-bottom: 5px !important;
+                gap: 3px !important;
+                font-size: 14px !important;
             }
             
             .info-item label {
-                width: 100px !important;
-                font-size: 10px !important;
+                width: 110px !important;
+                font-size: 12px !important;
             }
             
             .info-item span {
-                height: 16px !important;
-                font-size: 12px !important;
+                height: 18px !important;
+                font-size: 14px !important;
             }
             
             .instructions {
-                margin-top: 4px !important;
-                padding: 2px !important;
-                font-size: 10px !important;
+                margin-top: 8px !important;
+                padding: 4px !important;
+                font-size: 12px !important;
             }
             
             .instructions h3 {
-                font-size: 12px !important;
+                font-size: 14px !important;
                 margin: 0 !important;
             }
             
             .instructions ul {
-                padding-right: 6px !important;
+                padding-right: 8px !important;
                 margin: 0 !important;
-                line-height: 1.2 !important;
+                line-height: 1.4 !important;
             }
             
             /* نتایج در چاپ */
             .results-summary {
-                margin-top: 4px !important;
-                padding: 2px !important;
-                font-size: 10px !important;
+                margin-top: 8px !important;
+                padding: 4px !important;
+                font-size: 12px !important;
             }
             
             .results-summary h3 {
-                font-size: 12px !important;
-                margin-bottom: 3px !important;
+                font-size: 14px !important;
+                margin-bottom: 5px !important;
             }
             
             .summary-grid {
-                gap: 3px !important;
-                margin-bottom: 3px !important;
+                gap: 5px !important;
+                margin-bottom: 5px !important;
             }
             
             .summary-item {
-                padding: 1px 0 !important;
+                padding: 2px 0 !important;
             }
             
             .teacher-signature {
-                margin-top: 3px !important;
-                padding-top: 1px !important;
+                margin-top: 5px !important;
+                padding-top: 3px !important;
             }
             
             .signature-label {
-                font-size: 8px !important;
-                margin-top: 8px !important;
+                font-size: 10px !important;
+                margin-top: 15px !important;
             }
             
             .sheet-footer {
-                margin-top: 3px !important;
-                font-size: 8px !important;
-                padding-top: 1px !important;
+                margin-top: 5px !important;
+                font-size: 10px !important;
+                padding-top: 3px !important;
             }
             
             /* تنظیمات جدید برای پاسخنامه 40 سوالی */
             .a5-print-item.compact-mode .questions-two-column {
-                gap: 0.5px !important;
-                margin-top: 1px !important;
+                gap: 1px !important;
+                margin-top: 3px !important;
             }
             
             .a5-print-item.compact-mode .question-column {
-                gap: 0.5px !important;
+                gap: 1px !important;
             }
             
             .a5-print-item.compact-mode .question-vertical {
@@ -1020,26 +1020,26 @@
             }
             
             .a5-print-item.compact-mode .question-number {
-                font-size: 10px !important;
-                width: 14px !important;
+                font-size: 12px !important;
+                width: 16px !important;
             }
             
             .a5-print-item.compact-mode .option {
-                width: 14px !important;
-                height: 14px !important;
-                font-size: 8px !important;
+                width: 16px !important;
+                height: 16px !important;
+                font-size: 10px !important;
             }
             
             .a5-print-item.compact-mode .instructions {
-                margin-top: 2px !important;
-                padding: 1px !important;
-                font-size: 8px !important;
+                margin-top: 4px !important;
+                padding: 2px !important;
+                font-size: 10px !important;
             }
             
             .a5-print-item.compact-mode .results-summary {
-                margin-top: 2px !important;
-                padding: 1px !important;
-                font-size: 8px !important;
+                margin-top: 4px !important;
+                padding: 2px !important;
+                font-size: 10px !important;
             }
         }
     </style>
@@ -1279,7 +1279,7 @@
                     به‌روزرسانی پاسخنامه
                 </button>
                 <button onclick="printAnswerSheets()" class="btn-secondary">
-                    چاپ پاسخنامه (۴ عدد در صفحه)
+                    چاپ پاسخنامه (۲ عدد در صفحه)
                 </button>
                 <button onclick="clearAllAnswers()" class="btn-warning">
                     پاک کردن همه پاسخ‌ها
@@ -1288,7 +1288,7 @@
         </div>
         
         <footer class="no-print">
-            <p>ساخته شده با ❤️ | نسخه ۳.۴.۰ | قابل استفاده در GitHub Pages</p>
+            <p>ساخته شده با ❤️ | نسخه ۳.۵.۰ | قابل استفاده در GitHub Pages</p>
         </footer>
     </div>
 
@@ -1639,7 +1639,7 @@
             initializeAnswerKey('new-exam-answer-inputs', count);
         }
         
-        // Print 4 answer sheets per A4 page
+        // Print 2 answer sheets per A4 page
         function printAnswerSheets() {
             const originalSheet = document.querySelector('.a5-container');
             const questionCount = parseInt(document.getElementById('question-count').value);
@@ -1649,8 +1649,8 @@
             const gridContainer = document.createElement('div');
             gridContainer.className = 'print-grid-container';
             
-            // Create 4 answer sheets
-            for (let i = 0; i < 4; i++) {
+            // Create 2 answer sheets
+            for (let i = 0; i < 2; i++) {
                 const clone = originalSheet.cloneNode(true);
                 clone.className = 'a5-print-item';
                 
@@ -1717,7 +1717,16 @@
             
             startCameraBtn.addEventListener('click', async function() {
                 try {
-                    stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                    // Use rear camera (environment) instead of front camera
+                    const constraints = {
+                        video: { 
+                            facingMode: 'environment',
+                            width: { ideal: 1280 },
+                            height: { ideal: 720 }
+                        }
+                    };
+                    
+                    stream = await navigator.mediaDevices.getUserMedia(constraints);
                     const video = document.createElement('video');
                     video.srcObject = stream;
                     video.autoplay = true;
@@ -1725,8 +1734,30 @@
                     cameraView.appendChild(video);
                     captureBtn.disabled = false;
                     startCameraBtn.disabled = true;
+                    
+                    // نمایش پیام راهنما
+                    const overlay = document.createElement('div');
+                    overlay.className = 'camera-overlay';
+                    cameraView.appendChild(overlay);
                 } catch (error) {
-                    alert('خطا در دسترسی به دوربین: ' + error.message);
+                    console.error('Error accessing camera:', error);
+                    // Fallback to any available camera if rear camera is not available
+                    try {
+                        stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                        const video = document.createElement('video');
+                        video.srcObject = stream;
+                        video.autoplay = true;
+                        cameraView.innerHTML = '';
+                        cameraView.appendChild(video);
+                        captureBtn.disabled = false;
+                        startCameraBtn.disabled = true;
+                        
+                        const overlay = document.createElement('div');
+                        overlay.className = 'camera-overlay';
+                        cameraView.appendChild(overlay);
+                    } catch (fallbackError) {
+                        alert('خطا در دسترسی به دوربین: ' + fallbackError.message);
+                    }
                 }
             });
             
@@ -1741,7 +1772,7 @@
                 context.drawImage(video, 0, 0);
                 
                 const image = new Image();
-                image.src = canvas.toDataURL();
+                image.src = canvas.toDataURL('image/jpeg', 0.8);
                 image.style.width = '100%';
                 cameraView.innerHTML = '';
                 cameraView.appendChild(image);
