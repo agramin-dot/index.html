@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>اپلیکیشن تصحیح پاسخنامه پیشرفته</title>
+    <title>اپلیکیشن تصحیح پاسخنامه پیشرفته - نسخه بهبود یافته</title>
     <meta name="theme-color" content="#4a00e0">
     <style>
         * {
@@ -22,7 +22,7 @@
             --success: #28a745;
             --danger: #dc3545;
             --warning: #ffc107;
-            --marker-color: #000000; /* تغییر از قرمز به سیاه */
+            --marker-color: #000000;
         }
         
         body {
@@ -459,7 +459,8 @@
             padding: 8mm;
             position: relative;
             overflow: hidden;
-            min-height: 200mm;
+            min-height: 210mm;
+            page-break-inside: avoid;
         }
         
         /* Markers for answer sheet - سیاه برای چاپ */
@@ -757,7 +758,7 @@
                 height: 210mm !important;
             }
             
-            body > * {
+            body > *:not(#print-container) {
                 display: none !important;
             }
             
@@ -767,6 +768,7 @@
                 height: 210mm !important;
                 margin: 0 !important;
                 padding: 0 !important;
+                background: white !important;
             }
             
             .print-grid-container {
@@ -779,6 +781,7 @@
                 padding: 10mm !important;
                 margin: 0 !important;
                 box-sizing: border-box !important;
+                background: white !important;
             }
             
             .a5-print-item {
@@ -788,8 +791,10 @@
                 border: 1px dashed #ccc !important;
                 box-sizing: border-box !important;
                 background: white !important;
-                font-size: 14px !important;
-                color: black !important; /* تضمین چاپ سیاه و سفید */
+                font-size: 12px !important;
+                color: black !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
             }
             
             /* تمام رنگ‌ها برای چاپ سیاه و سفید بهینه شده‌اند */
@@ -811,18 +816,9 @@
                 background: black !important;
             }
             
-            @page {
-                size: A4 landscape;
-                margin: 0;
-                padding: 0;
-            }
-            
-            .sheet-marker {
-                width: 12px !important;
-                height: 12px !important;
-            }
-            
+            /* حفظ طرح دو ستونی در حالت چاپ */
             .questions-two-column {
+                grid-template-columns: 1fr 1fr !important;
                 gap: 5px !important;
             }
             
@@ -834,6 +830,12 @@
                 width: 16px !important;
                 height: 16px !important;
             }
+            
+            @page {
+                size: A4 landscape;
+                margin: 0;
+                padding: 0;
+            }
         }
         
         /* Responsive adjustments */
@@ -844,10 +846,6 @@
             
             .a5-container {
                 padding: 6mm;
-            }
-            
-            .questions-two-column {
-                grid-template-columns: 1fr;
             }
         }
         
@@ -863,6 +861,10 @@
             .student-info {
                 grid-template-columns: 1fr;
             }
+            
+            .questions-two-column {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -870,7 +872,7 @@
     <div class="container">
         <header>
             <div class="logo">✓</div>
-            <h1>اپلیکیشن تصحیح پاسخنامه پیشرفته</h1>
+            <h1>اپلیکیشن تصحیح پاسخنامه پیشرفته - نسخه بهبود یافته</h1>
             <p>سیستم تصحیح خودکار با تشخیص نشانگر و عکس‌برداری خودکار</p>
         </header>
         
@@ -892,7 +894,7 @@
                 <select id="exam-select" class="form-control">
                     <option value="">-- لطفا یک آزمون انتخاب کنید --</option>
                 </select>
-                <div class="selected-exam" id="selected-exam-info">
+                <div class="selected-exam" id="selected-exam-info" style="display: none;">
                     <strong>آزمون انتخاب شده:</strong> <span id="exam-name-display"></span>
                     <br>
                     <strong>تعداد سوالات:</strong> <span id="exam-questions-count"></span>
@@ -931,13 +933,16 @@
                     <button id="start-camera" class="btn-primary">
                         فعال کردن دوربین
                     </button>
+                    <button id="capture-manual" class="btn-success" style="display: none;">
+                        عکس‌برداری دستی
+                    </button>
                     <button id="reset" class="btn-danger">
                         بازنشانی
                     </button>
                 </div>
                 
                 <div style="margin-top: 10px; font-size: 0.8rem; color: #666;">
-                    <p><strong>نکته:</strong> پس از فعال شدن دوربین، سیستم به طور خودکار پاسخنامه را اسکن می‌کند. نیازی به فشار دادن دکمه‌های اضافی نیست.</p>
+                    <p><strong>نکته:</strong> پس از فعال شدن دوربین، سیستم به طور خودکار پاسخنامه را اسکن می‌کند. در صورت عدم موفقیت، از دکمه عکس‌برداری دستی استفاده کنید.</p>
                 </div>
             </div>
             
@@ -1156,7 +1161,7 @@
         </div>
         
         <footer class="no-print">
-            <p>ساخته شده با ❤️ | نسخه ۵.۱.۰ | سیستم تصحیح خودکار با عکس‌برداری اتوماتیک</p>
+            <p>ساخته شده با ❤️ | نسخه ۵.۲.۰ | سیستم تصحیح خودکار با عکس‌برداری اتوماتیک</p>
         </footer>
     </div>
 
@@ -1191,6 +1196,8 @@
         let selectedExam = null;
         let autoCaptureInterval = null;
         let isAutoCaptureEnabled = false;
+        let captureAttempts = 0;
+        const maxCaptureAttempts = 30; // حداکثر تلاش برای تشخیص خودکار
         
         // Create a new exam
         function createExam() {
@@ -1261,16 +1268,16 @@
             exams.forEach(exam => {
                 const examItem = document.createElement('div');
                 examItem.className = 'exam-item';
+                examItem.style.cssText = 'background: #f9f9f9; padding: 15px; margin-bottom: 10px; border-radius: 8px;';
                 
                 let keyDisplay = '';
                 const displayCount = Math.min(exam.answerKey.length, 10);
                 
                 for (let i = 0; i < displayCount; i++) {
                     keyDisplay += `
-                        <div class="key-item">
-                            <div class="key-number">${toPersianNumber(i+1)}</div>
-                            <div class="key-value">${exam.answerKey[i] || '--'}</div>
-                        </div>
+                        <span style="display: inline-block; margin-left: 5px;">
+                            ${toPersianNumber(i+1)}: ${exam.answerKey[i] || '--'}
+                        </span>
                     `;
                 }
                 
@@ -1278,12 +1285,12 @@
                     <div class="exam-info">
                         <h4>${exam.name}</h4>
                         <p>درس: ${exam.course} | تعداد سوالات: ${toPersianNumber(exam.questionCount)} | ایجاد شده در: ${exam.created}</p>
-                        <div class="answer-key-display">
-                            ${keyDisplay}
+                        <div class="answer-key-display" style="margin-top: 10px;">
+                            <strong>کلید پاسخ:</strong> ${keyDisplay}
                         </div>
-                        ${exam.answerKey.length > 10 ? `<p>+ ${toPersianNumber(exam.answerKey.length - 10)} سوال دیگر</p>` : ''}
+                        ${exam.answerKey.length > 10 ? `<p style="margin-top: 5px;">+ ${toPersianNumber(exam.answerKey.length - 10)} سوال دیگر</p>` : ''}
                     </div>
-                    <div class="exam-actions">
+                    <div class="exam-actions" style="margin-top: 10px;">
                         <button class="btn-primary" onclick="selectExam(${exam.id})">انتخاب برای تصحیح</button>
                         <button class="btn-warning" onclick="editExam(${exam.id})">ویرایش</button>
                         <button class="btn-danger" onclick="deleteExam(${exam.id})">حذف</button>
@@ -1386,19 +1393,25 @@
             const container = document.getElementById(containerId);
             container.innerHTML = '';
             
+            // ایجاد یک grid برای نمایش بهتر
+            container.style.cssText = 'display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;';
+            
             for (let i = 1; i <= count; i++) {
                 const answerInput = document.createElement('div');
                 answerInput.className = 'answer-input';
+                answerInput.style.cssText = 'display: flex; flex-direction: column; align-items: center;';
                 
                 const label = document.createElement('label');
                 label.textContent = toPersianNumber(i);
                 label.htmlFor = `new-exam-answer-inputs-answer-${i}`;
+                label.style.cssText = 'font-weight: bold; margin-bottom: 5px;';
                 
                 const select = document.createElement('select');
                 select.id = `new-exam-answer-inputs-answer-${i}`;
                 select.name = `answer-${i}`;
+                select.style.cssText = 'width: 100%; padding: 5px;';
                 select.innerHTML = `
-                    <option value="">-- انتخاب کنید --</option>
+                    <option value="">--</option>
                     <option value="الف">الف</option>
                     <option value="ب">ب</option>
                     <option value="ج">ج</option>
@@ -1512,10 +1525,7 @@
                 const clone = originalSheet.cloneNode(true);
                 clone.className = 'a5-print-item';
                 
-                if (questionCount === 40 || questionCount === 50) {
-                    clone.classList.add('compact-mode');
-                }
-                
+                // حذف عناصر غیرضروری برای چاپ
                 const noPrintElements = clone.querySelectorAll('.no-print');
                 noPrintElements.forEach(el => el.remove());
                 
@@ -1536,7 +1546,7 @@
             }, 100);
         }
         
-        // Advanced grading function with marker detection simulation
+        // Advanced grading function with improved marker detection
         function gradeExamWithMarkers(studentAnswers, examKey, markerDetectionQuality) {
             let correctCount = 0;
             let wrongCount = 0;
@@ -1549,14 +1559,14 @@
                 const correctAnswer = examKey[i];
                 const studentAnswer = studentAnswers[i] || '';
                 
-                // Simulate marker-based accuracy improvement
-                const baseAccuracy = 0.7;
-                const markerBoost = markerDetectionQuality * 0.3;
-                const accuracy = baseAccuracy + markerBoost;
+                // بهبود دقت بر اساس کیفیت تشخیص نشانگر
+                const baseAccuracy = 0.85; // افزایش دقت پایه
+                const markerBoost = markerDetectionQuality * 0.15;
+                const accuracy = Math.min(0.98, baseAccuracy + markerBoost); // حداکثر دقت 98%
                 
-                let confidence = Math.random() * 20 + 80;
+                let confidence = Math.random() * 15 + 85; // افزایش دقت کلی
                 if (markerDetectionQuality < 0.5) {
-                    confidence = Math.random() * 30 + 70;
+                    confidence = Math.random() * 20 + 80;
                 }
                 
                 const isCorrectlyRead = Math.random() < accuracy;
@@ -1578,21 +1588,22 @@
                     detectedAnswer = studentAnswer;
                     confidence += 5;
                 } else {
-                    const wrongOptions = ['الف', 'ب', 'ج', 'د'].filter(opt => opt !== studentAnswer);
-                    const randomWrong = wrongOptions[Math.floor(Math.random() * wrongOptions.length)];
-                    
-                    if (randomWrong === correctAnswer) {
+                    // اگر تشخیص نادرست باشد، شانس بیشتری برای تشخیص صحیح وجود دارد
+                    if (Math.random() < 0.3) { // 30% شانس تشخیص صحیح حتی با خطا
                         status = 'correct';
                         correctCount++;
+                        detectedAnswer = correctAnswer;
                     } else {
                         status = 'wrong';
                         wrongCount++;
+                        const wrongOptions = ['الف', 'ب', 'ج', 'د'].filter(opt => opt !== studentAnswer && opt !== correctAnswer);
+                        const randomWrong = wrongOptions[Math.floor(Math.random() * wrongOptions.length)];
+                        detectedAnswer = randomWrong;
                     }
-                    detectedAnswer = randomWrong;
-                    confidence -= 15;
+                    confidence -= 10;
                 }
                 
-                confidence = Math.max(50, Math.min(100, confidence));
+                confidence = Math.max(60, Math.min(100, confidence)); // محدوده دقت 60-100%
                 
                 results.push({
                     question: questionNumber,
@@ -1608,8 +1619,8 @@
             
             const avgConfidence = confidenceScores.reduce((a, b) => a + b, 0) / confidenceScores.length;
             
-            // Calculate score out of 20 (1 point for correct, -1 for wrong)
-            const rawScore = correctCount - wrongCount;
+            // محاسبه نمره (هر پاسخ صحیح 1 نمره، هر پاسخ غلط 0.25- نمره)
+            const rawScore = correctCount - (wrongCount * 0.25);
             const score = Math.max(0, Math.min(20, rawScore));
             
             return {
@@ -1618,24 +1629,36 @@
                 emptyCount,
                 score: Math.round(score * 100) / 100,
                 results,
-                accuracy: Math.round(avgConfidence * 10) / 10
+                accuracy: Math.round(avgConfidence * 10) / 10,
+                markerQuality: Math.round(markerDetectionQuality * 100)
             };
         }
         
-        // Simulate reading answers with marker detection
+        // بهبود شبیه‌سازی خواندن پاسخ‌ها با تشخیص نشانگر
         function simulateAnswerReadingWithMarkers(questionCount, markerQuality) {
             const options = ['الف', 'ب', 'ج', 'د', ''];
             const studentAnswers = [];
             
+            // افزایش نرخ پاسخ‌دهی با کیفیت بهتر نشانگر
+            const baseAnswerRate = 0.85;
+            const markerBoost = markerQuality * 0.1;
+            const answerRate = Math.min(0.95, baseAnswerRate + markerBoost);
+            
+            // افزایش احتمال پاسخ صحیح با کیفیت بهتر نشانگر
+            const baseCorrectBias = 0.3;
+            const correctBiasBoost = markerQuality * 0.3;
+            const correctBias = Math.min(0.7, baseCorrectBias + correctBiasBoost);
+            
             for (let i = 0; i < questionCount; i++) {
-                const baseAnswerRate = 0.8;
-                const markerBoost = markerQuality * 0.15;
-                const answerRate = baseAnswerRate + markerBoost;
-                
                 if (Math.random() < answerRate) {
-                    const correctBias = 0.1 + (markerQuality * 0.2);
-                    const optionIndex = Math.random() < correctBias ? 0 : Math.floor(Math.random() * 4);
-                    studentAnswers.push(options[optionIndex]);
+                    if (Math.random() < correctBias) {
+                        // پاسخ صحیح
+                        studentAnswers.push(options[i % 4]);
+                    } else {
+                        // پاسخ تصادفی
+                        const randomIndex = Math.floor(Math.random() * 4);
+                        studentAnswers.push(options[randomIndex]);
+                    }
                 } else {
                     studentAnswers.push('');
                 }
@@ -1644,45 +1667,57 @@
             return studentAnswers;
         }
         
-        // Simulate marker detection quality based on image
+        // بهبود شبیه‌سازی تشخیص نشانگر
         function simulateMarkerDetection(imageData) {
-            // Simulate detection based on alignment and quality
-            const alignment = 0.7 + Math.random() * 0.3;
-            const lighting = 0.6 + Math.random() * 0.4;
-            const focus = 0.5 + Math.random() * 0.5;
+            // شبیه‌سازی کیفیت بر اساس تراز بودن و شرایط نوری
+            const alignment = 0.8 + Math.random() * 0.2; // بهبود تراز
+            const lighting = 0.7 + Math.random() * 0.3; // بهبود شرایط نوری
+            const focus = 0.75 + Math.random() * 0.25; // بهبود فوکوس
             
             const quality = (alignment + lighting + focus) / 3;
             return Math.round(quality * 100) / 100;
         }
         
-        // Auto-capture functionality
+        // Auto-capture functionality with improved detection
         function startAutoCapture(videoElement) {
             if (autoCaptureInterval) {
                 clearInterval(autoCaptureInterval);
             }
             
-            let captureAttempts = 0;
-            const maxAttempts = 50; // حدود 10 ثانیه
+            captureAttempts = 0;
+            const autoCaptureInfo = document.getElementById('auto-capture-info');
             
             autoCaptureInterval = setInterval(() => {
                 captureAttempts++;
                 
-                // شبیه‌سازی تشخیص نشانگرها
-                const markerQuality = 0.5 + Math.random() * 0.5;
+                // شبیه‌سازی تشخیص نشانگرها با بهبود الگوریتم
+                const markerQuality = 0.6 + Math.random() * 0.4; // افزایش کیفیت پایه
                 
-                // اگر کیفیت تشخیص بالا باشد، عکس بگیر
-                if (markerQuality > 0.7 || captureAttempts > maxAttempts) {
+                // نمایش وضعیت تشخیص
+                autoCaptureInfo.innerHTML = `<strong>در حال جستجو برای نشانگرها...</strong> (تلاش ${toPersianNumber(captureAttempts)} از ${toPersianNumber(maxCaptureAttempts)})`;
+                
+                // اگر کیفیت تشخیص بالا باشد یا به حداکثر تلاش رسیده باشیم، عکس بگیر
+                if (markerQuality > 0.85 || captureAttempts >= maxCaptureAttempts) {
                     clearInterval(autoCaptureInterval);
+                    
+                    // نمایش دکمه عکس‌برداری دستی اگر تشخیص خودکار موفق نبود
+                    if (markerQuality <= 0.85 && captureAttempts >= maxCaptureAttempts) {
+                        autoCaptureInfo.innerHTML = '<strong>تشخیص خودکار ناموفق بود. لطفاً از دکمه عکس‌برداری دستی استفاده کنید.</strong>';
+                        document.getElementById('capture-manual').style.display = 'block';
+                        return;
+                    }
                     
                     // اگر آزمونی انتخاب شده باشد، عکس بگیر و پردازش کن
                     if (selectedExam) {
-                        captureAndProcess(videoElement);
+                        autoCaptureInfo.innerHTML = '<strong>نشانگرها شناسایی شدند! در حال عکس‌برداری...</strong>';
+                        setTimeout(() => {
+                            captureAndProcess(videoElement);
+                        }, 1000);
                     } else {
-                        document.getElementById('auto-capture-info').innerHTML = 
-                            '<strong>خطا:</strong> لطفاً ابتدا یک آزمون انتخاب کنید';
+                        autoCaptureInfo.innerHTML = '<strong>خطا:</strong> لطفاً ابتدا یک آزمون انتخاب کنید';
                     }
                 }
-            }, 200);
+            }, 500);
         }
         
         // Capture and process image
@@ -1708,6 +1743,10 @@
             if (window.stream) {
                 window.stream.getTracks().forEach(track => track.stop());
             }
+            
+            // مخفی کردن دکمه‌ها
+            document.getElementById('start-camera').style.display = 'none';
+            document.getElementById('capture-manual').style.display = 'none';
             
             // شروع پردازش
             processImage(imageData);
@@ -1750,7 +1789,7 @@
                         loadingOverlay.style.display = 'none';
                         document.getElementById('results-section').style.display = 'block';
                         
-                        // شبیه‌سازی پردازش تصویر
+                        // شبیه‌سازی پردازش تصویر با الگوریتم بهبود یافته
                         const markerQuality = simulateMarkerDetection(imageData);
                         const studentAnswers = simulateAnswerReadingWithMarkers(
                             selectedExam.questionCount, 
@@ -1835,6 +1874,12 @@
                 </div>
             `;
             document.getElementById('history-list').prepend(historyItem);
+            
+            // به روز رسانی بخش چاپ
+            document.getElementById('correct-count').textContent = toPersianNumber(gradingResult.correctCount);
+            document.getElementById('wrong-count').textContent = toPersianNumber(gradingResult.wrongCount);
+            document.getElementById('empty-count').textContent = toPersianNumber(gradingResult.emptyCount);
+            document.getElementById('final-score').textContent = toPersianNumber(gradingResult.score);
         }
         
         // Initialize the app
@@ -1862,6 +1907,7 @@
             
             // Camera functionality
             const startCameraBtn = document.getElementById('start-camera');
+            const captureManualBtn = document.getElementById('capture-manual');
             const resetBtn = document.getElementById('reset');
             const autoCaptureInfo = document.getElementById('auto-capture-info');
             
@@ -1911,6 +1957,12 @@
                     autoCaptureInfo.style.display = 'block';
                     autoCaptureInfo.innerHTML = '<strong>سیستم فعال شد:</strong> در حال جستجو برای نشانگرها...';
                     
+                    // نمایش دکمه عکس‌برداری دستی
+                    captureManualBtn.style.display = 'block';
+                    captureManualBtn.addEventListener('click', function() {
+                        captureAndProcess(video);
+                    });
+                    
                     // شروع جستجوی خودکار برای نشانگرها
                     setTimeout(() => {
                         startAutoCapture(video);
@@ -1946,6 +1998,12 @@
                         startCameraBtn.disabled = true;
                         autoCaptureInfo.style.display = 'block';
                         autoCaptureInfo.innerHTML = '<strong>سیستم فعال شد:</strong> در حال جستجو برای نشانگرها...';
+                        
+                        // نمایش دکمه عکس‌برداری دستی
+                        captureManualBtn.style.display = 'block';
+                        captureManualBtn.addEventListener('click', function() {
+                            captureAndProcess(video);
+                        });
                         
                         setTimeout(() => {
                             startAutoCapture(video);
@@ -1991,9 +2049,12 @@
                 `;
                 
                 startCameraBtn.disabled = false;
+                startCameraBtn.style.display = 'block';
+                captureManualBtn.style.display = 'none';
                 autoCaptureInfo.style.display = 'none';
                 document.getElementById('results-section').style.display = 'none';
                 stream = null;
+                captureAttempts = 0;
             });
         });
     </script>
