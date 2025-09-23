@@ -115,7 +115,7 @@
             margin-bottom: 25px;
         }
         
-        #camera-view, #key-camera-view {
+        #camera-view {
             width: 100%;
             height: 300px;
             background-color: #f1f1f1;
@@ -128,8 +128,7 @@
             position: relative;
         }
         
-        #camera-view video, #camera-view canvas, #camera-view img,
-        #key-camera-view video, #key-camera-view canvas, #key-camera-view img {
+        #camera-view video, #camera-view canvas, #camera-view img {
             width: 100%;
             height: 100%;
             object-fit: cover;
@@ -217,75 +216,6 @@
         
         .btn-warning:hover {
             background: #e0a800;
-        }
-        
-        .answer-key-section {
-            background: #f9f9f9;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 25px;
-        }
-        
-        .answer-key-section h3 {
-            margin-bottom: 15px;
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .key-input-methods {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        
-        .key-method {
-            flex: 1;
-            padding: 15px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .key-method.active {
-            border-color: var(--primary);
-            background-color: #f0f0ff;
-        }
-        
-        .key-method h4 {
-            margin-bottom: 10px;
-            color: var(--primary);
-        }
-        
-        .answer-inputs {
-            display: grid;
-            grid-template-columns: repeat(8, 1fr);
-            gap: 5px;
-            margin-top: 15px;
-        }
-        
-        .answer-input {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        .answer-input label {
-            margin-bottom: 3px;
-            font-size: 0.8rem;
-            font-weight: bold;
-        }
-        
-        .answer-input select {
-            width: 100%;
-            padding: 5px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background: white;
-            font-size: 0.8rem;
         }
         
         .results-section {
@@ -407,7 +337,7 @@
             100% { transform: rotate(360deg); }
         }
         
-        /* Answer Sheet Styles - Ultra Compact Two Column Layout */
+        /* Answer Sheet Styles - A5 for web view */
         .a5-container {
             width: 100%;
             max-width: 148mm;
@@ -473,38 +403,44 @@
             height: 18px;
         }
         
-        /* Ultra compact two column questions layout */
+        /* Ultra compact two column questions layout - MODIFIED */
         .questions-two-column {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 8px;
+            gap: 5px;
             margin-top: 10px;
+            justify-content: center;
         }
         
         .question-column {
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 4px;
+            margin: 0 auto;
+            width: 90%;
         }
         
         .question-vertical {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 3px 0;
+            padding: 2px 0;
         }
         
         .question-number {
             font-size: 11px;
             font-weight: bold;
             color: #444;
-            width: 18px;
+            width: 16px;
             text-align: left;
+            margin-left: 100; /* حذف فاصله */
         }
         
         .options-horizontal {
             display: flex;
-            gap: 6px;
+            gap: 4px;
+            margin-right: 0; /* حذف فاصله */
+            margin-left: 100px; /* فاصله کم از سمت چپ */
         }
         
         .option {
@@ -549,6 +485,60 @@
         .instructions ul {
             padding-right: 10px;
             line-height: 1.4;
+        }
+        
+        /* NEW: Results summary section */
+        .results-summary {
+            margin-top: 15px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            font-size: 11px;
+        }
+        
+        .results-summary h3 {
+            font-size: 12px;
+            color: var(--primary);
+            margin-bottom: 8px;
+            text-align: center;
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 3px 0;
+            border-bottom: 1px dashed #ccc;
+        }
+        
+        .summary-label {
+            font-weight: bold;
+            color: #444;
+        }
+        
+        .summary-value {
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .teacher-signature {
+            margin-top: 10px;
+            padding-top: 5px;
+            border-top: 1px solid #ddd;
+            text-align: left;
+        }
+        
+        .signature-label {
+            font-size: 10px;
+            color: #666;
+            margin-top: 15px;
         }
         
         .sheet-footer {
@@ -617,13 +607,144 @@
             margin-top: 15px;
         }
         
+        /* آزمون‌ها تب */
+        .exam-management {
+            margin-bottom: 25px;
+        }
+        
+        .exam-form {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .exam-form h3 {
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+        
+        .exam-list {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        
+        .exam-list h3 {
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+        
+        .exam-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .exam-info h4 {
+            margin-bottom: 5px;
+            color: var(--primary);
+        }
+        
+        .exam-info p {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .exam-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .exam-selector {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 10px;
+        }
+        
+        .exam-selector h3 {
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+        
+        .selected-exam {
+            background: #e8f5e9;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            display: none;
+        }
+        
+        .answer-key-display {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 3px;
+            margin-top: 10px;
+            background: #f0f0f0;
+            padding: 8px;
+            border-radius: 5px;
+        }
+        
+        .key-item {
+            text-align: center;
+            font-size: 0.8rem;
+            padding: 3px;
+            background: white;
+            border-radius: 3px;
+            border: 1px solid #ddd;
+        }
+        
+        .key-number {
+            font-weight: bold;
+            color: #444;
+            font-size: 0.7rem;
+        }
+        
+        .key-value {
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .answer-key-section {
+            margin-top: 15px;
+        }
+        
+        .answer-inputs {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 5px;
+            margin-top: 10px;
+        }
+        
+        .answer-input {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .answer-input label {
+            margin-bottom: 3px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .answer-input select {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: white;
+            font-size: 0.8rem;
+        }
+        
         @media (max-width: 900px) {
             .config-form {
                 grid-template-columns: 1fr;
-            }
-            
-            .answer-inputs {
-                grid-template-columns: repeat(5, 1fr);
             }
             
             .a5-container {
@@ -634,16 +755,23 @@
                 grid-template-columns: 1fr;
             }
             
-            .key-input-methods {
+            .exam-item {
                 flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .exam-actions {
+                margin-top: 10px;
+                width: 100%;
+                justify-content: flex-end;
+            }
+            
+            .answer-key-display, .answer-inputs {
+                grid-template-columns: repeat(5, 1fr);
             }
         }
         
         @media (max-width: 600px) {
-            .answer-inputs, .answers-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
-            
             .controls, .sheet-controls {
                 flex-direction: column;
             }
@@ -657,7 +785,7 @@
             }
             
             .options-horizontal {
-                gap: 4px;
+                gap: 3px;
             }
             
             .option {
@@ -667,142 +795,214 @@
             }
             
             .question-number {
-                width: 16px;
+                width: 14px;
                 font-size: 10px;
+            }
+            
+            .exam-actions {
+                flex-direction: column;
+            }
+            
+            .answer-key-display, .answer-inputs {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .summary-grid {
+                grid-template-columns: 1fr;
             }
         }
         
-        /* Print Styles - Only answer sheet */
+        /* Print Styles - 4 answer sheets per A4 page - FIXED */
         @media print {
-            body {
+            body, html {
                 background: white !important;
                 padding: 0 !important;
                 margin: 0 !important;
-                width: 148mm !important;
-                height: 210mm !important;
+                width: 210mm !important;
+                height: 297mm !important;
             }
             
-            .container {
-                box-shadow: none !important;
-                max-width: 100% !important;
-                border-radius: 0 !important;
-                margin: 0 !important;
-                width: 148mm !important;
-                height: 210mm !important;
-            }
-            
-            /* Hide everything except the answer sheet */
-            header, .tabs, .config-panel, .sheet-controls, footer, 
-            #app, .no-print {
+            /* Hide everything */
+            body > * {
                 display: none !important;
             }
             
-            /* Show only the answer sheet tab */
-            #sheet {
+            /* Show only print container */
+            #print-container {
                 display: block !important;
-                padding: 0 !important;
-                width: 148mm !important;
-                height: 210mm !important;
-            }
-            
-            .tab-content {
-                display: block !important;
-                padding: 0 !important;
-            }
-            
-            .a5-container {
-                box-shadow: none !important;
-                padding: 8mm !important;
-                max-width: 100% !important;
-                min-height: 200mm !important;
+                width: 210mm !important;
+                height: 297mm !important;
                 margin: 0 !important;
-                page-break-after: avoid !important;
-                page-break-inside: avoid !important;
-                break-inside: avoid !important;
+                padding: 0 !important;
+            }
+            
+            .print-grid-container {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr !important;
+                grid-template-rows: 1fr 1fr !important;
+                width: 210mm !important;
+                height: 297mm !important;
+                gap: 2mm !important;
+                padding: 5mm !important;
+                margin: 0 !important;
+                box-sizing: border-box !important;
+            }
+            
+            .a5-print-item {
+                width: 99mm !important;
+                height: 138mm !important;
+                padding: 3mm !important;
+                border: 1px dashed #ccc !important;
+                box-sizing: border-box !important;
+                background: white !important;
+                font-size: 8px !important;
             }
             
             /* Ensure proper print layout */
             @page {
-                size: A5;
+                size: A4;
                 margin: 0;
                 padding: 0;
             }
             
-            /* حفظ چیدمان دو ستونی در حالت چاپ */
+            /* بهبود فاصله‌ها در حالت چاپ */
             .questions-two-column {
                 display: grid !important;
                 grid-template-columns: 1fr 1fr !important;
-                gap: 8px !important;
-                margin-top: 10px !important;
+                gap: 1px !important;
+                margin-top: 2px !important;
+                justify-content: center !important;
             }
             
             .question-column {
                 display: flex !important;
                 flex-direction: column !important;
-                gap: 6px !important;
+                gap: 1px !important;
+                margin: 0 auto !important;
+                width: 90% !important;
             }
             
             .question-vertical {
                 display: flex !important;
                 align-items: center !important;
                 justify-content: space-between !important;
-                padding: 3px 0 !important;
+                padding: 0 !important;
+                margin: 0 !important;
             }
             
             .question-number {
-                font-size: 11px !important;
-                width: 18px !important;
+                font-size: 6px !important;
+                width: 8px !important;
+                margin-left: 100 !important; /* حذف فاصله در چاپ */
             }
             
             .options-horizontal {
                 display: flex !important;
-                gap: 6px !important;
+                gap: 1px !important;
+                margin-right: 0 !important; /* حذف فاصله در چاپ */
+                margin-left: 100px !important; /* فاصله کم در چاپ */
             }
             
             .option {
-                width: 16px !important;
-                height: 16px !important;
-                font-size: 9px !important;
+                width: 8px !important;
+                height: 8px !important;
+                font-size: 5px !important;
+                border: 0.5px solid #333 !important;
+                border-radius: 1px !important;
+                display: flex !important;
+                justify-content: center !important;
+                align-items: center !important;
             }
             
             /* Ultra compact for print */
             .school-name {
-                font-size: 14px !important;
-                margin-bottom: 5px !important;
+                font-size: 8px !important;
+                margin-bottom: 1px !important;
             }
             
             .answer-sheet-header {
-                margin-bottom: 10px !important;
+                margin-bottom: 2px !important;
+                padding-bottom: 1px !important;
             }
             
             .answer-sheet-header h1 {
-                font-size: 16px !important;
+                font-size: 9px !important;
+                margin: 0 !important;
             }
             
             .answer-sheet-header p {
-                font-size: 12px !important;
+                font-size: 6px !important;
+                margin: 0 !important;
             }
             
             .student-info {
-                margin-bottom: 10px !important;
-                gap: 5px !important;
-                font-size: 12px !important;
+                margin-bottom: 2px !important;
+                gap: 1px !important;
+                font-size: 6px !important;
             }
             
             .info-item label {
-                width: 100px !important;
-                font-size: 11px !important;
+                width: 50px !important;
+                font-size: 5px !important;
+            }
+            
+            .info-item span {
+                height: 8px !important;
+                font-size: 6px !important;
             }
             
             .instructions {
-                margin-top: 15px !important;
-                padding: 6px !important;
-                font-size: 10px !important;
+                margin-top: 4px !important;
+                padding: 2px !important;
+                font-size: 5px !important;
+            }
+            
+            .instructions h3 {
+                font-size: 6px !important;
+                margin: 0 !important;
+            }
+            
+            .instructions ul {
+                padding-right: 6px !important;
+                margin: 0 !important;
+                line-height: 1.2 !important;
+            }
+            
+            /* نتایج در چاپ */
+            .results-summary {
+                margin-top: 4px !important;
+                padding: 2px !important;
+                font-size: 5px !important;
+            }
+            
+            .results-summary h3 {
+                font-size: 6px !important;
+                margin-bottom: 3px !important;
+            }
+            
+            .summary-grid {
+                gap: 3px !important;
+                margin-bottom: 3px !important;
+            }
+            
+            .summary-item {
+                padding: 1px 0 !important;
+            }
+            
+            .teacher-signature {
+                margin-top: 3px !important;
+                padding-top: 1px !important;
+            }
+            
+            .signature-label {
+                font-size: 4px !important;
+                margin-top: 8px !important;
             }
             
             .sheet-footer {
-                margin-top: 12px !important;
-                font-size: 9px !important;
+                margin-top: 3px !important;
+                font-size: 4px !important;
+                padding-top: 1px !important;
             }
         }
     </style>
@@ -819,12 +1019,27 @@
             <button class="tab-btn active" onclick="openTab('app')">
                 📷 اپلیکیشن تصحیح
             </button>
+            <button class="tab-btn" onclick="openTab('exams')">
+                📚 مدیریت آزمون‌ها
+            </button>
             <button class="tab-btn" onclick="openTab('sheet')">
                 📝 پاسخنامه A5
             </button>
         </div>
         
         <div id="app" class="tab-content active">
+            <div class="exam-selector">
+                <h3>🎯 انتخاب آزمون برای تصحیح</h3>
+                <select id="exam-select" class="form-control">
+                    <option value="">-- لطفا یک آزمون انتخاب کنید --</option>
+                </select>
+                <div class="selected-exam" id="selected-exam-info">
+                    <strong>آزمون انتخاب شده:</strong> <span id="exam-name-display"></span>
+                    <br>
+                    <strong>تعداد سوالات:</strong> <span id="exam-questions-count"></span>
+                </div>
+            </div>
+            
             <div class="camera-section">
                 <h3>📷 اسکن پاسخنامه دانشجو</h3>
                 <div id="camera-view">
@@ -855,53 +1070,6 @@
                 </div>
             </div>
             
-            <div class="answer-key-section">
-                <h3>🔑 تعیین کلید پاسخ صحیح</h3>
-                
-                <div class="key-input-methods">
-                    <div class="key-method active" id="manual-method" onclick="setKeyMethod('manual')">
-                        <h4>📝 ورود دستی</h4>
-                        <p>پاسخ صحیح هر سوال را به صورت دستی انتخاب کنید</p>
-                    </div>
-                    <div class="key-method" id="scan-method" onclick="setKeyMethod('scan')">
-                        <h4>📷 اسکن کلید پاسخ</h4>
-                        <p>کلید پاسخ را با دوربین اسکن کنید</p>
-                    </div>
-                </div>
-                
-                <div id="manual-key-section">
-                    <div class="answer-inputs" id="answer-key-inputs">
-                        <!-- Answer key inputs will be generated here -->
-                    </div>
-                </div>
-                
-                <div id="scan-key-section" style="display: none;">
-                    <div id="key-camera-view">
-                        <div class="placeholder-text">
-                            <p>کلید پاسخ صحیح را درون کادر قرار دهید</p>
-                            <p>و عکس بگیرید تا پاسخ‌ها به صورت خودکار شناسایی شوند</p>
-                        </div>
-                        <div class="camera-overlay"></div>
-                        <div class="loading">
-                            <div class="spinner"></div>
-                            <p>در حال پردازش کلید پاسخ</p>
-                        </div>
-                    </div>
-                    
-                    <div class="controls">
-                        <button id="start-key-camera" class="btn-primary">
-                            فعال کردن دوربین
-                        </button>
-                        <button id="capture-key" class="btn-secondary" disabled>
-                            عکس‌برداری از کلید
-                        </button>
-                        <button id="process-key" class="btn-success" disabled>
-                            پردازش کلید پاسخ
-                        </button>
-                    </div>
-                </div>
-            </div>
-            
             <div class="results-section" id="results-section">
                 <h3>📊 نتایج تصحیح</h3>
                 <div class="score-display">
@@ -916,6 +1084,52 @@
                 <h3>🕒 تاریخچه تصحیح‌ها</h3>
                 <div class="history-list" id="history-list">
                     <!-- History items will be added here -->
+                </div>
+            </div>
+        </div>
+        
+        <div id="exams" class="tab-content">
+            <div class="exam-management">
+                <div class="exam-form">
+                    <h3 id="exam-form-title">➕ ایجاد آزمون جدید</h3>
+                    <div class="config-form">
+                        <div class="form-group">
+                            <label for="new-exam-name">نام آزمون:</label>
+                            <input type="text" id="new-exam-name" placeholder="مثال: آزمون پایانی ریاضی نیمسال اول">
+                        </div>
+                        <div class="form-group">
+                            <label for="new-exam-course">نام درس:</label>
+                            <input type="text" id="new-exam-course" placeholder="مثال: ریاضی عمومی">
+                        </div>
+                        <div class="form-group">
+                            <label for="new-exam-count">تعداد سوالات:</label>
+                            <select id="new-exam-count">
+                                <option value="20">۲۰ سوال</option>
+                                <option value="30">۳۰ سوال</option>
+                                <option value="40">۴۰ سوال</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="answer-key-section">
+                        <h3>🔑 تعیین کلید پاسخ صحیح</h3>
+                        <div class="answer-inputs" id="new-exam-answer-inputs">
+                            <!-- Answer key inputs will be generated here -->
+                        </div>
+                    </div>
+                    
+                    <div class="controls">
+                        <button id="create-exam" class="btn-success">
+                            ایجاد آزمون
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="exam-list">
+                    <h3>📋 لیست آزمون‌های ایجاد شده</h3>
+                    <div id="exams-list">
+                        <!-- Exams will be listed here -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -946,18 +1160,18 @@
                             <option value="20">۲۰ سوال</option>
                             <option value="30">۳۰ سوال</option>
                             <option value="40">۴۰ سوال</option>
-                            <option value="50" selected>۵۰ سوال</option>
                         </select>
                     </div>
                 </div>
             </div>
             
+            <!-- Single answer sheet for web view -->
             <div class="a5-container">
-                <div class="school-name" id="school-name-display">هنرستان فنی ماندگار شهید بهشتی دورود</div>
+                <div class="school-name" id="school-name-display">هنرستان فنی ماندگار شهید بهشتی</div>
                 
                 <div class="answer-sheet-header">
                     <h1 id="sheet-title">آزمون پایان پودمان</h1>
-                    <p id="sheet-details">درس:شیمی فنی | تاریخ: ۱۴۰۳/۰۳/۱۵</p>
+                    <p id="sheet-details">درس: شیمی فنی | تاریخ: ۱۴۰۳/۰۳/۱۵</p>
                 </div>
                 
                 <div class="student-info">
@@ -992,6 +1206,32 @@
                     </ul>
                 </div>
                 
+                <!-- NEW: Results summary section -->
+                <div class="results-summary">
+                    <h3>نتایج تصحیح</h3>
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <span class="summary-label">تعداد پاسخ درست:</span>
+                            <span class="summary-value" id="correct-count">۰</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">تعداد پاسخ نادرست:</span>
+                            <span class="summary-value" id="wrong-count">۰</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">تعداد بدون پاسخ:</span>
+                            <span class="summary-value" id="empty-count">۰</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">نمره:</span>
+                            <span class="summary-value" id="final-score">۰</span>
+                        </div>
+                    </div>
+                    <div class="teacher-signature">
+                        <div class="signature-label">امضای دبیر</div>
+                    </div>
+                </div>
+                
                 <div class="sheet-footer">
                     <p>پاسخنامه توسط اپلیکیشن تصحیح پاسخنامه چهارگزینه‌ای قابل پردازش است</p>
                 </div>
@@ -1001,20 +1241,14 @@
                 <button onclick="updateAnswerSheet()" class="btn-primary">
                     به‌روزرسانی پاسخنامه
                 </button>
-                <button onclick="window.print()" class="btn-secondary">
-                    چاپ پاسخنامه
-                </button>
-                <button onclick="fillRandomAnswers()" class="btn-warning">
-                    پر کردن تصادفی پاسخ‌ها
-                </button>
-                <button onclick="clearAllAnswers()" class="btn-danger">
-                    پاک کردن همه پاسخ‌ها
+                <button onclick="printAnswerSheets()" class="btn-secondary">
+                    چاپ پاسخنامه (۴ عدد در صفحه)
                 </button>
             </div>
         </div>
         
         <footer class="no-print">
-            <p>ساخته شده با ❤️ | نسخه ۳.۰.۰ | قابل استفاده در GitHub Pages</p>
+            <p>ساخته شده توسط امین قائدرحمتی | نسخه 1.1.0 | قابل استفاده در GitHub Pages</p>
         </footer>
     </div>
 
@@ -1041,6 +1275,11 @@
             });
             
             event.currentTarget.classList.add('active');
+            
+            // If opening exams tab, refresh the list
+            if (tabId === 'exams') {
+                refreshExamsList();
+            }
         }
         
         // Answer sheet functionality
@@ -1053,33 +1292,21 @@
             element.classList.add('selected');
         }
         
-        // Fill random answers for testing
-        function fillRandomAnswers() {
-            const allOptions = document.querySelectorAll('.options-horizontal');
-            
-            allOptions.forEach(options => {
-                // Clear previous selection
-                const opts = options.querySelectorAll('.option');
-                opts.forEach(opt => opt.classList.remove('selected'));
-                
-                // Select a random option
-                const randomIndex = Math.floor(Math.random() * 4);
-                opts[randomIndex].classList.add('selected');
-            });
-        }
-        
         // Clear all answers
         function clearAllAnswers() {
             const allOptions = document.querySelectorAll('.option');
             allOptions.forEach(opt => opt.classList.remove('selected'));
+            
+            // Reset results
+            resetResults();
         }
         
-        // Set key input method
-        function setKeyMethod(method) {
-            document.getElementById('manual-method').classList.toggle('active', method === 'manual');
-            document.getElementById('scan-method').classList.toggle('active', method === 'scan');
-            document.getElementById('manual-key-section').style.display = method === 'manual' ? 'block' : 'none';
-            document.getElementById('scan-key-section').style.display = method === 'scan' ? 'block' : 'none';
+        // Reset results display
+        function resetResults() {
+            document.getElementById('correct-count').textContent = '۰';
+            document.getElementById('wrong-count').textContent = '۰';
+            document.getElementById('empty-count').textContent = '۰';
+            document.getElementById('final-score').textContent = '۰';
         }
         
         // Update answer sheet based on configuration
@@ -1098,13 +1325,13 @@
             // Regenerate questions
             generateQuestionsTwoColumn(questionCount);
             
-            // Regenerate answer key inputs
-            initializeAnswerKey(questionCount);
+            // Reset results
+            resetResults();
             
             alert('پاسخنامه با موفقیت به‌روزرسانی شد!');
         }
         
-        // Generate questions for two-column answer sheet
+        // Generate questions for two-column answer sheet with reduced margins
         function generateQuestionsTwoColumn(count) {
             const container = document.getElementById('questions-two-column');
             container.innerHTML = '';
@@ -1142,15 +1369,9 @@
         }
         
         // Initialize answer key inputs
-        function initializeAnswerKey(count) {
-            const container = document.getElementById('answer-key-inputs');
+        function initializeAnswerKey(containerId, count) {
+            const container = document.getElementById(containerId);
             container.innerHTML = '';
-            
-            // Calculate grid columns based on question count
-            let gridColumns = 8;
-            if (count > 40) gridColumns = 10;
-            
-            container.style.gridTemplateColumns = `repeat(${gridColumns}, 1fr)`;
             
             for (let i = 1; i <= count; i++) {
                 const answerInput = document.createElement('div');
@@ -1158,9 +1379,11 @@
                 
                 const label = document.createElement('label');
                 label.textContent = toPersianNumber(i);
+                label.htmlFor = `new-exam-answer-inputs-answer-${i}`;
                 
                 const select = document.createElement('select');
-                select.id = `answer-${i}`;
+                select.id = `new-exam-answer-inputs-answer-${i}`;
+                select.name = `answer-${i}`;
                 select.innerHTML = `
                     <option value="الف">الف</option>
                     <option value="ب">ب</option>
@@ -1168,7 +1391,7 @@
                     <option value="د">د</option>
                 `;
                 
-                // Set default answer key (for demo purposes)
+                // Set default answer key
                 if (i % 4 === 0) select.value = 'الف';
                 else if (i % 4 === 1) select.value = 'ب';
                 else if (i % 4 === 2) select.value = 'ج';
@@ -1180,264 +1403,319 @@
             }
         }
         
-        // App functionality
+        // Exam management functionality
+        let exams = JSON.parse(localStorage.getItem('exams')) || [];
+        let selectedExam = null;
+        
+        // Create a new exam
+        function createExam() {
+            const name = document.getElementById('new-exam-name').value;
+            const course = document.getElementById('new-exam-course').value;
+            const count = parseInt(document.getElementById('new-exam-count').value);
+            
+            if (!name || !course) {
+                alert('لطفاً نام آزمون و نام درس را وارد کنید.');
+                return;
+            }
+            
+            // Get answer key
+            const answerKey = [];
+            for (let i = 1; i <= count; i++) {
+                const select = document.getElementById(`new-exam-answer-inputs-answer-${i}`);
+                if (select) {
+                    answerKey.push(select.value);
+                }
+            }
+            
+            const newExam = {
+                id: Date.now(),
+                name: name,
+                course: course,
+                questionCount: count,
+                answerKey: answerKey,
+                created: new Date().toLocaleString('fa-IR')
+            };
+            
+            exams.push(newExam);
+            localStorage.setItem('exams', JSON.stringify(exams));
+            
+            // Reset form
+            resetExamForm();
+            
+            alert('آزمون با موفقیت ایجاد شد!');
+            refreshExamsList();
+            refreshExamSelector();
+        }
+        
+        // Reset exam form
+        function resetExamForm() {
+            document.getElementById('new-exam-name').value = '';
+            document.getElementById('new-exam-course').value = '';
+            document.getElementById('new-exam-count').value = '20';
+            initializeAnswerKey('new-exam-answer-inputs', 20);
+        }
+        
+        // Refresh exams list
+        function refreshExamsList() {
+            const examsList = document.getElementById('exams-list');
+            examsList.innerHTML = '';
+            
+            if (exams.length === 0) {
+                examsList.innerHTML = '<p>هیچ آزمونی ایجاد نشده است.</p>';
+                return;
+            }
+            
+            exams.forEach(exam => {
+                const examItem = document.createElement('div');
+                examItem.className = 'exam-item';
+                
+                let keyDisplay = '';
+                for (let i = 0; i < exam.answerKey.length; i++) {
+                    keyDisplay += `
+                        <div class="key-item">
+                            <div class="key-number">${toPersianNumber(i+1)}</div>
+                            <div class="key-value">${exam.answerKey[i]}</div>
+                        </div>
+                    `;
+                }
+                
+                examItem.innerHTML = `
+                    <div class="exam-info">
+                        <h4>${exam.name}</h4>
+                        <p>درس: ${exam.course} | تعداد سوالات: ${toPersianNumber(exam.questionCount)} | ایجاد شده در: ${exam.created}</p>
+                        <div class="answer-key-display">
+                            ${keyDisplay}
+                        </div>
+                    </div>
+                    <div class="exam-actions">
+                        <button class="btn-primary" onclick="selectExam(${exam.id})">انتخاب برای تصحیح</button>
+                        <button class="btn-warning" onclick="editExam(${exam.id})">ویرایش</button>
+                        <button class="btn-danger" onclick="deleteExam(${exam.id})">حذف</button>
+                    </div>
+                `;
+                
+                examsList.appendChild(examItem);
+            });
+        }
+        
+        // Edit an exam
+        function editExam(examId) {
+            if (confirm('آیا می‌خواهید این آزمون را ویرایش کنید؟')) {
+                const examIndex = exams.findIndex(exam => exam.id === examId);
+                if (examIndex !== -1) {
+                    const exam = exams[examIndex];
+                    
+                    document.getElementById('new-exam-name').value = exam.name;
+                    document.getElementById('new-exam-course').value = exam.course;
+                    document.getElementById('new-exam-count').value = exam.questionCount;
+                    
+                    initializeAnswerKey('new-exam-answer-inputs', exam.questionCount);
+                    
+                    setTimeout(() => {
+                        for (let i = 1; i <= exam.questionCount; i++) {
+                            const select = document.getElementById(`new-exam-answer-inputs-answer-${i}`);
+                            if (select && exam.answerKey[i-1]) {
+                                select.value = exam.answerKey[i-1];
+                            }
+                        }
+                    }, 100);
+                    
+                    exams.splice(examIndex, 1);
+                    localStorage.setItem('exams', JSON.stringify(exams));
+                    
+                    refreshExamsList();
+                    refreshExamSelector();
+                    
+                    alert('اطلاعات آزمون به فرم وارد شد. لطفاً دکمه "ایجاد آزمون" را بزنید.');
+                }
+            }
+        }
+        
+        // Refresh exam selector dropdown
+        function refreshExamSelector() {
+            const examSelect = document.getElementById('exam-select');
+            examSelect.innerHTML = '<option value="">-- لطفا یک آزمون انتخاب کنید --</option>';
+            
+            exams.forEach(exam => {
+                const option = document.createElement('option');
+                option.value = exam.id;
+                option.textContent = `${exam.name} (${exam.course})`;
+                examSelect.appendChild(option);
+            });
+        }
+        
+        // Select an exam for grading
+        function selectExam(examId) {
+            selectedExam = exams.find(exam => exam.id === examId);
+            
+            if (selectedExam) {
+                document.getElementById('exam-name-display').textContent = `${selectedExam.name} (${selectedExam.course})`;
+                document.getElementById('exam-questions-count').textContent = toPersianNumber(selectedExam.questionCount);
+                document.getElementById('selected-exam-info').style.display = 'block';
+                document.getElementById('exam-select').value = examId;
+            }
+        }
+        
+        // Delete an exam
+        function deleteExam(examId) {
+            if (confirm('آیا از حذف این آزمون اطمینان دارید؟')) {
+                exams = exams.filter(exam => exam.id !== examId);
+                localStorage.setItem('exams', JSON.stringify(exams));
+                refreshExamsList();
+                refreshExamSelector();
+                
+                if (selectedExam && selectedExam.id === examId) {
+                    selectedExam = null;
+                    document.getElementById('selected-exam-info').style.display = 'none';
+                    document.getElementById('exam-select').value = '';
+                }
+            }
+        }
+        
+        // Update answer key inputs when question count changes
+        function updateNewExamAnswerKey() {
+            const count = parseInt(document.getElementById('new-exam-count').value);
+            initializeAnswerKey('new-exam-answer-inputs', count);
+        }
+        
+        // Print 4 answer sheets per A4 page
+        function printAnswerSheets() {
+            const originalSheet = document.querySelector('.a5-container');
+            const printContainer = document.createElement('div');
+            printContainer.id = 'print-container';
+            
+            const gridContainer = document.createElement('div');
+            gridContainer.className = 'print-grid-container';
+            
+            // Create 4 answer sheets
+            for (let i = 0; i < 4; i++) {
+                const clone = originalSheet.cloneNode(true);
+                clone.className = 'a5-print-item';
+                
+                // Remove no-print elements
+                const noPrintElements = clone.querySelectorAll('.no-print');
+                noPrintElements.forEach(el => el.remove());
+                
+                gridContainer.appendChild(clone);
+            }
+            
+            printContainer.appendChild(gridContainer);
+            document.body.appendChild(printContainer);
+            
+            // Print after a short delay
+            setTimeout(() => {
+                window.print();
+                
+                // Clean up
+                setTimeout(() => {
+                    if (document.body.contains(printContainer)) {
+                        document.body.removeChild(printContainer);
+                    }
+                }, 100);
+            }, 100);
+        }
+        
+        // Initialize the app
         document.addEventListener('DOMContentLoaded', function() {
-            // Elements
-            const cameraView = document.getElementById('camera-view');
+            // Initialize answer sheet
+            generateQuestionsTwoColumn(20);
+            initializeAnswerKey('new-exam-answer-inputs', 20);
+            
+            // Load exams
+            refreshExamsList();
+            refreshExamSelector();
+            
+            // Set up event listeners
+            document.getElementById('create-exam').addEventListener('click', createExam);
+            document.getElementById('new-exam-count').addEventListener('change', updateNewExamAnswerKey);
+            document.getElementById('exam-select').addEventListener('change', function() {
+                if (this.value) {
+                    selectExam(parseInt(this.value));
+                } else {
+                    selectedExam = null;
+                    document.getElementById('selected-exam-info').style.display = 'none';
+                }
+            });
+            
+            // Camera functionality
             const startCameraBtn = document.getElementById('start-camera');
             const captureBtn = document.getElementById('capture');
             const processBtn = document.getElementById('process');
             const resetBtn = document.getElementById('reset');
-            
-            const keyCameraView = document.getElementById('key-camera-view');
-            const startKeyCameraBtn = document.getElementById('start-key-camera');
-            const captureKeyBtn = document.getElementById('capture-key');
-            const processKeyBtn = document.getElementById('process-key');
-            
+            const cameraView = document.getElementById('camera-view');
             const loadingOverlay = document.querySelector('.loading');
             const resultsSection = document.getElementById('results-section');
-            const answersGrid = document.getElementById('answers-grid');
-            const historyList = document.getElementById('history-list');
-            const scoreElement = document.getElementById('score');
-            const totalElement = document.getElementById('total');
             
             let stream = null;
-            let video = null;
-            let canvas = null;
-            let capturedImage = null;
             
-            let keyStream = null;
-            let keyVideo = null;
-            let keyCanvas = null;
-            let keyCapturedImage = null;
-            
-            let answerKey = [];
-            
-            // Initialize the app
-            const initialQuestionCount = 50; // Default to 50 questions
-            generateQuestionsTwoColumn(initialQuestionCount);
-            initializeAnswerKey(initialQuestionCount);
-            
-            // Check camera support
-            function checkCameraSupport() {
-                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                    alert('مرورگر شما از دوربین پشتیبانی نمی‌کند. لطفاً از مرورگرهای مدرن مانند Chrome استفاده کنید.');
-                    return false;
-                }
-                return true;
-            }
-            
-            // Request camera permission for student sheet
             startCameraBtn.addEventListener('click', async function() {
-                if (!checkCameraSupport()) return;
-                
                 try {
-                    stream = await navigator.mediaDevices.getUserMedia({ 
-                        video: { 
-                            facingMode: 'environment',
-                            width: { ideal: 1280 },
-                            height: { ideal: 720 }
-                        }, 
-                        audio: false 
-                    });
-                    
-                    cameraView.innerHTML = '';
-                    video = document.createElement('video');
+                    stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                    const video = document.createElement('video');
                     video.srcObject = stream;
                     video.autoplay = true;
-                    video.playsInline = true;
-                    
-                    // Add video to camera view
+                    cameraView.innerHTML = '';
                     cameraView.appendChild(video);
-                    cameraView.appendChild(document.createElement('div')).className = 'camera-overlay';
-                    
-                    // Create canvas for capturing images
-                    canvas = document.createElement('canvas');
-                    canvas.style.display = 'none';
-                    cameraView.appendChild(canvas);
-                    
-                    // Enable capture button
                     captureBtn.disabled = false;
                     startCameraBtn.disabled = true;
-                    startCameraBtn.textContent = 'دوربین فعال است';
-                    
                 } catch (error) {
-                    console.error('Error accessing camera:', error);
-                    alert('خطا در دسترسی به دوربین. لطفاً مجوز دوربین را بررسی کنید. ' + error.message);
+                    alert('خطا در دسترسی به دوربین: ' + error.message);
                 }
             });
             
-            // Request camera permission for answer key
-            startKeyCameraBtn.addEventListener('click', async function() {
-                if (!checkCameraSupport()) return;
-                
-                try {
-                    keyStream = await navigator.mediaDevices.getUserMedia({ 
-                        video: { 
-                            facingMode: 'environment',
-                            width: { ideal: 1280 },
-                            height: { ideal: 720 }
-                        }, 
-                        audio: false 
-                    });
-                    
-                    keyCameraView.innerHTML = '';
-                    keyVideo = document.createElement('video');
-                    keyVideo.srcObject = keyStream;
-                    keyVideo.autoplay = true;
-                    keyVideo.playsInline = true;
-                    
-                    // Add video to camera view
-                    keyCameraView.appendChild(keyVideo);
-                    keyCameraView.appendChild(document.createElement('div')).className = 'camera-overlay';
-                    
-                    // Create canvas for capturing images
-                    keyCanvas = document.createElement('canvas');
-                    keyCanvas.style.display = 'none';
-                    keyCameraView.appendChild(keyCanvas);
-                    
-                    // Enable capture button
-                    captureKeyBtn.disabled = false;
-                    startKeyCameraBtn.disabled = true;
-                    startKeyCameraBtn.textContent = 'دوربین فعال است';
-                    
-                } catch (error) {
-                    console.error('Error accessing camera:', error);
-                    alert('خطا در دسترسی به دوربین. لطفاً مجوز دوربین را بررسی کنید. ' + error.message);
-                }
-            });
-            
-            // Capture image for student sheet
             captureBtn.addEventListener('click', function() {
-                if (!video) return;
+                if (!stream) return;
                 
-                const context = canvas.getContext('2d');
-                
-                // Set canvas dimensions to match video
+                const video = cameraView.querySelector('video');
+                const canvas = document.createElement('canvas');
                 canvas.width = video.videoWidth;
                 canvas.height = video.videoHeight;
+                const context = canvas.getContext('2d');
+                context.drawImage(video, 0, 0);
                 
-                // Draw the current video frame to the canvas
-                context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                
-                // Convert canvas to image
-                capturedImage = new Image();
-                capturedImage.src = canvas.toDataURL('image/png');
-                capturedImage.style.width = '100%';
-                capturedImage.style.height = '100%';
-                capturedImage.style.objectFit = 'cover';
-                
-                // Replace video with captured image
+                const image = new Image();
+                image.src = canvas.toDataURL();
+                image.style.width = '100%';
                 cameraView.innerHTML = '';
-                cameraView.appendChild(capturedImage);
-                cameraView.appendChild(document.createElement('div')).className = 'camera-overlay';
+                cameraView.appendChild(image);
                 
-                // Stop the video stream
-                if (stream) {
-                    stream.getTracks().forEach(track => track.stop());
-                }
-                
-                // Enable process button
+                stream.getTracks().forEach(track => track.stop());
                 processBtn.disabled = false;
                 captureBtn.disabled = true;
             });
             
-            // Capture image for answer key
-            captureKeyBtn.addEventListener('click', function() {
-                if (!keyVideo) return;
-                
-                const context = keyCanvas.getContext('2d');
-                
-                // Set canvas dimensions to match video
-                keyCanvas.width = keyVideo.videoWidth;
-                keyCanvas.height = keyVideo.videoHeight;
-                
-                // Draw the current video frame to the canvas
-                context.drawImage(keyVideo, 0, 0, keyCanvas.width, keyCanvas.height);
-                
-                // Convert canvas to image
-                keyCapturedImage = new Image();
-                keyCapturedImage.src = keyCanvas.toDataURL('image/png');
-                keyCapturedImage.style.width = '100%';
-                keyCapturedImage.style.height = '100%';
-                keyCapturedImage.style.objectFit = 'cover';
-                
-                // Replace video with captured image
-                keyCameraView.innerHTML = '';
-                keyCameraView.appendChild(keyCapturedImage);
-                keyCameraView.appendChild(document.createElement('div')).className = 'camera-overlay';
-                
-                // Stop the video stream
-                if (keyStream) {
-                    keyStream.getTracks().forEach(track => track.stop());
+            processBtn.addEventListener('click', function() {
+                if (!selectedExam) {
+                    alert('لطفاً یک آزمون انتخاب کنید.');
+                    return;
                 }
                 
-                // Enable process button
-                processKeyBtn.disabled = false;
-                captureKeyBtn.disabled = true;
-            });
-            
-            // Process student answers
-            processBtn.addEventListener('click', function() {
-                // Show loading
                 loadingOverlay.style.display = 'flex';
                 
-                // Get answer key from inputs
-                const questionCount = parseInt(document.getElementById('question-count').value);
-                answerKey = [];
-                for (let i = 1; i <= questionCount; i++) {
-                    answerKey.push(document.getElementById(`answer-${i}`).value);
-                }
-                
-                // Simulate processing delay
                 setTimeout(() => {
-                    // Simulate answer detection (in a real app, this would use image processing)
-                    const detectedAnswers = simulateAnswerDetection(answerKey);
-                    
-                    // Calculate results
-                    calculateResults(detectedAnswers, answerKey);
-                    
-                    // Hide loading
                     loadingOverlay.style.display = 'none';
-                    
-                    // Show results section
                     resultsSection.style.display = 'block';
                     
+                    // Simulate results
+                    const score = Math.floor(Math.random() * selectedExam.questionCount);
+                    document.getElementById('score').textContent = toPersianNumber(score);
+                    document.getElementById('total').textContent = toPersianNumber(selectedExam.questionCount);
+                    
                     // Add to history
-                    addToHistory(detectedAnswers, answerKey);
+                    const historyItem = document.createElement('div');
+                    historyItem.className = 'history-item';
+                    historyItem.innerHTML = `
+                        <div>آزمون: ${selectedExam.name} | تاریخ: ${new Date().toLocaleString('fa-IR')}</div>
+                        <div class="history-score">${toPersianNumber(score)}/${toPersianNumber(selectedExam.questionCount)}</div>
+                    `;
+                    document.getElementById('history-list').prepend(historyItem);
                 }, 2000);
             });
             
-            // Process answer key
-            processKeyBtn.addEventListener('click', function() {
-                // Show loading
-                const keyLoading = keyCameraView.querySelector('.loading');
-                keyLoading.style.display = 'flex';
-                
-                // Simulate processing delay
-                setTimeout(() => {
-                    // Simulate answer key detection (in a real app, this would use image processing)
-                    const questionCount = parseInt(document.getElementById('question-count').value);
-                    const detectedKey = simulateAnswerKeyDetection(questionCount);
-                    
-                    // Set the detected key to the answer inputs
-                    setAnswerKey(detectedKey);
-                    
-                    // Hide loading
-                    keyLoading.style.display = 'none';
-                    
-                    alert('کلید پاسخ با موفقیت اسکن و تنظیم شد!');
-                }, 2000);
-            });
-            
-            // Reset button for student sheet
             resetBtn.addEventListener('click', function() {
-                // Stop the video stream if active
                 if (stream) {
                     stream.getTracks().forEach(track => track.stop());
                 }
-                
-                // Reset camera view
                 cameraView.innerHTML = `
                     <div class="placeholder-text">
                         <p>برای شروع، دوربین را فعال کنید</p>
@@ -1449,107 +1727,12 @@
                         <p>در حال پردازش تصویر</p>
                     </div>
                 `;
-                
-                // Reset buttons
                 startCameraBtn.disabled = false;
-                startCameraBtn.textContent = 'فعال کردن دوربین';
                 captureBtn.disabled = true;
                 processBtn.disabled = true;
-                
-                // Hide results
                 resultsSection.style.display = 'none';
-                
                 stream = null;
-                video = null;
-                capturedImage = null;
             });
-            
-            // Simulate answer detection for student sheet
-            function simulateAnswerDetection(answerKey) {
-                const detectedAnswers = [];
-                for (let i = 0; i < answerKey.length; i++) {
-                    // 80% chance of correct answer, 20% chance of random wrong answer
-                    if (Math.random() > 0.2) {
-                        detectedAnswers.push(answerKey[i]);
-                    } else {
-                        const options = ['الف', 'ب', 'ج', 'د'];
-                        const wrongOptions = options.filter(opt => opt !== answerKey[i]);
-                        detectedAnswers.push(wrongOptions[Math.floor(Math.random() * wrongOptions.length)]);
-                    }
-                }
-                return detectedAnswers;
-            }
-            
-            // Simulate answer key detection
-            function simulateAnswerKeyDetection(questionCount) {
-                const detectedKey = [];
-                for (let i = 0; i < questionCount; i++) {
-                    const options = ['الف', 'ب', 'ج', 'د'];
-                    // For answer key, we use a more consistent pattern
-                    detectedKey.push(options[i % 4]);
-                }
-                return detectedKey;
-            }
-            
-            // Set answer key from detected values
-            function setAnswerKey(detectedKey) {
-                for (let i = 0; i < detectedKey.length; i++) {
-                    const select = document.getElementById(`answer-${i+1}`);
-                    if (select) {
-                        select.value = detectedKey[i];
-                    }
-                }
-            }
-            
-            // Calculate and display results
-            function calculateResults(detectedAnswers, answerKey) {
-                let correctCount = 0;
-                
-                // Clear previous results
-                answersGrid.innerHTML = '';
-                
-                // Calculate grid columns based on question count
-                let gridColumns = 5;
-                if (answerKey.length > 30) gridColumns = 6;
-                if (answerKey.length > 40) gridColumns = 8;
-                
-                answersGrid.style.gridTemplateColumns = `repeat(${gridColumns}, 1fr)`;
-                
-                for (let i = 0; i < detectedAnswers.length; i++) {
-                    const isCorrect = detectedAnswers[i] === answerKey[i];
-                    if (isCorrect) correctCount++;
-                    
-                    const answerItem = document.createElement('div');
-                    answerItem.className = `answer-item ${isCorrect ? 'correct' : 'incorrect'}`;
-                    answerItem.innerHTML = `
-                        <div>سوال ${toPersianNumber(i + 1)}</div>
-                        <div>پاسخ: ${detectedAnswers[i]}</div>
-                        <div>${isCorrect ? '✓' : '✗'}</div>
-                    `;
-                    
-                    answersGrid.appendChild(answerItem);
-                }
-                
-                // Update score
-                scoreElement.textContent = toPersianNumber(correctCount);
-                totalElement.textContent = toPersianNumber(answerKey.length);
-            }
-            
-            // Add to history
-            function addToHistory(detectedAnswers, answerKey) {
-                const correctCount = detectedAnswers.filter((answer, i) => answer === answerKey[i]).length;
-                const total = answerKey.length;
-                const percentage = Math.round((correctCount / total) * 100);
-                
-                const historyItem = document.createElement('div');
-                historyItem.className = 'history-item';
-                historyItem.innerHTML = `
-                    <div>تاریخ: ${new Date().toLocaleString('fa-IR')}</div>
-                    <div class="history-score">${toPersianNumber(correctCount)}/${toPersianNumber(total)} (${toPersianNumber(percentage)}%)</div>
-                `;
-                
-                historyList.prepend(historyItem);
-            }
         });
     </script>
 </body>
