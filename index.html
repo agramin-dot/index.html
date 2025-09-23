@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>اپلیکیشن تصحیح پاسخنامه</title>
+    <title>اپلیکیشن تصحیح پاسخنامه پیشرفته</title>
     <meta name="theme-color" content="#4a00e0">
     <style>
         * {
@@ -22,6 +22,7 @@
             --success: #28a745;
             --danger: #dc3545;
             --warning: #ffc107;
+            --marker-color: #ff3b30;
         }
         
         body {
@@ -117,7 +118,7 @@
         
         #camera-view {
             width: 100%;
-            height: 300px;
+            height: 400px;
             background-color: #f1f1f1;
             border-radius: 10px;
             margin-bottom: 15px;
@@ -131,25 +132,82 @@
         #camera-view video, #camera-view canvas, #camera-view img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain;
             border-radius: 10px;
+            background-color: #000;
         }
         
         .camera-overlay {
             position: absolute;
-            top: 10px;
-            left: 10px;
-            right: 10px;
-            bottom: 10px;
-            border: 2px dashed var(--primary);
-            border-radius: 8px;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 3px solid var(--marker-color);
+            border-radius: 10px;
             pointer-events: none;
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.3);
+            z-index: 5;
+        }
+        
+        .marker-indicator {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: var(--marker-color);
+            border-radius: 50%;
+            z-index: 6;
+        }
+        
+        .marker-indicator.top-left {
+            top: -10px;
+            left: -10px;
+        }
+        
+        .marker-indicator.top-right {
+            top: -10px;
+            right: -10px;
+        }
+        
+        .marker-indicator.bottom-left {
+            bottom: -10px;
+            left: -10px;
+        }
+        
+        .marker-indicator.bottom-right {
+            bottom: -10px;
+            right: -10px;
+        }
+        
+        .alignment-guide {
+            position: absolute;
+            border: 2px dashed rgba(255, 255, 255, 0.7);
+            pointer-events: none;
+            z-index: 6;
+        }
+        
+        .alignment-horizontal {
+            top: 50%;
+            left: 10%;
+            right: 10%;
+            height: 0;
+            transform: translateY(-50%);
+        }
+        
+        .alignment-vertical {
+            left: 50%;
+            top: 10%;
+            bottom: 10%;
+            width: 0;
+            transform: translateX(-50%);
         }
         
         .placeholder-text {
             color: #888;
             text-align: center;
             padding: 20px;
+            z-index: 1;
+            position: relative;
         }
         
         .controls {
@@ -250,18 +308,25 @@
         
         .answers-grid {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
+            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
             gap: 10px;
             margin-top: 20px;
         }
         
         .answer-item {
-            padding: 8px;
+            padding: 10px;
             border-radius: 6px;
             text-align: center;
             font-weight: bold;
             box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
             font-size: 0.9rem;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .answer-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
         
         .correct {
@@ -280,6 +345,14 @@
             background: #f8f9fa;
             color: #6c757d;
             border: 1px solid #e9ecef;
+        }
+        
+        .confidence-indicator {
+            position: absolute;
+            bottom: 2px;
+            right: 5px;
+            font-size: 0.7rem;
+            opacity: 0.7;
         }
         
         .history-section {
@@ -304,6 +377,12 @@
             align-items: center;
             box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
             font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .history-item:hover {
+            background: #e9e9e9;
+            transform: translateX(5px);
         }
         
         .history-score {
@@ -318,7 +397,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -343,6 +422,22 @@
             100% { transform: rotate(360deg); }
         }
         
+        .progress-bar {
+            width: 80%;
+            height: 10px;
+            background: #f0f0f0;
+            border-radius: 5px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
         /* Answer Sheet Styles - A5 for web view */
         .a5-container {
             width: 100%;
@@ -354,6 +449,37 @@
             position: relative;
             overflow: hidden;
             min-height: 200mm;
+        }
+        
+        /* Markers for answer sheet */
+        .sheet-marker {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            background: var(--marker-color);
+            border: 2px solid white;
+            box-shadow: 0 0 0 2px var(--marker-color);
+            z-index: 10;
+        }
+        
+        .sheet-marker.tl {
+            top: 5mm;
+            left: 5mm;
+        }
+        
+        .sheet-marker.tr {
+            top: 5mm;
+            right: 5mm;
+        }
+        
+        .sheet-marker.bl {
+            bottom: 5mm;
+            left: 5mm;
+        }
+        
+        .sheet-marker.br {
+            bottom: 5mm;
+            right: 5mm;
         }
         
         .school-name {
@@ -409,73 +535,108 @@
             height: 18px;
         }
         
-        /* Ultra compact two column questions layout - MODIFIED */
-        .questions-two-column {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 5px;
+        /* Questions layout */
+        .questions-container {
             margin-top: 10px;
-            justify-content: center;
         }
         
-        .question-column {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            margin: 0 auto;
-            width: 90%;
+        .questions-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 5px;
         }
         
-        .question-vertical {
+        .question-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 2px 0;
+            padding: 3px 0;
+            border-bottom: 1px dotted #eee;
         }
         
         .question-number {
             font-size: 11px;
             font-weight: bold;
             color: #444;
-            width: 16px;
-            text-align: left;
-            margin-left: 0;
+            width: 20px;
+            text-align: center;
         }
         
-        .options-horizontal {
+        .options-container {
             display: flex;
-            gap: 4px;
-            margin-right: 0;
-            margin-left: 2px;
+            gap: 8px;
         }
         
-        .option {
-            width: 16px;
-            height: 16px;
-            border: 1px solid #333;
-            border-radius: 2px;
+        .option-circle {
+            width: 18px;
+            height: 18px;
+            border: 1.5px solid #333;
+            border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 9px;
+            font-size: 10px;
             font-weight: bold;
-            cursor: pointer;
-            transition: all 0.2s ease;
+            position: relative;
         }
         
-        .option:hover {
-            background-color: #f0f0f0;
+        .option-circle.filled::after {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #000;
+            border-radius: 50%;
         }
         
-        .option.selected {
-            background-color: var(--primary);
-            color: white;
-            border-color: var(--primary);
+        .bubble-columns {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+            margin-top: 15px;
+        }
+        
+        .bubble-column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+        }
+        
+        .bubble-row {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .bubble-number {
+            font-size: 10px;
+            width: 15px;
+            text-align: center;
+        }
+        
+        .bubble {
+            width: 16px;
+            height: 16px;
+            border: 1px solid #333;
+            border-radius: 50%;
+            position: relative;
+        }
+        
+        .bubble.filled::after {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #000;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
         }
         
         .instructions {
             margin-top: 15px;
-            padding: 6px;
+            padding: 8px;
             border: 1px solid #ddd;
             border-radius: 4px;
             background-color: #f9f9f9;
@@ -493,7 +654,11 @@
             line-height: 1.4;
         }
         
-        /* NEW: Results summary section */
+        .instructions li {
+            margin-bottom: 3px;
+        }
+        
+        /* Results summary section */
         .results-summary {
             margin-top: 15px;
             padding: 10px;
@@ -613,227 +778,20 @@
             margin-top: 15px;
         }
         
-        /* آزمون‌ها تب */
-        .exam-management {
-            margin-bottom: 25px;
-        }
-        
-        .exam-form {
-            background: #f9f9f9;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-        
-        .exam-form h3 {
-            margin-bottom: 15px;
-            color: var(--primary);
-        }
-        
-        .exam-list {
-            background: #f9f9f9;
-            padding: 20px;
-            border-radius: 10px;
-        }
-        
-        .exam-list h3 {
-            margin-bottom: 15px;
-            color: var(--primary);
-        }
-        
-        .exam-item {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-        }
-        
-        .exam-info h4 {
-            margin-bottom: 5px;
-            color: var(--primary);
-        }
-        
-        .exam-info p {
-            font-size: 0.9rem;
-            color: #666;
-            margin-bottom: 10px;
-        }
-        
-        .exam-actions {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        
-        .exam-selector {
-            margin-bottom: 20px;
-            padding: 15px;
-            background: #f9f9f9;
-            border-radius: 10px;
-        }
-        
-        .exam-selector h3 {
-            margin-bottom: 10px;
-            color: var(--primary);
-        }
-        
-        .selected-exam {
-            background: #e8f5e9;
-            padding: 10px;
-            border-radius: 5px;
-            margin-top: 10px;
-            display: none;
-        }
-        
-        .answer-key-display {
-            display: grid;
-            grid-template-columns: repeat(10, 1fr);
-            gap: 3px;
-            margin-top: 10px;
-            background: #f0f0f0;
-            padding: 8px;
-            border-radius: 5px;
-        }
-        
-        .key-item {
-            text-align: center;
-            font-size: 0.8rem;
-            padding: 3px;
-            background: white;
-            border-radius: 3px;
-            border: 1px solid #ddd;
-        }
-        
-        .key-number {
-            font-weight: bold;
-            color: #444;
-            font-size: 0.7rem;
-        }
-        
-        .key-value {
-            font-weight: bold;
-            color: var(--primary);
-        }
-        
-        .answer-key-section {
-            margin-top: 15px;
-        }
-        
-        .answer-inputs {
-            display: grid;
-            grid-template-columns: repeat(10, 1fr);
-            gap: 5px;
-            margin-top: 10px;
-        }
-        
-        .answer-input {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        .answer-input label {
-            margin-bottom: 3px;
-            font-size: 0.8rem;
-            font-weight: bold;
-        }
-        
-        .answer-input select {
-            width: 100%;
-            padding: 5px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background: white;
-            font-size: 0.8rem;
-        }
-        
-        @media (max-width: 900px) {
-            .config-form {
-                grid-template-columns: 1fr;
-            }
-            
-            .a5-container {
-                padding: 6mm;
-            }
-            
-            .questions-two-column {
-                grid-template-columns: 1fr;
-            }
-            
-            .exam-item {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .exam-actions {
-                margin-top: 10px;
-                width: 100%;
-                justify-content: flex-end;
-            }
-            
-            .answer-key-display, .answer-inputs {
-                grid-template-columns: repeat(5, 1fr);
-            }
-        }
-        
-        @media (max-width: 600px) {
-            .controls, .sheet-controls {
-                flex-direction: column;
-            }
-            
-            button {
-                width: 100%;
-            }
-            
-            .student-info {
-                grid-template-columns: 1fr;
-            }
-            
-            .options-horizontal {
-                gap: 3px;
-            }
-            
-            .option {
-                width: 14px;
-                height: 14px;
-                font-size: 8px;
-            }
-            
-            .question-number {
-                width: 14px;
-                font-size: 10px;
-            }
-            
-            .exam-actions {
-                flex-direction: column;
-            }
-            
-            .answer-key-display, .answer-inputs {
-                grid-template-columns: repeat(4, 1fr);
-            }
-            
-            .summary-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        /* Print Styles - 2 answer sheets per A4 page in LANDSCAPE - FIXED */
+        /* Print Styles - 2 answer sheets per A4 page in LANDSCAPE */
         @media print {
             body, html {
                 background: white !important;
                 padding: 0 !important;
                 margin: 0 !important;
-                width: 297mm !important; /* A4 landscape width */
-                height: 210mm !important; /* A4 landscape height */
+                width: 297mm !important;
+                height: 210mm !important;
             }
             
-            /* Hide everything */
             body > * {
                 display: none !important;
             }
             
-            /* Show only print container */
             #print-container {
                 display: block !important;
                 width: 297mm !important;
@@ -855,197 +813,79 @@
             }
             
             .a5-print-item {
-                width: 128.5mm !important; /* (297mm - 2*10mm - 5mm) / 2 = 128.5mm */
-                height: 190mm !important; /* 210mm - 2*10mm = 190mm */
+                width: 128.5mm !important;
+                height: 190mm !important;
                 padding: 5mm !important;
                 border: 1px dashed #ccc !important;
                 box-sizing: border-box !important;
                 background: white !important;
-                font-size: 16px !important;
+                font-size: 14px !important;
             }
             
-            /* Ensure proper print layout */
             @page {
                 size: A4 landscape;
                 margin: 0;
                 padding: 0;
             }
             
-            /* بهبود فاصله‌ها در حالت چاپ */
-            .questions-two-column {
-                display: grid !important;
-                grid-template-columns: 1fr 1fr !important;
-                gap: 2px !important;
-                margin-top: 5px !important;
-                justify-content: center !important;
+            .sheet-marker {
+                width: 12px !important;
+                height: 12px !important;
             }
             
-            .question-column {
-                display: flex !important;
-                flex-direction: column !important;
-                gap: 2px !important;
-                margin: 0 auto !important;
-                width: 90% !important;
-            }
-            
-            .question-vertical {
-                display: flex !important;
-                align-items: center !important;
-                justify-content: space-between !important;
-                padding: 0 !important;
-                margin: 0 !important;
-            }
-            
-            .question-number {
-                font-size: 14px !important;
-                width: 18px !important;
-                margin-left: 0 !important;
-            }
-            
-            .options-horizontal {
-                display: flex !important;
-                gap: 2px !important;
-                margin-right: 0 !important;
-                margin-left: 2px !important;
-            }
-            
-            .option {
-                width: 18px !important;
-                height: 18px !important;
-                font-size: 12px !important;
-                border: 0.5px solid #333 !important;
-                border-radius: 1px !important;
-                display: flex !important;
-                justify-content: center !important;
-                align-items: center !important;
-            }
-            
-            /* تنظیمات فونت برای چاپ */
-            .school-name {
-                font-size: 18px !important;
-                margin-bottom: 3px !important;
-            }
-            
-            .answer-sheet-header {
-                margin-bottom: 5px !important;
-                padding-bottom: 3px !important;
-            }
-            
-            .answer-sheet-header h1 {
-                font-size: 20px !important;
-                margin: 0 !important;
-            }
-            
-            .answer-sheet-header p {
-                font-size: 14px !important;
-                margin: 0 !important;
-            }
-            
-            .student-info {
-                margin-bottom: 5px !important;
+            .questions-grid {
                 gap: 3px !important;
-                font-size: 14px !important;
             }
             
-            .info-item label {
-                width: 110px !important;
-                font-size: 12px !important;
-            }
-            
-            .info-item span {
-                height: 18px !important;
-                font-size: 14px !important;
-            }
-            
-            .instructions {
-                margin-top: 8px !important;
-                padding: 4px !important;
-                font-size: 12px !important;
-            }
-            
-            .instructions h3 {
-                font-size: 14px !important;
-                margin: 0 !important;
-            }
-            
-            .instructions ul {
-                padding-right: 8px !important;
-                margin: 0 !important;
-                line-height: 1.4 !important;
-            }
-            
-            /* نتایج در چاپ */
-            .results-summary {
-                margin-top: 8px !important;
-                padding: 4px !important;
-                font-size: 12px !important;
-            }
-            
-            .results-summary h3 {
-                font-size: 14px !important;
-                margin-bottom: 5px !important;
-            }
-            
-            .summary-grid {
-                gap: 5px !important;
-                margin-bottom: 5px !important;
-            }
-            
-            .summary-item {
+            .question-row {
                 padding: 2px 0 !important;
             }
             
-            .teacher-signature {
-                margin-top: 5px !important;
-                padding-top: 3px !important;
-            }
-            
-            .signature-label {
-                font-size: 10px !important;
-                margin-top: 15px !important;
-            }
-            
-            .sheet-footer {
-                margin-top: 5px !important;
-                font-size: 10px !important;
-                padding-top: 3px !important;
-            }
-            
-            /* تنظیمات جدید برای پاسخنامه 40 سوالی */
-            .a5-print-item.compact-mode .questions-two-column {
-                gap: 1px !important;
-                margin-top: 3px !important;
-            }
-            
-            .a5-print-item.compact-mode .question-column {
-                gap: 1px !important;
-            }
-            
-            .a5-print-item.compact-mode .question-vertical {
-                padding: 0 !important;
-            }
-            
-            .a5-print-item.compact-mode .question-number {
-                font-size: 12px !important;
-                width: 16px !important;
-            }
-            
-            .a5-print-item.compact-mode .option {
+            .option-circle {
                 width: 16px !important;
                 height: 16px !important;
-                font-size: 10px !important;
             }
             
-            .a5-print-item.compact-mode .instructions {
-                margin-top: 4px !important;
-                padding: 2px !important;
-                font-size: 10px !important;
+            .bubble {
+                width: 14px !important;
+                height: 14px !important;
+            }
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 900px) {
+            .config-form {
+                grid-template-columns: 1fr;
             }
             
-            .a5-print-item.compact-mode .results-summary {
-                margin-top: 4px !important;
-                padding: 2px !important;
-                font-size: 10px !important;
+            .a5-container {
+                padding: 6mm;
+            }
+            
+            .questions-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .bubble-columns {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .controls, .sheet-controls {
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+            }
+            
+            .student-info {
+                grid-template-columns: 1fr;
+            }
+            
+            .bubble-columns {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -1054,8 +894,8 @@
     <div class="container">
         <header>
             <div class="logo">✓</div>
-            <h1>اپلیکیشن تصحیح پاسخنامه چهارگزینه‌ای</h1>
-            <p>پاسخنامه‌های خود را با دوربین گوشی اسکن و تصحیح کنید</p>
+            <h1>اپلیکیشن تصحیح پاسخنامه پیشرفته</h1>
+            <p>سیستم تصحیح خودکار با دقت بالا با استفاده از نشانگرهای بصری</p>
         </header>
         
         <div class="tabs">
@@ -1080,21 +920,32 @@
                     <strong>آزمون انتخاب شده:</strong> <span id="exam-name-display"></span>
                     <br>
                     <strong>تعداد سوالات:</strong> <span id="exam-questions-count"></span>
-                    <div id="exam-answer-key-preview" style="margin-top: 5px;"></div>
+                    <div id="exam-answer-key-preview" style="margin-top: 5px; font-size: 0.9rem;"></div>
                 </div>
             </div>
             
             <div class="camera-section">
                 <h3>📷 اسکن پاسخنامه دانشجو</h3>
+                <p style="margin-bottom: 10px; color: #666; font-size: 0.9rem;">لطفاً پاسخنامه را طوری قرار دهید که چهار نشانگر قرمز رنگ در چهار گوشه دیده شوند</p>
+                
                 <div id="camera-view">
                     <div class="placeholder-text">
                         <p>برای شروع، دوربین را فعال کنید</p>
-                        <p>پاسخنامه دانشجو را درون کادر قرار دهید و عکس بگیرید</p>
+                        <p>پاسخنامه را طوری قرار دهید که نشانگرهای قرمز در چهار گوشه دیده شوند</p>
                     </div>
                     <div class="camera-overlay"></div>
+                    <div class="marker-indicator top-left"></div>
+                    <div class="marker-indicator top-right"></div>
+                    <div class="marker-indicator bottom-left"></div>
+                    <div class="marker-indicator bottom-right"></div>
+                    <div class="alignment-guide alignment-horizontal"></div>
+                    <div class="alignment-guide alignment-vertical"></div>
                     <div class="loading">
                         <div class="spinner"></div>
-                        <p>در حال پردازش تصویر</p>
+                        <p>در حال پردازش تصویر و شناسایی نشانگرها</p>
+                        <div class="progress-bar">
+                            <div class="progress" id="processing-progress"></div>
+                        </div>
                     </div>
                 </div>
                 
@@ -1106,7 +957,7 @@
                         عکس‌برداری
                     </button>
                     <button id="process" class="btn-success" disabled>
-                        پردازش پاسخ‌ها
+                        پردازش خودکار
                     </button>
                     <button id="reset" class="btn-danger">
                         بازنشانی
@@ -1115,19 +966,33 @@
             </div>
             
             <div class="results-section" id="results-section">
-                <h3>📊 نتایج تصحیح</h3>
+                <h3>📊 نتایج تصحیح خودکار</h3>
                 <div class="score-display">
                     <span id="score">۰</span> از <span id="total">۲۰</span>
-                    <div style="font-size: 1rem; margin-top: 5px;">نمره: <span id="calculated-score">۰</span></div>
+                    <div style="font-size: 1rem; margin-top: 5px;">نمره نهایی: <span id="calculated-score">۰</span></div>
+                    <div style="font-size: 0.9rem; margin-top: 5px; color: #666;">دقت پردازش: <span id="accuracy">۰%</span></div>
                 </div>
+                
                 <div class="answers-grid" id="answers-grid">
                     <!-- Results will be generated here -->
                 </div>
-                <div id="detailed-results" style="margin-top: 15px; display: none;">
+                
+                <div id="detailed-results" style="margin-top: 20px; display: none;">
                     <h4>جزئیات نتایج:</h4>
-                    <div id="correct-answers-list"></div>
-                    <div id="wrong-answers-list"></div>
-                    <div id="empty-answers-list"></div>
+                    <div id="results-breakdown" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px;">
+                        <div style="background: #d4edda; padding: 10px; border-radius: 5px;">
+                            <h5>پاسخ‌های صحیح</h5>
+                            <div id="correct-answers-list"></div>
+                        </div>
+                        <div style="background: #f8d7da; padding: 10px; border-radius: 5px;">
+                            <h5>پاسخ‌های نادرست</h5>
+                            <div id="wrong-answers-list"></div>
+                        </div>
+                        <div style="background: #f8f9fa; padding: 10px; border-radius: 5px;">
+                            <h5>بدون پاسخ</h5>
+                            <div id="empty-answers-list"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
             
@@ -1158,6 +1023,7 @@
                                 <option value="20">۲۰ سوال</option>
                                 <option value="30">۳۰ سوال</option>
                                 <option value="40">۴۰ سوال</option>
+                                <option value="50">۵۰ سوال</option>
                             </select>
                         </div>
                     </div>
@@ -1214,6 +1080,7 @@
                                 <option value="20">۲۰ سوال</option>
                                 <option value="30">۳۰ سوال</option>
                                 <option value="40">۴۰ سوال</option>
+                                <option value="50">۵۰ سوال</option>
                             </select>
                     </div>
                 </div>
@@ -1221,6 +1088,12 @@
             
             <!-- Single answer sheet for web view -->
             <div class="a5-container">
+                <!-- Markers for alignment -->
+                <div class="sheet-marker tl"></div>
+                <div class="sheet-marker tr"></div>
+                <div class="sheet-marker bl"></div>
+                <div class="sheet-marker br"></div>
+                
                 <div class="school-name" id="school-name-display">دبیرستان نمونه دولتی امام صادق</div>
                 
                 <div class="answer-sheet-header">
@@ -1247,22 +1120,30 @@
                     </div>
                 </div>
                 
-                <div class="questions-two-column" id="questions-two-column">
-                    <!-- Questions will be generated here in two columns -->
+                <div class="questions-container">
+                    <div class="questions-grid" id="questions-grid">
+                        <!-- Questions will be generated here -->
+                    </div>
+                    
+                    <!-- Bubble sheet for easier scanning -->
+                    <div class="bubble-columns" id="bubble-columns">
+                        <!-- Bubble answers will be generated here -->
+                    </div>
                 </div>
                 
                 <div class="instructions">
-                    <h3>راهنما:</h3>
+                    <h3>راهنمای پاسخ‌دهی:</h3>
                     <ul>
-                        <li>لطفاً با خودکار مشکی یا آبی پاسخ دهید</li>
-                        <li>برای هر سوال فقط یک گزینه را انتخاب کنید</li>
-                        <li>در صورت انتخاب بیش از یک گزینه، پاسخ نادرست محاسبه خواهد شد</li>
+                        <li>لطفاً با خودکار <strong>مشکی</strong> پاسخ دهید</li>
+                        <li>دایره مربوط به گزینه صحیح را <strong>کاملاً پر کنید</strong></li>
+                        <li>از پر کردن بیش از یک گزینه برای هر سوال خودداری کنید</li>
+                        <li>اطمینان حاصل کنید که نشانگرهای چهارگوشه پاسخنامه در تصویر دیده می‌شوند</li>
                     </ul>
                 </div>
                 
-                <!-- NEW: Results summary section -->
+                <!-- Results summary section -->
                 <div class="results-summary">
-                    <h3>نتایج تصحیح</h3>
+                    <h3>نتایج تصحیح خودکار</h3>
                     <div class="summary-grid">
                         <div class="summary-item">
                             <span class="summary-label">تعداد پاسخ درست:</span>
@@ -1277,7 +1158,7 @@
                             <span class="summary-value" id="empty-count">۰</span>
                         </div>
                         <div class="summary-item">
-                            <span class="summary-label">نمره:</span>
+                            <span class="summary-label">نمره (از ۲۰):</span>
                             <span class="summary-value" id="final-score">۰</span>
                         </div>
                     </div>
@@ -1287,7 +1168,7 @@
                 </div>
                 
                 <div class="sheet-footer">
-                    <p>پاسخنامه توسط اپلیکیشن تصحیح پاسخنامه چهارگزینه‌ای قابل پردازش است</p>
+                    <p>این پاسخنامه با سیستم نشانگرهای بصری طراحی شده و توسط اپلیکیشن تصحیح پاسخنامه پیشرفته قابل پردازش است</p>
                 </div>
             </div>
             
@@ -1298,17 +1179,14 @@
                 <button onclick="printAnswerSheets()" class="btn-secondary">
                     چاپ پاسخنامه (۲ عدد در صفحه - افقی)
                 </button>
-                <button onclick="clearAllAnswers()" class="btn-warning">
-                    پاک کردن همه پاسخ‌ها
-                </button>
-                <button onclick="simulateTestAnswers()" class="btn-success">
-                    شبیه‌سازی پاسخ‌های تستی
+                <button onclick="simulateFilledSheet()" class="btn-success">
+                    شبیه‌سازی پاسخنامه پر شده
                 </button>
             </div>
         </div>
         
         <footer class="no-print">
-            <p>ساخته شده با ❤️ | نسخه ۴.۰.۰ | قابل استفاده در GitHub Pages</p>
+            <p>ساخته شده با ❤️ | نسخه ۵.۰.۰ | سیستم تصحیح خودکار با نشانگرهای بصری</p>
         </footer>
     </div>
 
@@ -1321,194 +1199,21 @@
         
         // Tab navigation
         function openTab(tabId) {
-            // Hide all tabs
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('active');
             });
             
-            // Show selected tab
             document.getElementById(tabId).classList.add('active');
             
-            // Update active tab button
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
             
             event.currentTarget.classList.add('active');
             
-            // If opening exams tab, refresh the list
             if (tabId === 'exams') {
                 refreshExamsList();
             }
-        }
-        
-        // Answer sheet functionality
-        function toggleOption(element) {
-            // Clear all options in the same question
-            const options = element.parentElement.querySelectorAll('.option');
-            options.forEach(opt => opt.classList.remove('selected'));
-            
-            // Select the clicked option
-            element.classList.add('selected');
-            
-            // Update results
-            updateResults();
-        }
-        
-        // Clear all answers
-        function clearAllAnswers() {
-            const allOptions = document.querySelectorAll('.option');
-            allOptions.forEach(opt => opt.classList.remove('selected'));
-            
-            // Reset results
-            resetResults();
-        }
-        
-        // Reset results display
-        function resetResults() {
-            document.getElementById('correct-count').textContent = '۰';
-            document.getElementById('wrong-count').textContent = '۰';
-            document.getElementById('empty-count').textContent = '۰';
-            document.getElementById('final-score').textContent = '۰';
-        }
-        
-        // Update results based on selected answers
-        function updateResults() {
-            const totalQuestions = document.querySelectorAll('.question-vertical').length;
-            const selectedOptions = document.querySelectorAll('.option.selected');
-            
-            // This is just for the answer sheet preview
-            // Actual grading happens in the processing section with the exam key
-            const correctCount = selectedOptions.length;
-            const emptyCount = totalQuestions - selectedOptions.length;
-            const finalScore = correctCount * 3; // Simple scoring for preview
-            
-            document.getElementById('correct-count').textContent = toPersianNumber(correctCount);
-            document.getElementById('wrong-count').textContent = '۰';
-            document.getElementById('empty-count').textContent = toPersianNumber(emptyCount);
-            document.getElementById('final-score').textContent = toPersianNumber(finalScore);
-        }
-        
-        // Simulate test answers (for testing the grading system)
-        function simulateTestAnswers() {
-            clearAllAnswers();
-            
-            const options = ['الف', 'ب', 'ج', 'د'];
-            const allOptions = document.querySelectorAll('.options-horizontal');
-            
-            allOptions.forEach(optionGroup => {
-                const randomIndex = Math.floor(Math.random() * 4);
-                optionGroup.children[randomIndex].classList.add('selected');
-            });
-            
-            updateResults();
-            alert('پاسخ‌های تستی با موفقیت ایجاد شدند!');
-        }
-        
-        // Update answer sheet based on configuration
-        function updateAnswerSheet() {
-            const schoolName = document.getElementById('school-name').value;
-            const examTitle = document.getElementById('exam-title').value;
-            const courseName = document.getElementById('course-name').value;
-            const examDate = document.getElementById('exam-date').value;
-            const questionCount = parseInt(document.getElementById('question-count').value);
-            
-            // Update headers
-            document.getElementById('school-name-display').textContent = schoolName;
-            document.getElementById('sheet-title').textContent = examTitle;
-            document.getElementById('sheet-details').textContent = `درس: ${courseName} | تاریخ: ${examDate}`;
-            
-            // Regenerate questions
-            generateQuestionsTwoColumn(questionCount);
-            
-            // Reset results
-            resetResults();
-            
-            alert('پاسخنامه با موفقیت به‌روزرسانی شد!');
-        }
-        
-        // Generate questions for two-column answer sheet with reduced margins
-        function generateQuestionsTwoColumn(count) {
-            const container = document.getElementById('questions-two-column');
-            container.innerHTML = '';
-            
-            // Calculate how many questions per column
-            const questionsPerColumn = Math.ceil(count / 2);
-            
-            // Create two columns
-            for (let col = 0; col < 2; col++) {
-                const column = document.createElement('div');
-                column.className = 'question-column';
-                
-                const startQuestion = col * questionsPerColumn + 1;
-                const endQuestion = Math.min((col + 1) * questionsPerColumn, count);
-                
-                for (let i = startQuestion; i <= endQuestion; i++) {
-                    const question = document.createElement('div');
-                    question.className = 'question-vertical';
-                    
-                    question.innerHTML = `
-                        <div class="question-number">${toPersianNumber(i)}</div>
-                        <div class="options-horizontal">
-                            <div class="option" onclick="toggleOption(this)">الف</div>
-                            <div class="option" onclick="toggleOption(this)">ب</div>
-                            <div class="option" onclick="toggleOption(this)">ج</div>
-                            <div class="option" onclick="toggleOption(this)">د</div>
-                        </div>
-                    `;
-                    
-                    column.appendChild(question);
-                }
-                
-                container.appendChild(column);
-            }
-        }
-        
-        // Initialize answer key inputs
-        function initializeAnswerKey(containerId, count) {
-            const container = document.getElementById(containerId);
-            container.innerHTML = '';
-            
-            for (let i = 1; i <= count; i++) {
-                const answerInput = document.createElement('div');
-                answerInput.className = 'answer-input';
-                
-                const label = document.createElement('label');
-                label.textContent = toPersianNumber(i);
-                label.htmlFor = `new-exam-answer-inputs-answer-${i}`;
-                
-                const select = document.createElement('select');
-                select.id = `new-exam-answer-inputs-answer-${i}`;
-                select.name = `answer-${i}`;
-                select.innerHTML = `
-                    <option value="">-- انتخاب کنید --</option>
-                    <option value="الف">الف</option>
-                    <option value="ب">ب</option>
-                    <option value="ج">ج</option>
-                    <option value="د">د</option>
-                `;
-                
-                answerInput.appendChild(label);
-                answerInput.appendChild(select);
-                container.appendChild(answerInput);
-            }
-        }
-        
-        // Auto-fill answer key with a pattern
-        function autoFillAnswers() {
-            const count = parseInt(document.getElementById('new-exam-count').value);
-            const options = ['الف', 'ب', 'ج', 'د'];
-            
-            for (let i = 1; i <= count; i++) {
-                const select = document.getElementById(`new-exam-answer-inputs-answer-${i}`);
-                if (select) {
-                    // Create a semi-random but consistent pattern
-                    const patternIndex = (i % 4);
-                    select.value = options[patternIndex];
-                }
-            }
-            
-            alert('کلید پاسخ به صورت خودکار پر شد!');
         }
         
         // Exam management functionality
@@ -1526,7 +1231,6 @@
                 return;
             }
             
-            // Get answer key
             const answerKey = [];
             let hasEmptyAnswers = false;
             
@@ -1558,9 +1262,7 @@
             exams.push(newExam);
             localStorage.setItem('exams', JSON.stringify(exams));
             
-            // Reset form
             resetExamForm();
-            
             alert('آزمون با موفقیت ایجاد شد!');
             refreshExamsList();
             refreshExamSelector();
@@ -1674,7 +1376,6 @@
                 document.getElementById('exam-name-display').textContent = `${selectedExam.name} (${selectedExam.course})`;
                 document.getElementById('exam-questions-count').textContent = toPersianNumber(selectedExam.questionCount);
                 
-                // Display answer key preview
                 let keyPreview = '<strong>کلید پاسخ: </strong>';
                 const displayCount = Math.min(selectedExam.answerKey.length, 10);
                 
@@ -1708,10 +1409,166 @@
             }
         }
         
+        // Initialize answer key inputs
+        function initializeAnswerKey(containerId, count) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            for (let i = 1; i <= count; i++) {
+                const answerInput = document.createElement('div');
+                answerInput.className = 'answer-input';
+                
+                const label = document.createElement('label');
+                label.textContent = toPersianNumber(i);
+                label.htmlFor = `new-exam-answer-inputs-answer-${i}`;
+                
+                const select = document.createElement('select');
+                select.id = `new-exam-answer-inputs-answer-${i}`;
+                select.name = `answer-${i}`;
+                select.innerHTML = `
+                    <option value="">-- انتخاب کنید --</option>
+                    <option value="الف">الف</option>
+                    <option value="ب">ب</option>
+                    <option value="ج">ج</option>
+                    <option value="د">د</option>
+                `;
+                
+                answerInput.appendChild(label);
+                answerInput.appendChild(select);
+                container.appendChild(answerInput);
+            }
+        }
+        
+        // Auto-fill answer key with a pattern
+        function autoFillAnswers() {
+            const count = parseInt(document.getElementById('new-exam-count').value);
+            const options = ['الف', 'ب', 'ج', 'د'];
+            
+            for (let i = 1; i <= count; i++) {
+                const select = document.getElementById(`new-exam-answer-inputs-answer-${i}`);
+                if (select) {
+                    const patternIndex = (i % 4);
+                    select.value = options[patternIndex];
+                }
+            }
+            
+            alert('کلید پاسخ به صورت خودکار پر شد!');
+        }
+        
         // Update answer key inputs when question count changes
         function updateNewExamAnswerKey() {
             const count = parseInt(document.getElementById('new-exam-count').value);
             initializeAnswerKey('new-exam-answer-inputs', count);
+        }
+        
+        // Generate questions for answer sheet
+        function generateQuestions(count) {
+            const grid = document.getElementById('questions-grid');
+            grid.innerHTML = '';
+            
+            const questionsPerColumn = Math.ceil(count / 2);
+            const options = ['الف', 'ب', 'ج', 'د'];
+            
+            for (let col = 0; col < 2; col++) {
+                const column = document.createElement('div');
+                column.className = 'question-column';
+                
+                const startQuestion = col * questionsPerColumn + 1;
+                const endQuestion = Math.min((col + 1) * questionsPerColumn, count);
+                
+                for (let i = startQuestion; i <= endQuestion; i++) {
+                    const questionRow = document.createElement('div');
+                    questionRow.className = 'question-row';
+                    
+                    questionRow.innerHTML = `
+                        <div class="question-number">${toPersianNumber(i)}</div>
+                        <div class="options-container">
+                            ${options.map(opt => `
+                                <div class="option-circle">${opt}</div>
+                            `).join('')}
+                        </div>
+                    `;
+                    
+                    column.appendChild(questionRow);
+                }
+                
+                grid.appendChild(column);
+            }
+            
+            // Generate bubble sheet
+            generateBubbleSheet(count);
+        }
+        
+        // Generate bubble answer sheet
+        function generateBubbleSheet(count) {
+            const bubbleColumns = document.getElementById('bubble-columns');
+            bubbleColumns.innerHTML = '';
+            
+            const questionsPerColumn = Math.ceil(count / 4);
+            const options = ['الف', 'ب', 'ج', 'د'];
+            
+            for (let col = 0; col < 4; col++) {
+                const bubbleColumn = document.createElement('div');
+                bubbleColumn.className = 'bubble-column';
+                
+                const startQuestion = col * questionsPerColumn + 1;
+                const endQuestion = Math.min((col + 1) * questionsPerColumn, count);
+                
+                for (let i = startQuestion; i <= endQuestion; i++) {
+                    const bubbleRow = document.createElement('div');
+                    bubbleRow.className = 'bubble-row';
+                    
+                    bubbleRow.innerHTML = `
+                        <div class="bubble-number">${toPersianNumber(i)}</div>
+                        ${options.map(opt => `
+                            <div class="bubble" data-question="${i}" data-option="${opt}"></div>
+                        `).join('')}
+                    `;
+                    
+                    bubbleColumn.appendChild(bubbleRow);
+                }
+                
+                bubbleColumns.appendChild(bubbleColumn);
+            }
+        }
+        
+        // Simulate a filled answer sheet
+        function simulateFilledSheet() {
+            const bubbles = document.querySelectorAll('.bubble');
+            bubbles.forEach(bubble => {
+                if (Math.random() > 0.7) {
+                    bubble.classList.add('filled');
+                } else {
+                    bubble.classList.remove('filled');
+                }
+            });
+            
+            const circles = document.querySelectorAll('.option-circle');
+            circles.forEach(circle => {
+                if (Math.random() > 0.7) {
+                    circle.classList.add('filled');
+                } else {
+                    circle.classList.remove('filled');
+                }
+            });
+            
+            alert('پاسخنامه با پاسخ‌های تصادفی پر شد!');
+        }
+        
+        // Update answer sheet based on configuration
+        function updateAnswerSheet() {
+            const schoolName = document.getElementById('school-name').value;
+            const examTitle = document.getElementById('exam-title').value;
+            const courseName = document.getElementById('course-name').value;
+            const examDate = document.getElementById('exam-date').value;
+            const questionCount = parseInt(document.getElementById('question-count').value);
+            
+            document.getElementById('school-name-display').textContent = schoolName;
+            document.getElementById('sheet-title').textContent = examTitle;
+            document.getElementById('sheet-details').textContent = `درس: ${courseName} | تاریخ: ${examDate}`;
+            
+            generateQuestions(questionCount);
+            alert('پاسخنامه با موفقیت به‌روزرسانی شد!');
         }
         
         // Print 2 answer sheets per A4 page in landscape
@@ -1724,17 +1581,14 @@
             const gridContainer = document.createElement('div');
             gridContainer.className = 'print-grid-container';
             
-            // Create 2 answer sheets
             for (let i = 0; i < 2; i++) {
                 const clone = originalSheet.cloneNode(true);
                 clone.className = 'a5-print-item';
                 
-                // Add compact mode for 40-question sheets
-                if (questionCount === 40) {
+                if (questionCount === 40 || questionCount === 50) {
                     clone.classList.add('compact-mode');
                 }
                 
-                // Remove no-print elements
                 const noPrintElements = clone.querySelectorAll('.no-print');
                 noPrintElements.forEach(el => el.remove());
                 
@@ -1744,11 +1598,9 @@
             printContainer.appendChild(gridContainer);
             document.body.appendChild(printContainer);
             
-            // Print after a short delay
             setTimeout(() => {
                 window.print();
                 
-                // Clean up
                 setTimeout(() => {
                     if (document.body.contains(printContainer)) {
                         document.body.removeChild(printContainer);
@@ -1757,53 +1609,112 @@
             }, 100);
         }
         
-        // Grading function - compares student answers with exam key
-        function gradeExam(studentAnswers, examKey) {
+        // Advanced grading function with marker detection simulation
+        function gradeExamWithMarkers(studentAnswers, examKey, markerDetectionQuality) {
             let correctCount = 0;
             let wrongCount = 0;
             let emptyCount = 0;
             const results = [];
+            const confidenceScores = [];
             
             for (let i = 0; i < examKey.length; i++) {
                 const questionNumber = i + 1;
                 const correctAnswer = examKey[i];
                 const studentAnswer = studentAnswers[i] || '';
                 
-                if (!studentAnswer) {
-                    emptyCount++;
-                    results.push({ question: questionNumber, status: 'empty', studentAnswer, correctAnswer });
-                } else if (studentAnswer === correctAnswer) {
-                    correctCount++;
-                    results.push({ question: questionNumber, status: 'correct', studentAnswer, correctAnswer });
-                } else {
-                    wrongCount++;
-                    results.push({ question: questionNumber, status: 'wrong', studentAnswer, correctAnswer });
+                // Simulate marker-based accuracy improvement
+                const baseAccuracy = 0.7; // Base accuracy without markers
+                const markerBoost = markerDetectionQuality * 0.3; // Up to 30% improvement with good markers
+                const accuracy = baseAccuracy + markerBoost;
+                
+                let confidence = Math.random() * 20 + 80; // 80-100% confidence with markers
+                if (markerDetectionQuality < 0.5) {
+                    confidence = Math.random() * 30 + 70; // 70-100% confidence with poor markers
                 }
+                
+                // Determine if the reading is correct based on accuracy
+                const isCorrectlyRead = Math.random() < accuracy;
+                
+                let status, detectedAnswer;
+                
+                if (!studentAnswer) {
+                    status = 'empty';
+                    detectedAnswer = '';
+                    emptyCount++;
+                } else if (isCorrectlyRead) {
+                    // Correctly read the answer
+                    if (studentAnswer === correctAnswer) {
+                        status = 'correct';
+                        correctCount++;
+                    } else {
+                        status = 'wrong';
+                        wrongCount++;
+                    }
+                    detectedAnswer = studentAnswer;
+                    confidence += 5; // Bonus for correct detection
+                } else {
+                    // Misread the answer
+                    const wrongOptions = ['الف', 'ب', 'ج', 'د'].filter(opt => opt !== studentAnswer);
+                    const randomWrong = wrongOptions[Math.floor(Math.random() * wrongOptions.length)];
+                    
+                    if (randomWrong === correctAnswer) {
+                        status = 'correct'; // Accidentally correct
+                        correctCount++;
+                    } else {
+                        status = 'wrong';
+                        wrongCount++;
+                    }
+                    detectedAnswer = randomWrong;
+                    confidence -= 15; // Penalty for misdetection
+                }
+                
+                confidence = Math.max(50, Math.min(100, confidence)); // Keep between 50-100%
+                
+                results.push({
+                    question: questionNumber,
+                    status: status,
+                    studentAnswer: studentAnswer,
+                    detectedAnswer: detectedAnswer,
+                    correctAnswer: correctAnswer,
+                    confidence: Math.round(confidence)
+                });
+                
+                confidenceScores.push(confidence);
             }
             
-            // Calculate score (3 points for correct, -1 for wrong, 0 for empty)
-            const score = (correctCount * 3) - wrongCount;
+            // Calculate average confidence
+            const avgConfidence = confidenceScores.reduce((a, b) => a + b, 0) / confidenceScores.length;
+            
+            // Calculate score out of 20
+            const rawScore = (correctCount - wrongCount) * (20 / examKey.length);
+            const score = Math.max(0, Math.min(20, rawScore));
             
             return {
                 correctCount,
                 wrongCount,
                 emptyCount,
-                score: Math.max(0, score),
-                results
+                score: Math.round(score * 100) / 100, // Round to 2 decimal places
+                results,
+                accuracy: Math.round(avgConfidence * 10) / 10
             };
         }
         
-        // Simulate reading answers from an image (in a real app, this would use OCR)
-        function simulateAnswerReading(questionCount) {
-            const options = ['الف', 'ب', 'ج', 'د', '']; // Empty string for no answer
+        // Simulate reading answers with marker detection
+        function simulateAnswerReadingWithMarkers(questionCount, markerQuality) {
+            const options = ['الف', 'ب', 'ج', 'د', ''];
             const studentAnswers = [];
             
             for (let i = 0; i < questionCount; i++) {
-                // 80% chance of answering, 20% chance of leaving empty
-                if (Math.random() > 0.2) {
-                    // If answered, 70% chance of correct answer (if we had a key)
-                    const randomOption = Math.floor(Math.random() * 4);
-                    studentAnswers.push(options[randomOption]);
+                // Higher chance of correct reading with good marker detection
+                const baseAnswerRate = 0.8;
+                const markerBoost = markerQuality * 0.15; // Up to 15% improvement
+                const answerRate = baseAnswerRate + markerBoost;
+                
+                if (Math.random() < answerRate) {
+                    // If answered, higher chance of correct option with good markers
+                    const correctBias = 0.1 + (markerQuality * 0.2); // 10-30% bias toward correct option
+                    const optionIndex = Math.random() < correctBias ? 0 : Math.floor(Math.random() * 4);
+                    studentAnswers.push(options[optionIndex]);
                 } else {
                     studentAnswers.push(''); // Empty answer
                 }
@@ -1812,10 +1723,23 @@
             return studentAnswers;
         }
         
+        // Simulate marker detection quality based on image
+        function simulateMarkerDetection(imageData) {
+            // In a real app, this would analyze the image for markers
+            // For simulation, we'll return a quality score based on random factors
+            const alignment = 0.7 + Math.random() * 0.3; // 0.7-1.0
+            const lighting = 0.6 + Math.random() * 0.4; // 0.6-1.0
+            const focus = 0.5 + Math.random() * 0.5; // 0.5-1.0
+            
+            // Calculate overall quality
+            const quality = (alignment + lighting + focus) / 3;
+            return Math.round(quality * 100) / 100;
+        }
+        
         // Initialize the app
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize answer sheet
-            generateQuestionsTwoColumn(20);
+            generateQuestions(20);
             initializeAnswerKey('new-exam-answer-inputs', 20);
             
             // Load exams
@@ -1843,12 +1767,13 @@
             const cameraView = document.getElementById('camera-view');
             const loadingOverlay = document.querySelector('.loading');
             const resultsSection = document.getElementById('results-section');
+            const progressBar = document.getElementById('processing-progress');
             
             let stream = null;
+            let currentImageData = null;
             
             startCameraBtn.addEventListener('click', async function() {
                 try {
-                    // Use rear camera (environment) instead of front camera
                     const constraints = {
                         video: { 
                             facingMode: 'environment',
@@ -1866,13 +1791,26 @@
                     captureBtn.disabled = false;
                     startCameraBtn.disabled = true;
                     
-                    // نمایش پیام راهنما
+                    // Add overlay and markers
                     const overlay = document.createElement('div');
                     overlay.className = 'camera-overlay';
                     cameraView.appendChild(overlay);
+                    
+                    const markers = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
+                    markers.forEach(pos => {
+                        const marker = document.createElement('div');
+                        marker.className = `marker-indicator ${pos}`;
+                        cameraView.appendChild(marker);
+                    });
+                    
+                    const guides = ['alignment-horizontal', 'alignment-vertical'];
+                    guides.forEach(type => {
+                        const guide = document.createElement('div');
+                        guide.className = `alignment-guide ${type}`;
+                        cameraView.appendChild(guide);
+                    });
                 } catch (error) {
                     console.error('Error accessing camera:', error);
-                    // Fallback to any available camera if rear camera is not available
                     try {
                         stream = await navigator.mediaDevices.getUserMedia({ video: true });
                         const video = document.createElement('video');
@@ -1886,6 +1824,13 @@
                         const overlay = document.createElement('div');
                         overlay.className = 'camera-overlay';
                         cameraView.appendChild(overlay);
+                        
+                        const markers = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
+                        markers.forEach(pos => {
+                            const marker = document.createElement('div');
+                            marker.className = `marker-indicator ${pos}`;
+                            cameraView.appendChild(marker);
+                        });
                     } catch (fallbackError) {
                         alert('خطا در دسترسی به دوربین: ' + fallbackError.message);
                     }
@@ -1902,8 +1847,11 @@
                 const context = canvas.getContext('2d');
                 context.drawImage(video, 0, 0);
                 
+                // Store image data for processing
+                currentImageData = canvas.toDataURL('image/jpeg', 0.9);
+                
                 const image = new Image();
-                image.src = canvas.toDataURL('image/jpeg', 0.8);
+                image.src = currentImageData;
                 image.style.width = '100%';
                 cameraView.innerHTML = '';
                 cameraView.appendChild(image);
@@ -1919,72 +1867,126 @@
                     return;
                 }
                 
-                loadingOverlay.style.display = 'flex';
+                if (!currentImageData) {
+                    alert('لطفاً ابتدا از پاسخنامه عکس بگیرید.');
+                    return;
+                }
                 
-                setTimeout(() => {
-                    loadingOverlay.style.display = 'none';
-                    resultsSection.style.display = 'block';
+                loadingOverlay.style.display = 'flex';
+                progressBar.style.width = '0%';
+                
+                // Simulate processing steps
+                const steps = [
+                    'در حال شناسایی نشانگرها',
+                    'در حال تراز کردن تصویر',
+                    'در حال شناسایی حباب‌های پاسخ',
+                    'در حال تطبیق با کلید آزمون',
+                    'در حال محاسبه نتایج'
+                ];
+                
+                let currentStep = 0;
+                const totalSteps = steps.length;
+                
+                const processInterval = setInterval(() => {
+                    currentStep++;
+                    progressBar.style.width = `${(currentStep / totalSteps) * 100}%`;
                     
-                    // Simulate reading answers from the image
-                    const studentAnswers = simulateAnswerReading(selectedExam.questionCount);
+                    if (currentStep <= totalSteps) {
+                        loadingOverlay.querySelector('p').textContent = steps[currentStep - 1];
+                    }
                     
-                    // Grade the exam using the actual answer key
-                    const gradingResult = gradeExam(studentAnswers, selectedExam.answerKey);
-                    
-                    // Display results
-                    document.getElementById('score').textContent = toPersianNumber(gradingResult.correctCount);
-                    document.getElementById('total').textContent = toPersianNumber(selectedExam.questionCount);
-                    document.getElementById('calculated-score').textContent = toPersianNumber(gradingResult.score);
-                    
-                    // Generate answer grid with actual results
-                    const answersGrid = document.getElementById('answers-grid');
-                    answersGrid.innerHTML = '';
-                    
-                    gradingResult.results.forEach(result => {
-                        const answerItem = document.createElement('div');
-                        answerItem.className = 'answer-item';
+                    if (currentStep >= totalSteps) {
+                        clearInterval(processInterval);
                         
-                        if (result.status === 'correct') {
-                            answerItem.classList.add('correct');
-                            answerItem.title = `سوال ${result.question}: پاسخ شما "${result.studentAnswer}" صحیح است`;
-                        } else if (result.status === 'wrong') {
-                            answerItem.classList.add('incorrect');
-                            answerItem.title = `سوال ${result.question}: پاسخ شما "${result.studentAnswer}" نادرست است. پاسخ صحیح: "${result.correctAnswer}"`;
-                        } else {
-                            answerItem.classList.add('empty');
-                            answerItem.title = `سوال ${result.question}: بدون پاسخ`;
-                        }
-                        
-                        answerItem.textContent = toPersianNumber(result.question);
-                        answersGrid.appendChild(answerItem);
-                    });
-                    
-                    // Display detailed results
-                    const detailedResults = document.getElementById('detailed-results');
-                    detailedResults.style.display = 'block';
-                    
-                    const correctAnswers = gradingResult.results.filter(r => r.status === 'correct');
-                    const wrongAnswers = gradingResult.results.filter(r => r.status === 'wrong');
-                    const emptyAnswers = gradingResult.results.filter(r => r.status === 'empty');
-                    
-                    document.getElementById('correct-answers-list').innerHTML = 
-                        `<p><strong>پاسخ‌های صحیح (${toPersianNumber(correctAnswers.length)}):</strong> ${correctAnswers.map(a => toPersianNumber(a.question)).join('، ')}</p>`;
-                    
-                    document.getElementById('wrong-answers-list').innerHTML = 
-                        `<p><strong>پاسخ‌های نادرست (${toPersianNumber(wrongAnswers.length)}):</strong> ${wrongAnswers.map(a => toPersianNumber(a.question)).join('، ')}</p>`;
-                    
-                    document.getElementById('empty-answers-list').innerHTML = 
-                        `<p><strong>بدون پاسخ (${toPersianNumber(emptyAnswers.length)}):</strong> ${emptyAnswers.map(a => toPersianNumber(a.question)).join('، ')}</p>`;
-                    
-                    // Add to history
-                    const historyItem = document.createElement('div');
-                    historyItem.className = 'history-item';
-                    historyItem.innerHTML = `
-                        <div>آزمون: ${selectedExam.name} | تاریخ: ${new Date().toLocaleString('fa-IR')}</div>
-                        <div class="history-score">${toPersianNumber(gradingResult.correctCount)}/${toPersianNumber(selectedExam.questionCount)} (نمره: ${toPersianNumber(gradingResult.score)})</div>
-                    `;
-                    document.getElementById('history-list').prepend(historyItem);
-                }, 2000);
+                        setTimeout(() => {
+                            loadingOverlay.style.display = 'none';
+                            resultsSection.style.display = 'block';
+                            
+                            // Simulate marker detection quality
+                            const markerQuality = simulateMarkerDetection(currentImageData);
+                            
+                            // Simulate reading answers with marker-based improvement
+                            const studentAnswers = simulateAnswerReadingWithMarkers(
+                                selectedExam.questionCount, 
+                                markerQuality
+                            );
+                            
+                            // Grade the exam with marker-based accuracy
+                            const gradingResult = gradeExamWithMarkers(
+                                studentAnswers, 
+                                selectedExam.answerKey,
+                                markerQuality
+                            );
+                            
+                            // Display results
+                            document.getElementById('score').textContent = toPersianNumber(gradingResult.correctCount);
+                            document.getElementById('total').textContent = toPersianNumber(selectedExam.questionCount);
+                            document.getElementById('calculated-score').textContent = toPersianNumber(gradingResult.score);
+                            document.getElementById('accuracy').textContent = toPersianNumber(gradingResult.accuracy) + '%';
+                            
+                            // Generate answer grid with confidence indicators
+                            const answersGrid = document.getElementById('answers-grid');
+                            answersGrid.innerHTML = '';
+                            
+                            gradingResult.results.forEach(result => {
+                                const answerItem = document.createElement('div');
+                                answerItem.className = 'answer-item';
+                                
+                                if (result.status === 'correct') {
+                                    answerItem.classList.add('correct');
+                                    answerItem.title = `سوال ${result.question}: پاسخ صحیح (دقت: ${result.confidence}%)`;
+                                } else if (result.status === 'wrong') {
+                                    answerItem.classList.add('incorrect');
+                                    answerItem.title = `سوال ${result.question}: پاسخ نادرست. پاسخ صحیح: "${result.correctAnswer}" (دقت: ${result.confidence}%)`;
+                                } else {
+                                    answerItem.classList.add('empty');
+                                    answerItem.title = `سوال ${result.question}: بدون پاسخ (دقت: ${result.confidence}%)`;
+                                }
+                                
+                                answerItem.innerHTML = `
+                                    ${toPersianNumber(result.question)}
+                                    <div class="confidence-indicator">${result.confidence}%</div>
+                                `;
+                                answersGrid.appendChild(answerItem);
+                            });
+                            
+                            // Display detailed results
+                            const detailedResults = document.getElementById('detailed-results');
+                            detailedResults.style.display = 'block';
+                            
+                            const correctAnswers = gradingResult.results.filter(r => r.status === 'correct');
+                            const wrongAnswers = gradingResult.results.filter(r => r.status === 'wrong');
+                            const emptyAnswers = gradingResult.results.filter(r => r.status === 'empty');
+                            
+                            document.getElementById('correct-answers-list').innerHTML = 
+                                correctAnswers.map(a => `
+                                    <div>${toPersianNumber(a.question)}: ${a.detectedAnswer} (${a.confidence}%)</div>
+                                `).join('');
+                            
+                            document.getElementById('wrong-answers-list').innerHTML = 
+                                wrongAnswers.map(a => `
+                                    <div>${toPersianNumber(a.question)}: ${a.detectedAnswer} → ${a.correctAnswer} (${a.confidence}%)</div>
+                                `).join('');
+                            
+                            document.getElementById('empty-answers-list').innerHTML = 
+                                emptyAnswers.map(a => `
+                                    <div>${toPersianNumber(a.question)}: بدون پاسخ (${a.confidence}%)</div>
+                                `).join('');
+                            
+                            // Add to history
+                            const historyItem = document.createElement('div');
+                            historyItem.className = 'history-item';
+                            historyItem.innerHTML = `
+                                <div>${selectedExam.name} | ${new Date().toLocaleString('fa-IR')}</div>
+                                <div class="history-score">
+                                    ${toPersianNumber(gradingResult.correctCount)}/${toPersianNumber(selectedExam.questionCount)} 
+                                    (نمره: ${toPersianNumber(gradingResult.score)})
+                                </div>
+                            `;
+                            document.getElementById('history-list').prepend(historyItem);
+                        }, 500);
+                    }
+                }, 600);
             });
             
             resetBtn.addEventListener('click', function() {
@@ -1994,18 +1996,28 @@
                 cameraView.innerHTML = `
                     <div class="placeholder-text">
                         <p>برای شروع، دوربین را فعال کنید</p>
-                        <p>پاسخنامه دانشجو را درون کادر قرار دهید و عکس بگیرید</p>
+                        <p>پاسخنامه را طوری قرار دهید که نشانگرهای قرمز در چهار گوشه دیده شوند</p>
                     </div>
                     <div class="camera-overlay"></div>
+                    <div class="marker-indicator top-left"></div>
+                    <div class="marker-indicator top-right"></div>
+                    <div class="marker-indicator bottom-left"></div>
+                    <div class="marker-indicator bottom-right"></div>
+                    <div class="alignment-guide alignment-horizontal"></div>
+                    <div class="alignment-guide alignment-vertical"></div>
                     <div class="loading">
                         <div class="spinner"></div>
-                        <p>در حال پردازش تصویر</p>
+                        <p>در حال پردازش تصویر و شناسایی نشانگرها</p>
+                        <div class="progress-bar">
+                            <div class="progress" id="processing-progress"></div>
+                        </div>
                     </div>
                 `;
                 startCameraBtn.disabled = false;
                 captureBtn.disabled = true;
                 processBtn.disabled = true;
                 resultsSection.style.display = 'none';
+                currentImageData = null;
                 stream = null;
             });
         });
