@@ -433,14 +433,14 @@
             color: #444;
             width: 16px;
             text-align: left;
-            margin-left: 100; /* حذف فاصله */
+            margin-left: 0; /* حذف فاصله */
         }
         
         .options-horizontal {
             display: flex;
             gap: 4px;
             margin-right: 0; /* حذف فاصله */
-            margin-left: 100px; /* فاصله کم از سمت چپ */
+            margin-left: 2px; /* فاصله کم از سمت چپ */
         }
         
         .option {
@@ -855,7 +855,7 @@
                 border: 1px dashed #ccc !important;
                 box-sizing: border-box !important;
                 background: white !important;
-                font-size: 8px !important;
+                font-size: 16px !important; /* افزایش سایز فونت برای چاپ */
             }
             
             /* Ensure proper print layout */
@@ -891,22 +891,22 @@
             }
             
             .question-number {
-                font-size: 6px !important;
-                width: 8px !important;
-                margin-left: 100 !important; /* حذف فاصله در چاپ */
+                font-size: 12px !important; /* افزایش سایز فونت برای چاپ */
+                width: 16px !important; /* افزایش عرض برای متن بزرگتر */
+                margin-left: 70 !important; /* حذف فاصله در چاپ */
             }
             
             .options-horizontal {
                 display: flex !important;
                 gap: 1px !important;
                 margin-right: 0 !important; /* حذف فاصله در چاپ */
-                margin-left: 100px !important; /* فاصله کم در چاپ */
+                margin-left: 70px !important; /* فاصله کم در چاپ */
             }
             
             .option {
-                width: 8px !important;
-                height: 8px !important;
-                font-size: 5px !important;
+                width: 16px !important; /* افزایش عرض برای متن بزرگتر */
+                height: 16px !important; /* افزایش ارتفاع برای متن بزرگتر */
+                font-size: 10px !important; /* افزایش سایز فونت برای چاپ */
                 border: 0.5px solid #333 !important;
                 border-radius: 1px !important;
                 display: flex !important;
@@ -916,7 +916,7 @@
             
             /* Ultra compact for print */
             .school-name {
-                font-size: 8px !important;
+                font-size: 16px !important; /* افزایش سایز فونت برای چاپ */
                 margin-bottom: 1px !important;
             }
             
@@ -926,39 +926,39 @@
             }
             
             .answer-sheet-header h1 {
-                font-size: 9px !important;
+                font-size: 18px !important; /* افزایش سایز فونت برای چاپ */
                 margin: 0 !important;
             }
             
             .answer-sheet-header p {
-                font-size: 6px !important;
+                font-size: 12px !important; /* افزایش سایز فونت برای چاپ */
                 margin: 0 !important;
             }
             
             .student-info {
                 margin-bottom: 2px !important;
                 gap: 1px !important;
-                font-size: 6px !important;
+                font-size: 12px !important; /* افزایش سایز فونت برای چاپ */
             }
             
             .info-item label {
-                width: 50px !important;
-                font-size: 5px !important;
+                width: 100px !important; /* افزایش عرض برای متن بزرگتر */
+                font-size: 10px !important; /* افزایش سایز فونت برای چاپ */
             }
             
             .info-item span {
-                height: 8px !important;
-                font-size: 6px !important;
+                height: 16px !important; /* افزایش ارتفاع برای متن بزرگتر */
+                font-size: 12px !important; /* افزایش سایز فونت برای چاپ */
             }
             
             .instructions {
                 margin-top: 4px !important;
                 padding: 2px !important;
-                font-size: 5px !important;
+                font-size: 10px !important; /* افزایش سایز فونت برای چاپ */
             }
             
             .instructions h3 {
-                font-size: 6px !important;
+                font-size: 12px !important; /* افزایش سایز فونت برای چاپ */
                 margin: 0 !important;
             }
             
@@ -972,11 +972,11 @@
             .results-summary {
                 margin-top: 4px !important;
                 padding: 2px !important;
-                font-size: 5px !important;
+                font-size: 10px !important; /* افزایش سایز فونت برای چاپ */
             }
             
             .results-summary h3 {
-                font-size: 6px !important;
+                font-size: 12px !important; /* افزایش سایز فونت برای چاپ */
                 margin-bottom: 3px !important;
             }
             
@@ -995,13 +995,13 @@
             }
             
             .signature-label {
-                font-size: 4px !important;
+                font-size: 8px !important; /* افزایش سایز فونت برای چاپ */
                 margin-top: 8px !important;
             }
             
             .sheet-footer {
                 margin-top: 3px !important;
-                font-size: 4px !important;
+                font-size: 8px !important; /* افزایش سایز فونت برای چاپ */
                 padding-top: 1px !important;
             }
         }
@@ -1140,7 +1140,7 @@
                 <div class="config-form">
                     <div class="form-group">
                         <label for="school-name">نام مدرسه:</label>
-                        <input type="text" id="school-name" value="هنرستان فنی ماندگار شهید بهشتی">
+                        <input type="text" id="school-name" value="هنرستان فنی ماندگار شهید بهشتی دورود">
                     </div>
                     <div class="form-group">
                         <label for="exam-title">عنوان آزمون:</label>
@@ -1167,7 +1167,7 @@
             
             <!-- Single answer sheet for web view -->
             <div class="a5-container">
-                <div class="school-name" id="school-name-display">هنرستان فنی ماندگار شهید بهشتی</div>
+                <div class="school-name" id="school-name-display">هنرستان فنی ماندگار شهید بهشتی دورود</div>
                 
                 <div class="answer-sheet-header">
                     <h1 id="sheet-title">آزمون پایان پودمان</h1>
