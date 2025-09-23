@@ -276,6 +276,12 @@
             border: 1px solid #f5c6cb;
         }
         
+        .empty {
+            background: #f8f9fa;
+            color: #6c757d;
+            border: 1px solid #e9ecef;
+        }
+        
         .history-section {
             margin-top: 25px;
         }
@@ -812,14 +818,14 @@
             }
         }
         
-        /* Print Styles - 2 answer sheets per A4 page - FIXED */
+        /* Print Styles - 2 answer sheets per A4 page in LANDSCAPE - FIXED */
         @media print {
             body, html {
                 background: white !important;
                 padding: 0 !important;
                 margin: 0 !important;
-                width: 210mm !important;
-                height: 297mm !important;
+                width: 297mm !important; /* A4 landscape width */
+                height: 210mm !important; /* A4 landscape height */
             }
             
             /* Hide everything */
@@ -830,8 +836,8 @@
             /* Show only print container */
             #print-container {
                 display: block !important;
-                width: 210mm !important;
-                height: 297mm !important;
+                width: 297mm !important;
+                height: 210mm !important;
                 margin: 0 !important;
                 padding: 0 !important;
             }
@@ -840,8 +846,8 @@
                 display: grid !important;
                 grid-template-columns: 1fr 1fr !important;
                 grid-template-rows: 1fr !important;
-                width: 210mm !important;
-                height: 297mm !important;
+                width: 297mm !important;
+                height: 210mm !important;
                 gap: 5mm !important;
                 padding: 10mm !important;
                 margin: 0 !important;
@@ -849,8 +855,8 @@
             }
             
             .a5-print-item {
-                width: 95mm !important;
-                height: 277mm !important;
+                width: 128.5mm !important; /* (297mm - 2*10mm - 5mm) / 2 = 128.5mm */
+                height: 190mm !important; /* 210mm - 2*10mm = 190mm */
                 padding: 5mm !important;
                 border: 1px dashed #ccc !important;
                 box-sizing: border-box !important;
@@ -860,7 +866,7 @@
             
             /* Ensure proper print layout */
             @page {
-                size: A4;
+                size: A4 landscape;
                 margin: 0;
                 padding: 0;
             }
@@ -1074,6 +1080,7 @@
                     <strong>آزمون انتخاب شده:</strong> <span id="exam-name-display"></span>
                     <br>
                     <strong>تعداد سوالات:</strong> <span id="exam-questions-count"></span>
+                    <div id="exam-answer-key-preview" style="margin-top: 5px;"></div>
                 </div>
             </div>
             
@@ -1111,9 +1118,16 @@
                 <h3>📊 نتایج تصحیح</h3>
                 <div class="score-display">
                     <span id="score">۰</span> از <span id="total">۲۰</span>
+                    <div style="font-size: 1rem; margin-top: 5px;">نمره: <span id="calculated-score">۰</span></div>
                 </div>
                 <div class="answers-grid" id="answers-grid">
                     <!-- Results will be generated here -->
+                </div>
+                <div id="detailed-results" style="margin-top: 15px; display: none;">
+                    <h4>جزئیات نتایج:</h4>
+                    <div id="correct-answers-list"></div>
+                    <div id="wrong-answers-list"></div>
+                    <div id="empty-answers-list"></div>
                 </div>
             </div>
             
@@ -1158,6 +1172,9 @@
                     <div class="controls">
                         <button id="create-exam" class="btn-success">
                             ایجاد آزمون
+                        </button>
+                        <button id="auto-fill-answers" class="btn-secondary">
+                            پر کردن خودکار کلید
                         </button>
                     </div>
                 </div>
@@ -1279,16 +1296,19 @@
                     به‌روزرسانی پاسخنامه
                 </button>
                 <button onclick="printAnswerSheets()" class="btn-secondary">
-                    چاپ پاسخنامه (۲ عدد در صفحه)
+                    چاپ پاسخنامه (۲ عدد در صفحه - افقی)
                 </button>
                 <button onclick="clearAllAnswers()" class="btn-warning">
                     پاک کردن همه پاسخ‌ها
+                </button>
+                <button onclick="simulateTestAnswers()" class="btn-success">
+                    شبیه‌سازی پاسخ‌های تستی
                 </button>
             </div>
         </div>
         
         <footer class="no-print">
-            <p>ساخته شده با ❤️ | نسخه ۳.۵.۰ | قابل استفاده در GitHub Pages</p>
+            <p>ساخته شده با ❤️ | نسخه ۴.۰.۰ | قابل استفاده در GitHub Pages</p>
         </footer>
     </div>
 
@@ -1354,19 +1374,35 @@
         
         // Update results based on selected answers
         function updateResults() {
-            const allOptions = document.querySelectorAll('.option');
-            const selectedOptions = document.querySelectorAll('.option.selected');
             const totalQuestions = document.querySelectorAll('.question-vertical').length;
+            const selectedOptions = document.querySelectorAll('.option.selected');
             
-            const correctCount = Math.floor(Math.random() * totalQuestions); // شبیه‌سازی
-            const wrongCount = Math.floor(Math.random() * (totalQuestions - correctCount));
-            const emptyCount = totalQuestions - correctCount - wrongCount;
-            const finalScore = (correctCount * 3) - wrongCount; // فرمول نمره‌دهی
+            // This is just for the answer sheet preview
+            // Actual grading happens in the processing section with the exam key
+            const correctCount = selectedOptions.length;
+            const emptyCount = totalQuestions - selectedOptions.length;
+            const finalScore = correctCount * 3; // Simple scoring for preview
             
             document.getElementById('correct-count').textContent = toPersianNumber(correctCount);
-            document.getElementById('wrong-count').textContent = toPersianNumber(wrongCount);
+            document.getElementById('wrong-count').textContent = '۰';
             document.getElementById('empty-count').textContent = toPersianNumber(emptyCount);
-            document.getElementById('final-score').textContent = toPersianNumber(Math.max(0, finalScore));
+            document.getElementById('final-score').textContent = toPersianNumber(finalScore);
+        }
+        
+        // Simulate test answers (for testing the grading system)
+        function simulateTestAnswers() {
+            clearAllAnswers();
+            
+            const options = ['الف', 'ب', 'ج', 'د'];
+            const allOptions = document.querySelectorAll('.options-horizontal');
+            
+            allOptions.forEach(optionGroup => {
+                const randomIndex = Math.floor(Math.random() * 4);
+                optionGroup.children[randomIndex].classList.add('selected');
+            });
+            
+            updateResults();
+            alert('پاسخ‌های تستی با موفقیت ایجاد شدند!');
         }
         
         // Update answer sheet based on configuration
@@ -1445,22 +1481,34 @@
                 select.id = `new-exam-answer-inputs-answer-${i}`;
                 select.name = `answer-${i}`;
                 select.innerHTML = `
+                    <option value="">-- انتخاب کنید --</option>
                     <option value="الف">الف</option>
                     <option value="ب">ب</option>
                     <option value="ج">ج</option>
                     <option value="د">د</option>
                 `;
                 
-                // Set default answer key
-                if (i % 4 === 0) select.value = 'الف';
-                else if (i % 4 === 1) select.value = 'ب';
-                else if (i % 4 === 2) select.value = 'ج';
-                else select.value = 'د';
-                
                 answerInput.appendChild(label);
                 answerInput.appendChild(select);
                 container.appendChild(answerInput);
             }
+        }
+        
+        // Auto-fill answer key with a pattern
+        function autoFillAnswers() {
+            const count = parseInt(document.getElementById('new-exam-count').value);
+            const options = ['الف', 'ب', 'ج', 'د'];
+            
+            for (let i = 1; i <= count; i++) {
+                const select = document.getElementById(`new-exam-answer-inputs-answer-${i}`);
+                if (select) {
+                    // Create a semi-random but consistent pattern
+                    const patternIndex = (i % 4);
+                    select.value = options[patternIndex];
+                }
+            }
+            
+            alert('کلید پاسخ به صورت خودکار پر شد!');
         }
         
         // Exam management functionality
@@ -1480,10 +1528,21 @@
             
             // Get answer key
             const answerKey = [];
+            let hasEmptyAnswers = false;
+            
             for (let i = 1; i <= count; i++) {
                 const select = document.getElementById(`new-exam-answer-inputs-answer-${i}`);
                 if (select) {
-                    answerKey.push(select.value);
+                    if (!select.value) {
+                        hasEmptyAnswers = true;
+                    }
+                    answerKey.push(select.value || '');
+                }
+            }
+            
+            if (hasEmptyAnswers) {
+                if (!confirm('برخی سوالات پاسخ ندارند. آیا می‌خواهید ادامه دهید؟')) {
+                    return;
                 }
             }
             
@@ -1530,11 +1589,13 @@
                 examItem.className = 'exam-item';
                 
                 let keyDisplay = '';
-                for (let i = 0; i < Math.min(exam.answerKey.length, 10); i++) {
+                const displayCount = Math.min(exam.answerKey.length, 10);
+                
+                for (let i = 0; i < displayCount; i++) {
                     keyDisplay += `
                         <div class="key-item">
                             <div class="key-number">${toPersianNumber(i+1)}</div>
-                            <div class="key-value">${exam.answerKey[i]}</div>
+                            <div class="key-value">${exam.answerKey[i] || '--'}</div>
                         </div>
                     `;
                 }
@@ -1612,6 +1673,20 @@
             if (selectedExam) {
                 document.getElementById('exam-name-display').textContent = `${selectedExam.name} (${selectedExam.course})`;
                 document.getElementById('exam-questions-count').textContent = toPersianNumber(selectedExam.questionCount);
+                
+                // Display answer key preview
+                let keyPreview = '<strong>کلید پاسخ: </strong>';
+                const displayCount = Math.min(selectedExam.answerKey.length, 10);
+                
+                for (let i = 0; i < displayCount; i++) {
+                    keyPreview += `${toPersianNumber(i+1)}: ${selectedExam.answerKey[i] || '--'} `;
+                }
+                
+                if (selectedExam.answerKey.length > 10) {
+                    keyPreview += `... +${toPersianNumber(selectedExam.answerKey.length - 10)}`;
+                }
+                
+                document.getElementById('exam-answer-key-preview').innerHTML = keyPreview;
                 document.getElementById('selected-exam-info').style.display = 'block';
                 document.getElementById('exam-select').value = examId;
             }
@@ -1639,7 +1714,7 @@
             initializeAnswerKey('new-exam-answer-inputs', count);
         }
         
-        // Print 2 answer sheets per A4 page
+        // Print 2 answer sheets per A4 page in landscape
         function printAnswerSheets() {
             const originalSheet = document.querySelector('.a5-container');
             const questionCount = parseInt(document.getElementById('question-count').value);
@@ -1682,6 +1757,61 @@
             }, 100);
         }
         
+        // Grading function - compares student answers with exam key
+        function gradeExam(studentAnswers, examKey) {
+            let correctCount = 0;
+            let wrongCount = 0;
+            let emptyCount = 0;
+            const results = [];
+            
+            for (let i = 0; i < examKey.length; i++) {
+                const questionNumber = i + 1;
+                const correctAnswer = examKey[i];
+                const studentAnswer = studentAnswers[i] || '';
+                
+                if (!studentAnswer) {
+                    emptyCount++;
+                    results.push({ question: questionNumber, status: 'empty', studentAnswer, correctAnswer });
+                } else if (studentAnswer === correctAnswer) {
+                    correctCount++;
+                    results.push({ question: questionNumber, status: 'correct', studentAnswer, correctAnswer });
+                } else {
+                    wrongCount++;
+                    results.push({ question: questionNumber, status: 'wrong', studentAnswer, correctAnswer });
+                }
+            }
+            
+            // Calculate score (3 points for correct, -1 for wrong, 0 for empty)
+            const score = (correctCount * 3) - wrongCount;
+            
+            return {
+                correctCount,
+                wrongCount,
+                emptyCount,
+                score: Math.max(0, score),
+                results
+            };
+        }
+        
+        // Simulate reading answers from an image (in a real app, this would use OCR)
+        function simulateAnswerReading(questionCount) {
+            const options = ['الف', 'ب', 'ج', 'د', '']; // Empty string for no answer
+            const studentAnswers = [];
+            
+            for (let i = 0; i < questionCount; i++) {
+                // 80% chance of answering, 20% chance of leaving empty
+                if (Math.random() > 0.2) {
+                    // If answered, 70% chance of correct answer (if we had a key)
+                    const randomOption = Math.floor(Math.random() * 4);
+                    studentAnswers.push(options[randomOption]);
+                } else {
+                    studentAnswers.push(''); // Empty answer
+                }
+            }
+            
+            return studentAnswers;
+        }
+        
         // Initialize the app
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize answer sheet
@@ -1694,6 +1824,7 @@
             
             // Set up event listeners
             document.getElementById('create-exam').addEventListener('click', createExam);
+            document.getElementById('auto-fill-answers').addEventListener('click', autoFillAnswers);
             document.getElementById('new-exam-count').addEventListener('change', updateNewExamAnswerKey);
             document.getElementById('exam-select').addEventListener('change', function() {
                 if (this.value) {
@@ -1794,33 +1925,63 @@
                     loadingOverlay.style.display = 'none';
                     resultsSection.style.display = 'block';
                     
-                    // Simulate results
-                    const score = Math.floor(Math.random() * selectedExam.questionCount);
-                    document.getElementById('score').textContent = toPersianNumber(score);
-                    document.getElementById('total').textContent = toPersianNumber(selectedExam.questionCount);
+                    // Simulate reading answers from the image
+                    const studentAnswers = simulateAnswerReading(selectedExam.questionCount);
                     
-                    // Generate answer grid
+                    // Grade the exam using the actual answer key
+                    const gradingResult = gradeExam(studentAnswers, selectedExam.answerKey);
+                    
+                    // Display results
+                    document.getElementById('score').textContent = toPersianNumber(gradingResult.correctCount);
+                    document.getElementById('total').textContent = toPersianNumber(selectedExam.questionCount);
+                    document.getElementById('calculated-score').textContent = toPersianNumber(gradingResult.score);
+                    
+                    // Generate answer grid with actual results
                     const answersGrid = document.getElementById('answers-grid');
                     answersGrid.innerHTML = '';
                     
-                    for (let i = 1; i <= selectedExam.questionCount; i++) {
+                    gradingResult.results.forEach(result => {
                         const answerItem = document.createElement('div');
                         answerItem.className = 'answer-item';
                         
-                        // Randomly assign correct/incorrect
-                        const isCorrect = Math.random() > 0.5;
-                        answerItem.classList.add(isCorrect ? 'correct' : 'incorrect');
+                        if (result.status === 'correct') {
+                            answerItem.classList.add('correct');
+                            answerItem.title = `سوال ${result.question}: پاسخ شما "${result.studentAnswer}" صحیح است`;
+                        } else if (result.status === 'wrong') {
+                            answerItem.classList.add('incorrect');
+                            answerItem.title = `سوال ${result.question}: پاسخ شما "${result.studentAnswer}" نادرست است. پاسخ صحیح: "${result.correctAnswer}"`;
+                        } else {
+                            answerItem.classList.add('empty');
+                            answerItem.title = `سوال ${result.question}: بدون پاسخ`;
+                        }
                         
-                        answerItem.textContent = toPersianNumber(i);
+                        answerItem.textContent = toPersianNumber(result.question);
                         answersGrid.appendChild(answerItem);
-                    }
+                    });
+                    
+                    // Display detailed results
+                    const detailedResults = document.getElementById('detailed-results');
+                    detailedResults.style.display = 'block';
+                    
+                    const correctAnswers = gradingResult.results.filter(r => r.status === 'correct');
+                    const wrongAnswers = gradingResult.results.filter(r => r.status === 'wrong');
+                    const emptyAnswers = gradingResult.results.filter(r => r.status === 'empty');
+                    
+                    document.getElementById('correct-answers-list').innerHTML = 
+                        `<p><strong>پاسخ‌های صحیح (${toPersianNumber(correctAnswers.length)}):</strong> ${correctAnswers.map(a => toPersianNumber(a.question)).join('، ')}</p>`;
+                    
+                    document.getElementById('wrong-answers-list').innerHTML = 
+                        `<p><strong>پاسخ‌های نادرست (${toPersianNumber(wrongAnswers.length)}):</strong> ${wrongAnswers.map(a => toPersianNumber(a.question)).join('، ')}</p>`;
+                    
+                    document.getElementById('empty-answers-list').innerHTML = 
+                        `<p><strong>بدون پاسخ (${toPersianNumber(emptyAnswers.length)}):</strong> ${emptyAnswers.map(a => toPersianNumber(a.question)).join('، ')}</p>`;
                     
                     // Add to history
                     const historyItem = document.createElement('div');
                     historyItem.className = 'history-item';
                     historyItem.innerHTML = `
                         <div>آزمون: ${selectedExam.name} | تاریخ: ${new Date().toLocaleString('fa-IR')}</div>
-                        <div class="history-score">${toPersianNumber(score)}/${toPersianNumber(selectedExam.questionCount)}</div>
+                        <div class="history-score">${toPersianNumber(gradingResult.correctCount)}/${toPersianNumber(selectedExam.questionCount)} (نمره: ${toPersianNumber(gradingResult.score)})</div>
                     `;
                     document.getElementById('history-list').prepend(historyItem);
                 }, 2000);
