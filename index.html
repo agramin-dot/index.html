@@ -3,316 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>پاسخنامه یک‌صفحه‌ای واقعی</title>
+    <title>اپلیکیشن تصحیح پاسخنامه واقعی</title>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        body {
-            margin: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f7fa;
-            direction: rtl;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: auto;
-            background: white;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
-        }
-
-        header {
-            background: linear-gradient(to right, #4a00e0, #8e2de2);
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }
-
-        .tabs {
-            display: flex;
-        }
-
-        .tab-btn {
-            flex: 1;
-            padding: 15px;
-            border: none;
-            background: #e9ecef;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        .tab-btn.active {
-            background: white;
-            color: #4a00e0;
-            border-bottom: 3px solid #4a00e0;
-        }
-
-        .tab-content {
-            display: none;
-            padding: 20px;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        #camera-view {
-            width: 100%;
-            height: 400px;
-            background: #000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: white;
-        }
-
-        .controls {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        button {
-            padding: 10px 15px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        .btn-primary {
-            background: #4a00e0;
-            color: white;
-        }
-
-        .btn-success {
-            background: #00b09b;
-            color: white;
-        }
-
-        .btn-danger {
-            background: #dc3545;
-            color: white;
-        }
-
-        .results-section {
-            margin-top: 20px;
-            padding: 15px;
-            background: #f0f9ff;
-            border-radius: 10px;
-            display: none;
-        }
-
-        .answer-item {
-            display: inline-block;
-            margin: 5px;
-            padding: 10px;
-            border-radius: 5px;
-            font-weight: bold;
-            min-width: 40px;
-            text-align: center;
-        }
-
-        .correct {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .incorrect {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        .empty {
-            background: #f8f9fa;
-            color: #6c757d;
-        }
-
+        *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
+        :root{--primary:#4a00e0;--secondary:#8e2de2;--accent:#00b09b;--danger:#dc3545;--light:#f5f7fa;--dark:#333}
+        body{background:linear-gradient(135deg,var(--primary) 0%,var(--secondary) 100%);color:var(--dark);min-height:100vh;padding:20px}
+        .container{max-width:1200px;margin:0 auto;background:rgba(255,255,255,.95);border-radius:15px;box-shadow:0 10px 30px rgba(0,0,0,.15);overflow:hidden}
+        header{background:linear-gradient(to right,var(--primary),var(--secondary));color:white;text-align:center;padding:25px 20px;position:relative}
+        header h1{font-size:1.8rem;margin-bottom:10px}
+        .tabs{display:flex;background:var(--light)}
+        .tab-btn{flex:1;padding:15px;border:none;cursor:pointer;font-weight:600;transition:all .3s ease}
+        .tab-btn.active{background:white;color:var(--primary);border-bottom:3px solid var(--primary)}
+        .tab-content{display:none;padding:25px}
+        .tab-content.active{display:block}
+        #camera-view{width:100%;height:400px;background:#000;position:relative;display:flex;justify-content:center;align-items:center;color:white}
+        .controls{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap}
+        button{padding:10px 15px;border:none;border-radius:8px;cursor:pointer;font-weight:600}
+        .btn-primary{background:var(--primary);color:white}
+        .btn-success{background:var(--accent);color:white}
+        .btn-danger{background:var(--danger);color:white}
+        .btn-secondary{background:#6c757d;color:white}
+        .results-section{background:#f0f9ff;padding:20px;border-radius:10px;margin-top:20px;display:none}
+        .answer-item{display:inline-block;margin:5px;padding:10px;border-radius:5px;font-weight:bold;min-width:40px;text-align:center}
+        .correct{background:#d4edda;color:#155724}
+        .incorrect{background:#f8d7da;color:#721c24}
+        .empty{background:#f8f9fa;color:#6c757d}
         /* چاپ A5 یک‌صفحه‌ای */
-        .a5-container {
-            width: 148mm;
-            height: 210mm;
-            padding: 8mm;
-            margin: auto;
-            background: white;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            position: relative;
-            page-break-inside: avoid;
-            box-sizing: border-box;
-        }
-
-        .sheet-marker {
-            position: absolute;
-            width: 15px;
-            height: 15px;
-            background: black;
-            border: 2px solid white;
-            box-shadow: 0 0 0 2px black;
-            z-index: 10;
-        }
-
-        .sheet-marker.tl { top: 5mm; left: 5mm; }
-        .sheet-marker.tr { top: 5mm; right: 5mm; }
-        .sheet-marker.bl { bottom: 5mm; left: 5mm; }
-        .sheet-marker.br { bottom: 5mm; right: 5mm; }
-
-        .student-info {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 5px;
-            margin-bottom: 10px;
-            font-size: 12px;
-        }
-
-        .info-item {
-            display: flex;
-            align-items: center;
-        }
-
-        .info-item label {
-            width: 100px;
-            font-weight: bold;
-        }
-
-        .info-item span {
-            flex: 1;
-            border-bottom: 1px dashed #999;
-            height: 18px;
-        }
-
-        .questions-two-column {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .question-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 4px 0;
-            border-bottom: 1px dotted #ccc;
-            font-size: 12px;
-        }
-
-        .option-bubble {
-            width: 18px;
-            height: 18px;
-            border: 1.5px solid #333;
-            border-radius: 50%;
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 10px;
-            margin-left: 4px;
-        }
-
-        .option-bubble.filled::after {
-            content: '';
-            width: 12px;
-            height: 12px;
-            background: black;
-            border-radius: 50%;
-        }
-
-        .results-summary {
-            margin-top: 10px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background: #f9f9f9;
-            font-size: 12px;
-        }
-
-        .summary-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
-        .summary-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 3px 0;
-            border-bottom: 1px dashed #ccc;
-        }
-
-        .teacher-signature {
-            margin-top: 10px;
-            text-align: left;
-            font-size: 12px;
-        }
-
-        @media print {
-            body > *:not(#print-container) {
-                display: none !important;
-            }
-
-            #print-container {
-                display: block !important;
-                background: white !important;
-            }
-
-            .a5-container {
-                box-shadow: none !important;
-                margin: 0 !important;
-                padding: 8mm !important;
-                border: none !important;
-            }
-
-            .sheet-marker {
-                background: black !important;
-                border: 2px solid black !important;
-                box-shadow: none !important;
-            }
-
-            .option-bubble {
-                border-color: black !important;
-            }
-
-            .option-bubble.filled::after {
-                background: black !important;
-            }
+        .a5-container{width:148mm;height:210mm;padding:8mm;margin:auto;background:white;box-shadow:0 0 10px rgba(0,0,0,.1);position:relative;page-break-inside:avoid;box-sizing:border-box}
+        .sheet-marker{position:absolute;width:15px;height:15px;background:black;border:2px solid white;box-shadow:0 0 0 2px black;z-index:10}
+        .sheet-marker.tl{top:5mm;left:5mm}.sheet-marker.tr{top:5mm;right:5mm}.sheet-marker.bl{bottom:5mm;left:5mm}.sheet-marker.br{bottom:5mm;right:5mm}
+        .student-info{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:10px;font-size:12px}
+        .info-item{display:flex;align-items:center}.info-item label{width:100px;font-weight:bold}.info-item span{flex:1;border-bottom:1px dashed #999;height:18px}
+        .questions-two-column{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+        .question-item{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dotted #ccc;font-size:12px}
+        .option-bubble{width:18px;height:18px;border:1.5px solid #333;border-radius:50%;display:inline-flex;justify-content:center;align-items:center;font-size:10px;margin-left:4px}
+        .option-bubble.filled::after{content:'';width:12px;height:12px;background:black;border-radius:50%}
+        .results-summary{margin-top:10px;padding:10px;border:1px solid #ddd;border-radius:4px;background:#f9f9f9;font-size:12px}
+        .summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.summary-item{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px dashed #ccc}
+        .teacher-signature{margin-top:10px;text-align:left;font-size:12px}
+        @media print{
+            body>*:not(#print-container){display:none !important}
+            #print-container{display:block !important;background:white !important}
+            .a5-container{box-shadow:none !important;margin:0 !important;padding:8mm !important;border:none !important}
+            .sheet-marker{background:black !important;border:2px solid black !important;box-shadow:none !important}
+            .option-bubble{border-color:black !important}.option-bubble.filled::after{background:black !important}
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>پاسخنامه یک‌صفحه‌ای واقعی</h1>
-            <p>با OCR واقعی و چاپ یک‌صفحه‌ای</p>
+            <h1>اپلیکیشن تصحیح پاسخنامه واقعی</h1>
+            <p>مدیریت آزمون، OCR واقعی، چاپ یک‌صفحه‌ای</p>
         </header>
-
         <div class="tabs">
             <button class="tab-btn active" onclick="openTab('app')">تصحیح پاسخنامه</button>
+            <button class="tab-btn" onclick="openTab('exams')">مدیریت آزمون‌ها</button>
             <button class="tab-btn" onclick="openTab('sheet')">چاپ پاسخنامه</button>
         </div>
 
+        <!-- تصحیح پاسخنامه -->
         <div id="app" class="tab-content active">
-            <h3>انتخاب آزمون</h3>
-            <select id="exam-select">
-                <option value="">-- انتخاب کنید --</option>
-                <option value="1">ریاضی - 20 سوال</option>
-                <option value="2">علوم - 30 سوال</option>
-            </select>
+            <h3>۱. انتخاب آزمون</h3>
+            <select id="exam-select"><option value="">-- انتخاب کنید --</option></select>
 
-            <h3>تصویربرداری</h3>
-            <div id="camera-view">
-                <div>دوربین خاموش است</div>
-            </div>
+            <h3>۲. دریافت تصویر</h3>
+            <div id="camera-view"><div>دوربین خاموش است</div></div>
             <div class="controls">
                 <button class="btn-primary" onclick="startCamera()">روشن کردن دوربین</button>
                 <button class="btn-success" onclick="captureImage()">عکس‌برداری و تصحیح</button>
+                <input type="file" id="gallery-input" accept="image/*" onchange="loadFromGallery(event)" style="display:none">
+                <button class="btn-secondary" onclick="document.getElementById('gallery-input').click()">بارگذاری از گالری</button>
                 <button class="btn-danger" onclick="resetCamera()">بازنشانی</button>
             </div>
 
             <div class="results-section" id="results">
                 <h3>نتایج تصحیح</h3>
                 <div id="answers"></div>
+                <button class="btn-success" onclick="downloadExcel()">دانلود نتایج به Excel</button>
             </div>
         </div>
 
+        <!-- مدیریت آزمون‌ها -->
+        <div id="exams" class="tab-content">
+            <h3>ایجاد آزمون جدید</h3>
+            <div class="config-form">
+                <input id="new-exam-name" placeholder="نام آزمون">
+                <input id="new-exam-course" placeholder="نام درس">
+                <select id="new-exam-count"><option value="20">۲۰ سوال</option><option value="30">۳۰ سوال</option><option value="40">۴۰ سوال</option><option value="50">۵۰ سوال</option></select>
+            </div>
+            <div id="new-exam-answer-inputs"></div>
+            <div class="controls">
+                <button class="btn-success" onclick="createExam()">ایجاد آزمون</button>
+                <button class="btn-secondary" onclick="autoFillAnswers()">پر کردن خودکار کلید</button>
+            </div>
+            <div id="exams-list"></div>
+        </div>
+
+        <!-- چاپ پاسخنامه -->
         <div id="sheet" class="tab-content">
             <button class="btn-secondary" onclick="printAnswerSheet()">چاپ پاسخنامه یک‌صفحه‌ای</button>
             <div class="a5-container" id="sheet-template">
@@ -320,25 +110,16 @@
                 <div class="sheet-marker tr"></div>
                 <div class="sheet-marker bl"></div>
                 <div class="sheet-marker br"></div>
-
                 <div class="school-name">دبیرستان نمونه دولتی امام صادق</div>
-
-                <div style="text-align:center; margin-bottom: 10px;">
-                    <h3>آزمون پایانی ریاضی</h3>
-                    <p>درس: ریاضی عمومی | تاریخ: ۱۴۰۳/۰۳/۱۵</p>
-                </div>
-
+                <div style="text-align:center;margin-bottom:10px"><h3 id="sheet-exam-title">آزمون پایانی ریاضی</h3><p id="sheet-exam-details">درس: ریاضی عمومی | تاریخ: ۱۴۰۳/۰۳/۱۵</p></div>
                 <div class="student-info">
                     <div class="info-item"><label>نام و نام خانوادگی:</label><span></span></div>
                     <div class="info-item"><label>رشته تحصیلی:</label><span></span></div>
                     <div class="info-item"><label>شعبه کلاس:</label><span></span></div>
                     <div class="info-item"><label>کد ملی:</label><span></span></div>
                 </div>
-
                 <div class="questions-two-column" id="questions-box"></div>
-
-                <div class="results-summary">
-                    <h4>نتایج تصحیح خودکار</h4>
+                <div class="results-summary"><h4>نتایج تصحیح خودکار</h4>
                     <div class="summary-grid">
                         <div class="summary-item"><span>پاسخ درست:</span><span id="correct-count">۰</span></div>
                         <div class="summary-item"><span>پاسخ نادرست:</span><span id="wrong-count">۰</span></div>
@@ -352,20 +133,153 @@
     </div>
 
     <script>
+        /* ---------- داده‌ها و متغیرها ---------- */
+        let exams = JSON.parse(localStorage.getItem('exams')) || [];
         let selectedExam = null;
-        let video = null;
-        let stream = null;
+        let video = null, stream = null, lastGradingResult = null;
 
-        const exams = {
-            1: { name: 'ریاضی', count: 20, key: ['الف', 'ب', 'ج', 'د', 'الف', 'ب', 'ج', 'د', 'الف', 'ب', 'ج', 'د', 'الف', 'ب', 'ج', 'د', 'الف', 'ب', 'ج', 'د'] },
-            2: { name: 'علوم', count: 30, key: ['ب', 'ج', 'الف', 'د', 'ب', 'ج', 'الف', 'د', 'ب', 'ج', 'الف', 'د', 'ب', 'ج', 'الف', 'د', 'ب', 'ج', 'الف', 'د', 'ب', 'ج', 'الف', 'د', 'ب', 'ج', 'الف', 'د', 'ب', 'ج'] }
-        };
-
+        /* ---------- مدیریت تب‌ها ---------- */
         function openTab(id) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
             document.getElementById(id).classList.add('active');
+            if (id === 'exams') refreshExamsList();
+            if (id === 'sheet') generateQuestions(selectedExam ? selectedExam.count : 20);
         }
 
+        /* ---------- مدیریت آزمون‌ها ---------- */
+        function createExam() {
+            const name = document.getElementById('new-exam-name').value.trim();
+            const course = document.getElementById('new-exam-course').value.trim();
+            const count = parseInt(document.getElementById('new-exam-count').value);
+            if (!name || !course) return alert('نام آزمون و درس را وارد کنید');
+
+            const key = [];
+            for (let i = 1; i <= count; i++) {
+                key.push(document.getElementById(`answer-${i}`).value || '');
+            }
+
+            const newExam = { id: Date.now(), name, course, count, key, created: new Date().toLocaleString('fa-IR') };
+            exams.push(newExam);
+            localStorage.setItem('exams', JSON.stringify(exams));
+            resetExamForm();
+            refreshExamSelector();
+            alert('آزمون ایجاد شد');
+        }
+
+        function resetExamForm() {
+            document.getElementById('new-exam-name').value = '';
+            document.getElementById('new-exam-course').value = '';
+            document.getElementById('new-exam-count').value = '20';
+            initializeAnswerKey('new-exam-answer-inputs', 20);
+        }
+
+        function initializeAnswerKey(containerId, count) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            container.style.cssText = 'display:grid;grid-template-columns:repeat(5,1fr);gap:10px';
+            for (let i = 1; i <= count; i++) {
+                const div = document.createElement('div');
+                div.className = 'answer-input';
+                div.innerHTML = `
+                    <label style="font-size:12px">${i}</label>
+                    <select id="answer-${i}" style="width:100%;padding:4px;font-size:12px">
+                        <option value="">--</option>
+                        <option value="الف">الف</option>
+                        <option value="ب">ب</option>
+                        <option value="ج">ج</option>
+                        <option value="د">د</option>
+                    </select>
+                `;
+                container.appendChild(div);
+            }
+        }
+
+        function autoFillAnswers() {
+            const count = parseInt(document.getElementById('new-exam-count').value);
+            const options = ['الف', 'ب', 'ج', 'د'];
+            for (let i = 1; i <= count; i++) {
+                document.getElementById(`answer-${i}`).value = options[i % 4];
+            }
+        }
+
+        function refreshExamsList() {
+            const list = document.getElementById('exams-list');
+            list.innerHTML = '';
+            if (exams.length === 0) {
+                list.innerHTML = '<p>آزمونی وجود ندارد</p>';
+                return;
+            }
+            exams.forEach(ex => {
+                const div = document.createElement('div');
+                div.className = 'exam-item';
+                div.style.cssText = 'background:#f9f9f9;padding:10px;margin-bottom:10px;border-radius:8px;display:flex;justify-content:space-between;align-items:center';
+                div.innerHTML = `
+                    <div>
+                        <strong>${ex.name}</strong> (${ex.course}) - ${ex.count} سوال - ایجاد شده در ${ex.created}
+                        <br>کلید: ${ex.key.slice(0, 10).join(' ')}${ex.key.length > 10 ? '...' : ''}
+                    </div>
+                    <div>
+                        <button class="btn-primary" onclick="selectExam(${ex.id})">انتخاب</button>
+                        <button class="btn-warning" onclick="editExam(${ex.id})">ویرایش</button>
+                        <button class="btn-danger" onclick="deleteExam(${ex.id})">حذف</button>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function selectExam(id) {
+            selectedExam = exams.find(ex => ex.id === id);
+            refreshExamSelector();
+            document.getElementById('selected-exam-info').style.display = 'block';
+            document.getElementById('exam-name-display').textContent = `${selectedExam.name} (${selectedExam.course})`;
+            document.getElementById('exam-questions-count').textContent = selectedExam.count;
+            document.getElementById('exam-answer-key-preview').innerHTML = `<strong>کلید:</strong> ${selectedExam.key.join(' ')}`;
+            openTab('app');
+        }
+
+        function deleteExam(id) {
+            if (!confirm('آیا از حذف این آزمون اطمینان دارید؟')) return;
+            exams = exams.filter(ex => ex.id !== id);
+            localStorage.setItem('exams', JSON.stringify(exams));
+            refreshExamsList();
+            refreshExamSelector();
+            if (selectedExam && selectedExam.id === id) {
+                selectedExam = null;
+                document.getElementById('selected-exam-info').style.display = 'none';
+            }
+        }
+
+        function editExam(id) {
+            const exam = exams.find(ex => ex.id === id);
+            if (!exam) return;
+            document.getElementById('new-exam-name').value = exam.name;
+            document.getElementById('new-exam-course').value = exam.course;
+            document.getElementById('new-exam-count').value = exam.count;
+            initializeAnswerKey('new-exam-answer-inputs', exam.count);
+            setTimeout(() => {
+                exam.key.forEach((ans, i) => {
+                    document.getElementById(`answer-${i + 1}`).value = ans;
+                });
+            }, 100);
+            exams = exams.filter(ex => ex.id !== id);
+            localStorage.setItem('exams', JSON.stringify(exams));
+            refreshExamsList();
+            refreshExamSelector();
+        }
+
+        function refreshExamSelector() {
+            const select = document.getElementById('exam-select');
+            select.innerHTML = '<option value="">-- انتخاب کنید --</option>';
+            exams.forEach(ex => {
+                const opt = document.createElement('option');
+                opt.value = ex.id;
+                opt.textContent = `${ex.name} (${ex.course})`;
+                select.appendChild(opt);
+            });
+        }
+
+        /* ---------- تصحیح پاسخنامه ---------- */
         function startCamera() {
             navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
                 .then(s => {
@@ -393,12 +307,15 @@
             canvas.height = video.videoHeight;
             canvas.getContext('2d').drawImage(video, 0, 0);
             const imageData = canvas.toDataURL('image/jpeg');
-
-            const examId = document.getElementById('exam-select').value;
-            selectedExam = exams[examId];
-            if (!selectedExam) return alert('آزمونی انتخاب نشده');
-
             processImageWithOCR(imageData);
+        }
+
+        function loadFromGallery(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = e => processImageWithOCR(e.target.result);
+            reader.readAsDataURL(file);
         }
 
         async function processImageWithOCR(imageData) {
@@ -409,6 +326,7 @@
                 const text = result.data.text;
                 const studentAnswers = extractAnswersFromText(text);
                 const grading = gradeExam(studentAnswers, selectedExam.key);
+                lastGradingResult = grading;
                 displayResults(grading);
             };
         }
@@ -437,7 +355,7 @@
                 if (status === 'correct') correct++;
                 else if (status === 'incorrect') wrong++;
                 else empty++;
-                result.push({ q: i + 1, status });
+                result.push({ q: i + 1, status, studentAnswer: student[i], correctAnswer: key[i] });
             }
             return { result, correct, wrong, empty };
         }
@@ -453,8 +371,41 @@
             });
             div.innerHTML += `<br>درست: ${grading.correct} | نادرست: ${grading.wrong} | بی‌پاسخ: ${grading.empty}`;
             document.getElementById('results').style.display = 'block';
+
+            // بروزرسانی بخش چاپ
+            document.getElementById('correct-count').textContent = grading.correct;
+            document.getElementById('wrong-count').textContent = grading.wrong;
+            document.getElementById('empty-count').textContent = grading.empty;
+            document.getElementById('final-score').textContent = ((grading.correct / selectedExam.count) * 20).toFixed(2);
         }
 
+        function downloadExcel() {
+            if (!lastGradingResult) return alert('ابتدا تصحیح را انجام دهید');
+            const ws_data = [
+                ['سوال', 'پاسخ دانش‌آموز', 'پاسخ صحیح', 'وضعیت']
+            ];
+            lastGradingResult.result.forEach(r => {
+                ws_data.push([
+                    r.q.toString(),
+                    r.studentAnswer || 'بی‌پاسخ',
+                    r.correctAnswer,
+                    r.status === 'correct' ? 'درست' : r.status === 'incorrect' ? 'نادرست' : 'بی‌پاسخ'
+                ]);
+            });
+            ws_data.push([]);
+            ws_data.push(['جمع', '', '', '']);
+            ws_data.push(['درست', lastGradingResult.correct.toString(), '', '']);
+            ws_data.push(['نادرست', lastGradingResult.wrong.toString(), '', '']);
+            ws_data.push(['بی‌پاسخ', lastGradingResult.empty.toString(), '', '']);
+            ws_data.push(['نمره', ((lastGradingResult.correct / selectedExam.count) * 20).toFixed(2), '', '']);
+
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(ws_data);
+            XLSX.utils.book_append_sheet(wb, ws, 'نتایج');
+            XLSX.writeFile(wb, `نتایج_${selectedExam.name}.xlsx`);
+        }
+
+        /* ---------- چاپ پاسخنامه ---------- */
         function generateQuestions(count) {
             const container = document.getElementById('questions-box');
             container.innerHTML = '';
@@ -464,16 +415,14 @@
                 row.className = 'question-item';
                 row.innerHTML = `
                     <span>سوال ${i}</span>
-                    <div>
-                        ${options.map(o => `<span class="option-bubble">${o}</span>`).join('')}
-                    </div>
+                    <div>${options.map(o => `<span class="option-bubble">${o}</span>`).join('')}</div>
                 `;
                 container.appendChild(row);
             }
         }
 
         function printAnswerSheet() {
-            generateQuestions(20);
+            generateQuestions(selectedExam ? selectedExam.count : 20);
             const printContainer = document.createElement('div');
             printContainer.id = 'print-container';
             const sheet = document.getElementById('sheet-template').cloneNode(true);
@@ -489,7 +438,11 @@
             }, 500);
         }
 
-        generateQuestions(20);
+        /* ---------- راه‌اندازی اولیه ---------- */
+        document.addEventListener('DOMContentLoaded', () => {
+            refreshExamSelector();
+            initializeAnswerKey('new-exam-answer-inputs', 20);
+        });
     </script>
 </body>
 </html>
