@@ -17,53 +17,55 @@
           options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'] }
         };
     </script>
-
 <style>
-    @page{ size:A4; margin:10mm; }
+    @page{ size:A4; margin:5mm; }
     body{
         font-family:'B Nazanin',Tahoma,Arial,serif;
         background:#fff; color:#000; padding:0; margin:0;
-        font-size:12px; line-height:1.25; direction:rtl; text-align:right;
+        font-size:12px; line-height:1.2; direction:rtl; text-align:right;
         -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important;
+        font-weight:bold;
     }
-    .exam-paper{ width:190mm; margin:0 auto; background:#fff; padding:5mm; box-sizing:border-box; }
-    .exam-header{ display:flex; justify-content:space-between; align-items:flex-start; padding:3px 0; margin-bottom:4px; border-bottom:1px solid #000; }
-    .logo-placeholder{ width:22mm; height:22mm; border:1px solid #000; display:flex; align-items:center; justify-content:center; cursor:pointer; background:#f0f8ff; flex-shrink:0; }
+    .exam-paper{ width:200mm; margin:0 auto; background:#fff; padding:3mm; box-sizing:border-box; }
+    .exam-header{ display:flex; justify-content:space-between; align-items:flex-start; padding:2px 0; margin-bottom:3px; border-bottom:1px solid #000; }
+    .logo-placeholder{ width:20mm; height:20mm; border:1px solid #000; display:flex; align-items:center; justify-content:center; cursor:pointer; background:#f0f8ff; flex-shrink:0; }
     .logo-placeholder img{ max-width:100%; max-height:100%; }
-    .school-info{ flex:1; text-align:center; margin:0 4mm; }
-    .exam-details{ border:1px solid #000; padding:2mm; border-radius:3px; background:#f8f9fa; flex-shrink:0; width:40mm; font-size:10px; }
+    .school-info{ flex:1; text-align:center; margin:0 3mm; }
+    .exam-details{ border:1px solid #000; padding:1.5mm; border-radius:2px; background:#f8f9fa; flex-shrink:0; width:38mm; font-size:9px; }
     .detail-item{ display:flex; justify-content:space-between; margin-bottom:1mm; }
-    .school-name{ font-size:14px; font-weight:bold; margin-bottom:1mm; color:#1a237e; }
-    .exam-title{ font-size:12px; font-weight:500; margin:1mm 0; color:#283593; }
-    .student-info{ display:flex; justify-content:space-between; margin-bottom:4px; padding:2mm; border:1px solid #000; border-radius:2px; background:#fff3e0; font-size:0.9em; }
+    .school-name{ font-size:14px; font-weight:bold; margin-bottom:1mm; color:#1a237e; font-family:'B Nazanin',Tahoma,Arial,serif !important; }
+    .exam-title{ font-size:12px; font-weight:500; margin:1mm 0; color:#283593; font-family:'B Nazanin',Tahoma,Arial,serif !important; }
+    #academicYear{ font-family:'B Nazanin',Tahoma,Arial,serif !important; font-weight:bold; }
+    .student-info{ display:flex; justify-content:space-between; margin-bottom:3px; padding:1.5mm; border:1px solid #000; border-radius:2px; background:#fff3e0; font-size:9px; }
     .info-field{ display:flex; align-items:center; margin:0 2mm; }
-    .info-field strong{ margin-left:2mm; color:#5d4037; font-size:0.9em; }
-    .underline{ border-bottom:1px dashed #000; width:60px; height:12px; display:inline-block; margin:0 2px; }
-    .instructions{ background:#e3f2fd; padding:2mm; border:1px solid #1565c0; border-radius:2px; margin-bottom:4px; font-size:11px; }
-    .instructions h3{ margin:0 3mm 0 0; font-size:11px; white-space:nowrap; color:#0d47a1; display:inline; }
+    .info-field strong{ margin-left:2mm; color:#5d4037; font-size:9px; }
+    .underline{ border-bottom:1px dashed #000; width:55px; height:12px; display:inline-block; margin:0 2px; }
+    .instructions{ background:#e3f2fd; padding:1.5mm; border:1px solid #1565c0; border-radius:2px; margin-bottom:3px; font-size:10px; }
+    .instructions h3{ margin:0 2mm 0 0; font-size:10px; white-space:nowrap; color:#0d47a1; display:inline; }
     .instructions ul{ display:inline; margin:0; padding:0; list-style:none; }
-    .instructions li{ display:inline; margin:0 3mm; white-space:nowrap; color:#1565c0; }
-    .questions-container{ margin-bottom:4px; }
-    .question{ margin-bottom:3px; padding:2mm; border:1px solid #000; border-radius:2px; page-break-inside:avoid; position:relative; background:#fafafa; }
+    .instructions li{ display:inline; margin:0 2mm; white-space:nowrap; color:#1565c0; }
+    .questions-container{ margin-bottom:3px; }
+    .question{ margin-bottom:2px; padding:1.5mm; border:1px solid #000; border-radius:2px; page-break-inside:avoid; position:relative; background:#fafafa; }
     .question-header{ margin-bottom:2px; display:flex; justify-content:space-between; align-items:center; }
     .question-number{ font-weight:bold; font-size:11px; color:#d32f2f; }
-    .question-text{ font-size:11px; color:#000; font-weight:bold; flex-grow:1; margin:0 8px; }
-    .question-score{ font-size:10px; color:#d32f2f; }
-    .choices-row{ display:flex; justify-content:space-between; margin-top:3px; gap:2px; }
-    .choice{ flex:1; padding:2px 3px; border:1px solid #78909c; text-align:center; background:#fff; font-size:10px; border-radius:2px; color:#000; font-weight:bold; cursor:pointer; }
-    .descriptive-answer{ margin-top:3px; padding:4px; border:1px dashed #78909c; border-radius:2px; min-height:30px; background:#fff; }
-    .true-false-options{ display:flex; justify-content:center; margin-top:3px; gap:10px; }
-    .true-false-option{ padding:2px 8px; border:1px solid #78909c; border-radius:3px; background:#fff; color:#000; font-weight:bold; }
-    .blank-space{ display:inline-block; width:80px; border-bottom:1px dashed #000; margin:0 3px; height:12px; }
-    .total-score{ display:flex; justify-content:space-between; align-items:center; padding:2mm; background:#f3e5f5; border:1px solid #7b1fa2; border-radius:2px; margin-top:4px; font-weight:bold; font-size:11px; }
+    .question-text{ font-size:11px; color:#000; font-weight:bold; flex-grow:1; margin:0 6px; }
+    .question-score{ font-size:10px; color:#d32f2f; margin-left:4px; }
+    .question-score-value{ font-size:9px; padding:1px 3px; border:1px solid #78909c; border-radius:2px; background:#fff; min-width:20px; text-align:center; display:inline-block; }
+    .choices-row{ display:flex; justify-content:space-between; margin-top:2px; gap:1px; }
+    .choice{ flex:1; padding:1px 2px; border:1px solid #78909c; text-align:center; background:#fff; font-size:10px; border-radius:2px; color:#000; font-weight:bold; cursor:pointer; }
+    .descriptive-answer{ margin-top:2px; padding:3px; border:1px dashed #78909c; border-radius:2px; min-height:25px; background:#fff; resize:vertical; overflow:hidden; }
+    .true-false-options{ display:flex; justify-content:center; margin-top:2px; gap:8px; }
+    .true-false-option{ padding:1px 6px; border:1px solid #78909c; border-radius:2px; background:#fff; color:#000; font-weight:bold; }
+    .blank-space{ display:inline-block; width:70px; border-bottom:1px dashed #000; margin:0 2px; height:12px; }
+    .total-score{ display:flex; justify-content:space-between; align-items:center; padding:1.5mm; background:#f3e5f5; border:1px solid #7b1fa2; border-radius:2px; margin-top:3px; font-weight:bold; font-size:11px; }
     .score-text{ flex-grow:1; text-align:center; color:#6a1b9a; }
     .total-score-value{ color:#4a148c; }
-    .score-signature-container{ display:flex; justify-content:space-between; align-items:center; margin-top:10px; padding:4px 0; }
+    .score-signature-container{ display:flex; justify-content:space-between; align-items:center; margin-top:6px; padding:3px 0; }
     .student-score{ text-align:center; font-weight:bold; flex:1; }
-    .score-line{ border-bottom:1px dashed #ccc; width:90px; height:20px; display:inline-block; margin:0 3px; }
-    .teacher-signature{ text-align:center; flex:1; padding:4px; }
-    .action-buttons{ position:fixed; bottom:10px; left:10px; z-index:100; display:flex; flex-direction:column; gap:3px; background:#fff; padding:5px; border-radius:8px; box-shadow:0 0 8px rgba(0,0,0,.2); max-height:90vh; overflow-y:auto; }
-    .action-btn{ width:30px; height:30px; border-radius:50%; border:none; box-shadow:0 2px 4px rgba(0,0,0,.2); cursor:pointer; transition:.3s; display:flex; align-items:center; justify-content:center; color:#fff; font-size:12px; }
+    .score-line{ border-bottom:1px dashed #ccc; width:80px; height:18px; display:inline-block; margin:0 3px; }
+    .teacher-signature{ text-align:center; flex:1; padding:3px; }
+    .action-buttons{ position:fixed; bottom:6px; left:6px; z-index:100; display:flex; flex-direction:column; gap:2px; background:#fff; padding:3px; border-radius:6px; box-shadow:0 0 6px rgba(0,0,0,.2); max-height:90vh; overflow-y:auto; }
+    .action-btn{ width:28px; height:28px; border-radius:50%; border:none; box-shadow:0 1px 3px rgba(0,0,0,.2); cursor:pointer; transition:.2s; display:flex; align-items:center; justify-content:center; color:#fff; font-size:11px; }
     .action-btn:hover{ transform:scale(1.05); }
     .print-btn{ background:#1e40af; }
     .pdf-btn{ background:#10b981; }
@@ -77,27 +79,28 @@
     .add-image-btn{ background:#3b82f6; }
     .question-type-btn{ background:#ff6d00; }
     .add-formula-btn{ background:#00acc1; }
-    .question-actions{ position:absolute; top:2px; left:2px; display:none; }
+    .header-font-size-btn{ background:#7e57c2; }
+    .choice-font-size-btn{ background:#8e24aa; }
+    .question-actions{ position:absolute; top:1px; left:1px; display:none; }
     .question:hover .question-actions{ display:flex; }
-    .question-action-btn{ width:18px; height:18px; border-radius:50%; border:none; background:#3b82f6; color:#fff; cursor:pointer; margin-right:2px; display:flex; align-items:center; justify-content:center; font-size:9px; }
-    .button-group{ display:flex; flex-direction:column; gap:3px; margin:3px 0; padding:3px; background:#f5f5f5; border-radius:5px; }
-    .group-title{ font-size:8px; text-align:center; color:#555; margin-bottom:2px; }
-    /* ویرایش درجا */
-    [contenteditable]{outline:none; background:#fff3e0; padding:1px 3px; border-radius:3px; min-width:60px; display:inline-block; }
+    .question-action-btn{ width:16px; height:16px; border-radius:50%; border:none; background:#3b82f6; color:#fff; cursor:pointer; margin-right:1px; display:flex; align-items:center; justify-content:center; font-size:8px; }
+    .button-group{ display:flex; flex-direction:column; gap:2px; margin:2px 0; padding:2px; background:#f5f5f5; border-radius:4px; }
+    .group-title{ font-size:7px; text-align:center; color:#555; margin-bottom:1px; }
+    [contenteditable]{outline:none; background:#fff3e0; padding:1px 2px; border-radius:2px; min-width:50px; display:inline-block; }
     [contenteditable]:focus{ background:#ffe0b2; border:1px solid #f57c00; }
     @media print{
         body{ padding:0; margin:0; background:#fff; color:#000; -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
-        .exam-paper{ padding:5mm; width:190mm; max-width:none; }
+        .exam-paper{ padding:3mm; width:200mm; max-width:none; }
         .no-print,.question-actions,.action-buttons{ display:none !important; }
         .logo-placeholder{ border:1px solid #000; background:#f0f8ff !important; }
-        .exam-details{ background:#f8f9fa !important; border:1px solid #000 !important; }
-        .student-info{ background:#fff3e0 !important; border:1px solid #000 !important; }
-        .instructions{ background:#e3f2fd !important; border:1px solid #1565c0 !important; }
-        .question{ border:1px solid #000 !important; background:#fafafa !important; }
+        .exam-details{ background:#fff !important; border:1px solid #000 !important; }
+        .student-info{ background:#fff !important; border:1px solid #000 !important; }
+        .instructions{ background:#fff !important; border:1px solid #1565c0 !important; }
+        .question{ border:1px solid #000 !important; background:#fff !important; }
         .choice{ border:1px solid #78909c !important; background:#fff !important; color:#000 !important; font-weight:bold !important; }
         .descriptive-answer{ border:1px dashed #78909c !important; background:#fff !important; }
         .true-false-option{ border:1px solid #78909c !important; background:#fff !important; color:#000 !important; font-weight:bold !important; }
-        .total-score{ background:#f3e5f5 !important; border:1px solid #7b1fa2 !important; }
+        .total-score{ background:#fff !important; border:1px solid #7b1fa2 !important; }
         [contenteditable]{ background:transparent !important; padding:0 !important; border:none !important; }
     }
 </style>
@@ -115,6 +118,9 @@
         <button class="action-btn add-image-btn" onclick="addImage()" title="افزودن لوگو"><i class="fas fa-image"></i></button>
         <button class="action-btn font-size-btn" onclick="changeFontSize(1,'all')" title="افزایش فونت"><i class="fas fa-font"></i>+</button>
         <button class="action-btn font-size-btn" onclick="changeFontSize(-1,'all')" title="کاهش فونت"><i class="fas fa-font"></i>−</button>
+        <button class="action-btn header-font-size-btn" onclick="changeHeaderFontSize(1)" title="افزایش فونت سربرگ"><i class="fas fa-heading"></i>+</button>
+        <button class="action-btn header-font-size-btn" onclick="changeHeaderFontSize(-1)" title="کاهش فونت سربرگ"><i class="fas fa-heading"></i>−</button>
+        <button class="action-btn edit-instructions-btn" onclick="editInstructions()" title="ویرایش متن و فونت راهنما"><i class="fas fa-info-circle"></i></button>
     </div>
     <div class="button-group">
         <div class="group-title">مدیریت سوالات</div>
@@ -173,10 +179,13 @@
 
 <script>
 let questions=[], currentFileName="آزمون_ذخیره_شده";
+let currentHeaderFontSize=12;
+let currentInstructionsFontSize=10;
+
 function initializeQuestions(){
     questions=[
-        {number:1,type:'multiple-choice',text:'حاصل $1 \\times 2$ برابر است با:',choices:['$2$','$3$','$1$','$4$'],score:1},
-        {number:2,type:'multiple-choice',text:'فرمول شیمیایی آب: $\\ce{H2O}$',choices:['$\\ce{H2O}$','$\\ce{CO2}$','$\\ce{NaCl}$','$\\ce{O2}$'],score:1},
+        {number:1,type:'multiple-choice',text:'حاصل $1 \\times 2$ برابر است با:',choices:['الف) $2$','ب) $3$','ج) $1$','د) $4$'],score:1},
+        {number:2,type:'multiple-choice',text:'فرمول شیمیایی آب: $\\ce{H2O}$',choices:['الف) $\\ce{H2O}$','ب) $\\ce{CO2}$','ج) $\\ce{NaCl}$','د) $\\ce{O2}$'],score:1},
         {number:3,type:'descriptive',text:'معادلهٔ درجه‌۲ بنویسید: $ax^2+bx+c=0$',score:2},
         {number:4,type:'true-false',text:'گاز $\\ce{CO2}$ سبب گلخانه‌ای می‌شود.',score:1},
         {number:5,type:'fill-blank',text:'عنصر با نماد $\\ce{Na}$ چیست؟',score:1}
@@ -192,14 +201,14 @@ function renderQuestions(){
             <div class="question-header">
                 <span class="question-number">سوال ${q.number} - </span>
                 <span class="question-text math-tex" contenteditable="true" onblur="updateQuestionText(${i},this)" onkeypress="if(event.key==='Enter'){this.blur();}">${q.text}</span>
-                <span class="question-score" contenteditable="true" onblur="updateQuestionScore(${i},this)">${q.score}</span><span> نمره</span>
+                <span class="question-score-value" contenteditable="true" onblur="updateQuestionScore(${i},this)">${q.score}</span><span class="question-score"> نمره</span>
             </div>`;
         if(q.type==='multiple-choice'){
             html+=`<div class="choices-row">
                 ${q.choices.map((ch,idx)=>`<div class="choice math-tex" contenteditable="true" onblur="updateChoice(${i},${idx},this)" onkeypress="if(event.key==='Enter'){this.blur();}">${ch}</div>`).join('')}
             </div>`;
         }else if(q.type==='descriptive'){
-            html+=`<div class="descriptive-answer">پاسخ:</div>`;
+            html+=`<div class="descriptive-answer" contenteditable="true" style="min-height:50px;" oninput="autoResize(this)">پاسخ:</div>`;
         }else if(q.type==='true-false'){
             html+=`<div class="true-false-options">
                 <div class="true-false-option">درست</div>
@@ -208,7 +217,22 @@ function renderQuestions(){
         }
         div.innerHTML=html; container.appendChild(div);
     });
+    applyFontSizes();
     MathJax.typesetPromise();
+}
+function autoResize(el){
+    el.style.height='auto';
+    el.style.height=el.scrollHeight+'px';
+}
+function applyFontSizes(){
+    document.querySelectorAll('.school-name, .exam-title, #academicYear, .detail-item').forEach(el=>{
+        el.style.fontSize=currentHeaderFontSize+'px';
+        el.style.fontWeight='bold';
+    });
+    document.querySelectorAll('.instructions, .instructions h3, .instructions li').forEach(el=>{
+        el.style.fontSize=currentInstructionsFontSize+'px';
+        el.style.fontWeight='bold';
+    });
 }
 function updateQuestionText(i,el){
     questions[i].text=el.textContent.trim();
@@ -236,12 +260,43 @@ function changeFontSize(d,t){
         chs.forEach(el=>{el.style.fontSize=fsc+'px';el.style.fontWeight='bold';el.style.color='#000';});
     }
 }
+function changeHeaderFontSize(delta){
+    currentHeaderFontSize+=delta;
+    if(currentHeaderFontSize<10) currentHeaderFontSize=10;
+    if(currentHeaderFontSize>18) currentHeaderFontSize=18;
+    applyFontSizes();
+}
+function changeInstructionsFontSize(){
+    const newSize=prompt('سایز فونت راهنما را وارد کنید (عدد بین ۸ تا ۱۶):',currentInstructionsFontSize);
+    if(newSize!==null){
+        const n=parseInt(newSize);
+        if(!isNaN(n)&&n>=8&&n<=16){
+            currentInstructionsFontSize=n;
+            applyFontSizes();
+        }else{
+            alert('لطفاً عددی بین ۸ تا ۱۶ وارد کنید.');
+        }
+    }
+}
+function editInstructions(){
+    const currentText=Array.from(document.querySelectorAll('#instructions li')).map(li=>li.textContent).join('\n');
+    const newText=prompt('متن راهنما را وارد کنید (هر خط یک مورد):',currentText);
+    if(newText!==null){
+        const items=newText.split('\n').filter(l=>l.trim()!=='');
+        document.getElementById('instructions').innerHTML=
+            '<h3><i class="fas fa-exclamation-circle"></i> راهنما:</h3><ul>'+
+            items.map(i=>`<li>${i.trim()}</li>`).join('')+
+            '</ul>';
+        applyFontSizes();
+    }
+    changeInstructionsFontSize();
+}
 function addQuestion(type){
     const n=questions.length+1;
     let q;
     switch(type){
         case 'multiple-choice':
-            q={number:n,type:type,text:'متن سوال چهارگزینه‌ای (می‌توانید از $...$ یا $$...$$ استفاده کنید)',choices:['گزینه ۱','گزینه ۲','گزینه ۳','گزینه ۴'],score:1};break;
+            q={number:n,type:type,text:'متن سوال چهارگزینه‌ای (می‌توانید از $...$ یا $$...$$ استفاده کنید)',choices:['الف) گزینه اول','ب) گزینه دوم','ج) گزینه سوم','د) گزینه چهارم'],score:1};break;
         case 'descriptive':
             q={number:n,type:type,text:'متن سوال تشریحی (می‌توانید از فرمول ریاضی یا شیمیایی استفاده کنید)',score:2};break;
         case 'true-false':
@@ -249,7 +304,7 @@ function addQuestion(type){
         case 'fill-blank':
             q={number:n,type:type,text:'متن سوال جای خالی را اینجا وارد کنید',score:1};break;
         default:
-            q={number:n,type:'multiple-choice',text:'متن سوال جدید',choices:['گزینه ۱','گزینه ۲','گزینه ۳','گزینه ۴'],score:1};
+            q={number:n,type:'multiple-choice',text:'متن سوال جدید',choices:['الف) گزینه اول','ب) گزینه دوم','ج) گزینه سوم','د) گزینه چهارم'],score:1};
     }
     questions.push(q); renderQuestions();
 }
@@ -282,7 +337,9 @@ function saveExam(){
         teacherName:document.getElementById('teacherName').textContent,
         instructions:document.getElementById('instructions').innerHTML,
         questions:questions,
-        logo:document.querySelector('#logoPlaceholder img')? document.querySelector('#logoPlaceholder img').src:null
+        logo:document.querySelector('#logoPlaceholder img')? document.querySelector('#logoPlaceholder img').src:null,
+        headerFontSize:currentHeaderFontSize,
+        instructionsFontSize:currentInstructionsFontSize
     };
     localStorage.setItem('savedExam',JSON.stringify(data));
     alert('آزمون در LocalStorage ذخیره شد!');
@@ -297,7 +354,7 @@ function saveExamAs(){
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"><\/script>
     <script>window.MathJax={tex:{packages:{'[+]':['mhchem']},inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre']}};<\/script>
     <style>${document.querySelector('style').textContent}<\/style></head><body>${content}
-    <script>let questions=${JSON.stringify(questions)};function renderQuestions(){const c=document.getElementById('questionsContainer');c.innerHTML='';questions.forEach((q,i)=>{const d=document.createElement('div');d.className='question';let h=\`<div class="question-header"><span class="question-number">سوال \${q.number} - </span><span class="question-text math-tex" contenteditable="true" onblur="updateQuestionText(\${i},this)" onkeypress="if(event.key==='Enter'){this.blur();}">\${q.text}</span><span class="question-score" contenteditable="true" onblur="updateQuestionScore(\${i},this)">\${q.score}</span><span> نمره</span></div>\`;if(q.type==='multiple-choice'){h+=\`<div class="choices-row">\${q.choices.map((ch,idx)=>\`<div class="choice math-tex" contenteditable="true" onblur="updateChoice(\${i},\${idx},this)" onkeypress="if(event.key==='Enter'){this.blur();}">\${ch}</div>\`).join('')}</div>\`;}else if(q.type==='descriptive'){h+=\`<div class="descriptive-answer">پاسخ:</div>\`;}else if(q.type==='true-false'){h+=\`<div class="true-false-options"><div class="true-false-option">درست</div><div class="true-false-option">نادرست</div></div>\`;}d.innerHTML=h;c.appendChild(d);});MathJax.typesetPromise();}function updateQuestionText(i,el){questions[i].text=el.textContent.trim();MathJax.typesetPromise();}function updateChoice(i,j,el){questions[i].choices[j]=el.textContent.trim();MathJax.typesetPromise();}function updateQuestionScore(i,el){const v=parseFloat(el.textContent.trim());if(!isNaN(v)&&v>0) questions[i].score=v;else el.textContent=questions[i].score;}renderQuestions();function exportToPDF(){const el=document.getElementById('examPaper');html2pdf().set({margin:[5,5,5,5],filename:'${name}.pdf',image:{type:'jpeg',quality:.98},html2canvas:{scale:2,backgroundColor:'#ffffff',width:794,height:el.scrollHeight,useCORS:true},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}}).from(el).save();}<\/script></body></html>`;
+    <script>let questions=${JSON.stringify(questions)};function renderQuestions(){const c=document.getElementById('questionsContainer');c.innerHTML='';questions.forEach((q,i)=>{const d=document.createElement('div');d.className='question';let h=\`<div class="question-header"><span class="question-number">سوال \${q.number} - </span><span class="question-text math-tex" contenteditable="true" onblur="updateQuestionText(\${i},this)" onkeypress="if(event.key==='Enter'){this.blur();}">\${q.text}</span><span class="question-score-value" contenteditable="true" onblur="updateQuestionScore(\${i},this)">\${q.score}</span><span class="question-score"> نمره</span></div>\`;if(q.type==='multiple-choice'){h+=\`<div class="choices-row">\${q.choices.map((ch,idx)=>\`<div class="choice math-tex" contenteditable="true" onblur="updateChoice(\${i},\${idx},this)" onkeypress="if(event.key==='Enter'){this.blur();}">\${ch}</div>\`).join('')}</div>\`;}else if(q.type==='descriptive'){h+=\`<div class="descriptive-answer" contenteditable="true" style="min-height:50px;" oninput="autoResize(this)">پاسخ:</div>\`;}else if(q.type==='true-false'){h+=\`<div class="true-false-options"><div class="true-false-option">درست</div><div class="true-false-option">نادرست</div></div>\`;}d.innerHTML=h;c.appendChild(d);});applyFontSizes();MathJax.typesetPromise();}function updateQuestionText(i,el){questions[i].text=el.textContent.trim();MathJax.typesetPromise();}function updateChoice(i,j,el){questions[i].choices[j]=el.textContent.trim();MathJax.typesetPromise();}function updateQuestionScore(i,el){const v=parseFloat(el.textContent.trim());if(!isNaN(v)&&v>0) questions[i].score=v;else el.textContent=questions[i].score;}function autoResize(el){el.style.height='auto';el.style.height=el.scrollHeight+'px';}function applyFontSizes(){document.querySelectorAll('.school-name, .exam-title, #academicYear, .detail-item').forEach(el=>{el.style.fontSize=currentHeaderFontSize+'px';el.style.fontWeight='bold';});document.querySelectorAll('.instructions, .instructions h3, .instructions li').forEach(el=>{el.style.fontSize=currentInstructionsFontSize+'px';el.style.fontWeight='bold';});}renderQuestions();function exportToPDF(){const el=document.getElementById('examPaper');MathJax.typesetPromise().then(()=>{html2pdf().set({margin:[3,3,3,3],filename:'${name}.pdf',image:{type:'jpeg',quality:.98},html2canvas:{scale:2,backgroundColor:'#ffffff',width:794,height:el.scrollHeight,useCORS:true},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}}).from(el).save();});}<\/script></body></html>`;
     const blob=new Blob([fullHTML],{type:'text/html'});
     const url=URL.createObjectURL(blob);
     const a=document.createElement('a'); a.href=url; a.download=`${name}.html`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
@@ -314,7 +371,7 @@ function loadExam(){
     document.getElementById('teacherName').textContent=d.teacherName;
     document.getElementById('instructions').innerHTML=d.instructions;
     if(d.logo){document.getElementById('logoPlaceholder').innerHTML=`<img src="${d.logo}" alt="لوگو">`;}
-    questions=d.questions; renderQuestions();
+    questions=d.questions; currentHeaderFontSize=d.headerFontSize||12; currentInstructionsFontSize=d.instructionsFontSize||10; applyFontSizes();
     alert('آزمون ذخیره‌شده بارگذاری شد!');
 }
 function editExamInfo(){
@@ -347,16 +404,15 @@ function addImage(){
 }
 function exportToPDF(){
     const el=document.getElementById('examPaper');
-    // ابتدا MathJax را مجبور به تایپ‌ست کامل می‌کنیم
     MathJax.typesetPromise().then(()=>{
         html2pdf().set({
-            margin: [5, 5, 5, 5],
+            margin: [3, 3, 3, 3],
             filename: `${currentFileName}.pdf`,
             image: { type: 'jpeg', quality: 0.98 },
             html2canvas: {
                 scale: 2,
                 backgroundColor: '#ffffff',
-                width: 794,              // عرض A4 به پیکسل
+                width: 794,
                 height: el.scrollHeight,
                 useCORS: true
             },
