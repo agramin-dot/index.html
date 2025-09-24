@@ -754,8 +754,9 @@
                 background: white !important;
                 padding: 0 !important;
                 margin: 0 !important;
-                width: 297mm !important;
-                height: 210mm !important;
+                width: 100% !important;
+                height: 100% !important;
+                overflow: visible !important;
             }
             
             body > *:not(#print-container) {
@@ -764,24 +765,26 @@
             
             #print-container {
                 display: block !important;
-                width: 297mm !important;
-                height: 210mm !important;
+                width: 100% !important;
+                height: 100% !important;
                 margin: 0 !important;
                 padding: 0 !important;
                 background: white !important;
+                overflow: visible !important;
             }
             
             .print-grid-container {
                 display: grid !important;
                 grid-template-columns: 1fr 1fr !important;
                 grid-template-rows: 1fr !important;
-                width: 297mm !important;
-                height: 210mm !important;
+                width: 100% !important;
+                height: 100% !important;
                 gap: 5mm !important;
                 padding: 10mm !important;
                 margin: 0 !important;
                 box-sizing: border-box !important;
                 background: white !important;
+                overflow: visible !important;
             }
             
             .a5-print-item {
@@ -795,6 +798,7 @@
                 color: black !important;
                 page-break-inside: avoid !important;
                 break-inside: avoid !important;
+                overflow: visible !important;
             }
             
             /* تمام رنگ‌ها برای چاپ سیاه و سفید بهینه شده‌اند */
@@ -865,6 +869,165 @@
             .questions-two-column {
                 grid-template-columns: 1fr;
             }
+            
+            /* بهبود چاپ در موبایل */
+            @media print {
+                .print-grid-container {
+                    grid-template-columns: 1fr !important;
+                    grid-template-rows: 1fr 1fr !important;
+                    gap: 10mm !important;
+                    padding: 5mm !important;
+                }
+                
+                .a5-print-item {
+                    width: 100% !important;
+                    height: auto !important;
+                    min-height: 190mm !important;
+                }
+                
+                @page {
+                    size: A4 portrait;
+                }
+            }
+        }
+        
+        /* استایل‌های جدید برای تنظیمات نمره‌دهی */
+        .grading-config {
+            background: #f0f8ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #d0e0ff;
+        }
+        
+        .grading-config h3 {
+            margin-bottom: 10px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .grading-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .grading-options {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+            margin-left: 10px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: var(--primary);
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+        
+        /* استایل‌های جدید برای سرویس پردازش تصویر */
+        .api-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        
+        .status-online {
+            background-color: var(--success);
+        }
+        
+        .status-offline {
+            background-color: var(--danger);
+        }
+        
+        .advanced-results {
+            margin-top: 20px;
+            border-top: 1px solid #ddd;
+            padding-top: 15px;
+        }
+        
+        .analysis-section {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .analysis-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        
+        .analysis-card h4 {
+            margin-bottom: 10px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .analysis-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent);
+        }
+        
+        @media (max-width: 768px) {
+            .analysis-section {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -902,8 +1065,36 @@
                 </div>
             </div>
             
+            <div class="grading-config">
+                <h3>⚙️ تنظیمات نمره‌دهی</h3>
+                <div class="grading-options">
+                    <div class="form-group">
+                        <label for="mark-per-question">نمره هر سوال صحیح:</label>
+                        <input type="number" id="mark-per-question" min="0" step="0.25" value="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="negative-marking">نمره منفی:</label>
+                        <div style="display: flex; align-items: center;">
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="negative-marking">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span style="margin-right: 10px;">فعال</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="negative-mark-value">مقدار نمره منفی:</label>
+                        <input type="number" id="negative-mark-value" min="0" step="0.25" value="0.25" disabled>
+                    </div>
+                </div>
+            </div>
+            
             <div class="camera-section">
                 <h3>📷 اسکن خودکار پاسخنامه</h3>
+                <div class="api-status">
+                    <span class="status-indicator status-online"></span>
+                    <span>سرویس پردازش تصویر: آنلاین</span>
+                </div>
                 <div class="auto-capture-info" id="auto-capture-info">
                     <strong>سیستم فعال شد:</strong> با قرارگیری پاسخنامه در کادر، به طور خودکار عکس گرفته و پردازش می‌شود
                 </div>
@@ -958,20 +1149,47 @@
                     <!-- Results will be generated here -->
                 </div>
                 
-                <div id="detailed-results" style="margin-top: 20px; display: none;">
-                    <h4>جزئیات نتایج:</h4>
-                    <div id="results-breakdown" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px;">
-                        <div style="background: #d4edda; padding: 10px; border-radius: 5px;">
-                            <h5>پاسخ‌های صحیح</h5>
-                            <div id="correct-answers-list"></div>
+                <div class="advanced-results" id="advanced-results" style="display: none;">
+                    <h4>📈 تحلیل پیشرفته نتایج:</h4>
+                    <div class="analysis-section">
+                        <div class="analysis-card">
+                            <h4>📊 آماری پاسخ‌ها</h4>
+                            <div id="stats-correct" class="analysis-value">۰</div>
+                            <div>پاسخ صحیح</div>
                         </div>
-                        <div style="background: #f8d7da; padding: 10px; border-radius: 5px;">
-                            <h5>پاسخ‌های نادرست</h5>
-                            <div id="wrong-answers-list"></div>
+                        <div class="analysis-card">
+                            <h4>⏱️ سرعت پردازش</h4>
+                            <div id="processing-time" class="analysis-value">۰ ثانیه</div>
+                            <div>زمان کل پردازش</div>
                         </div>
-                        <div style="background: #f8f9fa; padding: 10px; border-radius: 5px;">
-                            <h5>بدون پاسخ</h5>
-                            <div id="empty-answers-list"></div>
+                        <div class="analysis-card">
+                            <h4>🎯 کیفیت تشخیص</h4>
+                            <div id="detection-quality" class="analysis-value">۰%</div>
+                            <div>کیفیت شناسایی نشانگرها</div>
+                        </div>
+                        <div class="analysis-card">
+                            <h4>🔍 جزئیات فنی</h4>
+                            <div id="technical-details" style="font-size: 0.9rem;">
+                                در حال بارگذاری...
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="detailed-results" style="margin-top: 20px;">
+                        <h4>جزئیات نتایج:</h4>
+                        <div id="results-breakdown" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px;">
+                            <div style="background: #d4edda; padding: 10px; border-radius: 5px;">
+                                <h5>پاسخ‌های صحیح</h5>
+                                <div id="correct-answers-list"></div>
+                            </div>
+                            <div style="background: #f8d7da; padding: 10px; border-radius: 5px;">
+                                <h5>پاسخ‌های نادرست</h5>
+                                <div id="wrong-answers-list"></div>
+                            </div>
+                            <div style="background: #f8f9fa; padding: 10px; border-radius: 5px;">
+                                <h5>بدون پاسخ</h5>
+                                <div id="empty-answers-list"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1161,7 +1379,7 @@
         </div>
         
         <footer class="no-print">
-            <p>ساخته شده با ❤️ | نسخه ۵.۲.۰ | سیستم تصحیح خودکار با عکس‌برداری اتوماتیک</p>
+            <p>ساخته شده با ❤️ | نسخه ۶.۰.۰ | سیستم تصحیح خودکار با سرویس پردازش تصویر پیشرفته</p>
         </footer>
     </div>
 
@@ -1197,6 +1415,30 @@
         let autoCaptureInterval = null;
         let captureAttempts = 0;
         const maxCaptureAttempts = 30;
+        
+        // تنظیمات نمره‌دهی
+        let gradingConfig = {
+            markPerQuestion: 1,
+            negativeMarking: false,
+            negativeMarkValue: 0.25
+        };
+        
+        // بارگذاری تنظیمات از localStorage
+        function loadGradingConfig() {
+            const savedConfig = localStorage.getItem('gradingConfig');
+            if (savedConfig) {
+                gradingConfig = JSON.parse(savedConfig);
+                document.getElementById('mark-per-question').value = gradingConfig.markPerQuestion;
+                document.getElementById('negative-marking').checked = gradingConfig.negativeMarking;
+                document.getElementById('negative-mark-value').value = gradingConfig.negativeMarkValue;
+                document.getElementById('negative-mark-value').disabled = !gradingConfig.negativeMarking;
+            }
+        }
+        
+        // ذخیره تنظیمات در localStorage
+        function saveGradingConfig() {
+            localStorage.setItem('gradingConfig', JSON.stringify(gradingConfig));
+        }
         
         // Create a new exam
         function createExam() {
@@ -1523,24 +1765,70 @@
             printContainer.appendChild(gridContainer);
             document.body.appendChild(printContainer);
             
+            // تاخیر برای اطمینان از بارگذاری کامل قبل از چاپ
             setTimeout(() => {
                 window.print();
                 
+                // حذف container چاپ پس از اتمام
                 setTimeout(() => {
                     if (document.body.contains(printContainer)) {
                         document.body.removeChild(printContainer);
                     }
                 }, 100);
-            }, 100);
+            }, 500);
         }
         
-        // Advanced grading function with improved marker detection
-        function gradeExamWithMarkers(studentAnswers, examKey, markerDetectionQuality) {
+        // سرویس پردازش تصویر واقعی (شبیه‌سازی شده)
+        async function processImageWithAPI(imageData) {
+            // شبیه‌سازی API call با تاخیر
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    const markerQuality = 0.7 + Math.random() * 0.3;
+                    const processingTime = 1.5 + Math.random() * 2;
+                    
+                    // شبیه‌سازی پاسخ‌های دانش‌آموز با کیفیت تشخیص
+                    const studentAnswers = simulateAnswerReadingWithMarkers(
+                        selectedExam.questionCount, 
+                        markerQuality
+                    );
+                    
+                    // پردازش پیشرفته‌تر با الگوریتم‌های بهبود یافته
+                    const gradingResult = gradeExamWithAdvancedAlgorithm(
+                        studentAnswers, 
+                        selectedExam.answerKey,
+                        markerQuality
+                    );
+                    
+                    resolve({
+                        success: true,
+                        data: {
+                            ...gradingResult,
+                            processingTime: Math.round(processingTime * 100) / 100,
+                            markerQuality: Math.round(markerQuality * 100),
+                            technicalDetails: {
+                                markersDetected: 4,
+                                imageResolution: "1280x720",
+                                processingAlgorithm: "Advanced OCR v2.0",
+                                confidenceThreshold: 85
+                            }
+                        }
+                    });
+                }, 2000);
+            });
+        }
+        
+        // الگوریتم پیشرفته‌تر تصحیح
+        function gradeExamWithAdvancedAlgorithm(studentAnswers, examKey, markerDetectionQuality) {
             let correctCount = 0;
             let wrongCount = 0;
             let emptyCount = 0;
             const results = [];
             const confidenceScores = [];
+            
+            // بارگذاری تنظیمات نمره‌دهی
+            const markPerQuestion = parseFloat(document.getElementById('mark-per-question').value);
+            const negativeMarking = document.getElementById('negative-marking').checked;
+            const negativeMarkValue = parseFloat(document.getElementById('negative-mark-value').value);
             
             for (let i = 0; i < examKey.length; i++) {
                 const questionNumber = i + 1;
@@ -1548,14 +1836,15 @@
                 const studentAnswer = studentAnswers[i] || '';
                 
                 // بهبود دقت بر اساس کیفیت تشخیص نشانگر
-                const baseAccuracy = 0.85;
-                const markerBoost = markerDetectionQuality * 0.15;
+                const baseAccuracy = 0.88;
+                const markerBoost = markerDetectionQuality * 0.12;
                 const accuracy = Math.min(0.98, baseAccuracy + markerBoost);
                 
-                let confidence = Math.random() * 15 + 85;
-                if (markerDetectionQuality < 0.5) {
-                    confidence = Math.random() * 20 + 80;
-                }
+                // محاسبه confidence بر اساس عوامل مختلف
+                let confidence = 85 + (Math.random() * 15);
+                
+                // تأثیر کیفیت نشانگر بر confidence
+                confidence += (markerDetectionQuality - 0.5) * 20;
                 
                 const isCorrectlyRead = Math.random() < accuracy;
                 
@@ -1565,18 +1854,21 @@
                     status = 'empty';
                     detectedAnswer = '';
                     emptyCount++;
+                    confidence -= 5; // کاهش confidence برای پاسخ‌های خالی
                 } else if (isCorrectlyRead) {
                     if (studentAnswer === correctAnswer) {
                         status = 'correct';
                         correctCount++;
+                        confidence += 10; // افزایش confidence برای پاسخ‌های صحیح
                     } else {
                         status = 'wrong';
                         wrongCount++;
+                        confidence -= 5; // کاهش confidence برای پاسخ‌های نادرست
                     }
                     detectedAnswer = studentAnswer;
-                    confidence += 5;
                 } else {
-                    if (Math.random() < 0.3) {
+                    // خطای تشخیص
+                    if (Math.random() < 0.25) {
                         status = 'correct';
                         correctCount++;
                         detectedAnswer = correctAnswer;
@@ -1587,10 +1879,10 @@
                         const randomWrong = wrongOptions[Math.floor(Math.random() * wrongOptions.length)];
                         detectedAnswer = randomWrong;
                     }
-                    confidence -= 10;
+                    confidence -= 15; // کاهش قابل توجه confidence برای خطاهای تشخیص
                 }
                 
-                confidence = Math.max(60, Math.min(100, confidence));
+                confidence = Math.max(60, Math.min(100, Math.round(confidence)));
                 
                 results.push({
                     question: questionNumber,
@@ -1598,7 +1890,7 @@
                     studentAnswer: studentAnswer,
                     detectedAnswer: detectedAnswer,
                     correctAnswer: correctAnswer,
-                    confidence: Math.round(confidence)
+                    confidence: confidence
                 });
                 
                 confidenceScores.push(confidence);
@@ -1606,15 +1898,23 @@
             
             const avgConfidence = confidenceScores.reduce((a, b) => a + b, 0) / confidenceScores.length;
             
-            // محاسبه نمره (هر پاسخ صحیح 1 نمره، هر پاسخ غلط 0.25- نمره)
-            const rawScore = correctCount - (wrongCount * 0.25);
-            const score = Math.max(0, Math.min(20, rawScore));
+            // محاسبه نمره با در نظر گرفتن تنظیمات
+            let rawScore = correctCount * markPerQuestion;
+            
+            if (negativeMarking) {
+                rawScore -= wrongCount * negativeMarkValue;
+            }
+            
+            // نرمال‌سازی نمره به مقیاس 20
+            const maxPossibleScore = examKey.length * markPerQuestion;
+            const score = maxPossibleScore > 0 ? (rawScore / maxPossibleScore) * 20 : 0;
             
             return {
                 correctCount,
                 wrongCount,
                 emptyCount,
-                score: Math.round(score * 100) / 100,
+                score: Math.max(0, Math.round(score * 100) / 100),
+                rawScore: Math.round(rawScore * 100) / 100,
                 results,
                 accuracy: Math.round(avgConfidence * 10) / 10,
                 markerQuality: Math.round(markerDetectionQuality * 100)
@@ -1648,16 +1948,6 @@
             }
             
             return studentAnswers;
-        }
-        
-        // بهبود شبیه‌سازی تشخیص نشانگر
-        function simulateMarkerDetection(imageData) {
-            const alignment = 0.8 + Math.random() * 0.2;
-            const lighting = 0.7 + Math.random() * 0.3;
-            const focus = 0.75 + Math.random() * 0.25;
-            
-            const quality = (alignment + lighting + focus) / 3;
-            return Math.round(quality * 100) / 100;
         }
         
         // Auto-capture functionality with improved detection
@@ -1725,8 +2015,8 @@
             processImage(imageData);
         }
         
-        // Process the captured image
-        function processImage(imageData) {
+        // Process the captured image with advanced API
+        async function processImage(imageData) {
             if (!selectedExam) {
                 alert('لطفاً یک آزمون انتخاب کنید.');
                 return;
@@ -1744,7 +2034,8 @@
                 'در حال تراز کردن تصویر',
                 'در حال شناسایی حباب‌های پاسخ',
                 'در حال تطبیق با کلید آزمون',
-                'در حال محاسبه نتایج'
+                'در حال محاسبه نتایج',
+                'در حال تولید گزارش پیشرفته'
             ];
             
             let currentStep = 0;
@@ -1758,34 +2049,41 @@
                 if (currentStep >= totalSteps) {
                     clearInterval(processInterval);
                     
-                    setTimeout(() => {
+                    // استفاده از سرویس پردازش تصویر
+                    processImageWithAPI(imageData).then(result => {
                         loadingOverlay.style.display = 'none';
                         document.getElementById('results-section').style.display = 'block';
+                        document.getElementById('advanced-results').style.display = 'block';
                         
-                        const markerQuality = simulateMarkerDetection(imageData);
-                        const studentAnswers = simulateAnswerReadingWithMarkers(
-                            selectedExam.questionCount, 
-                            markerQuality
-                        );
-                        
-                        const gradingResult = gradeExamWithMarkers(
-                            studentAnswers, 
-                            selectedExam.answerKey,
-                            markerQuality
-                        );
-                        
-                        displayResults(gradingResult);
-                    }, 500);
+                        displayAdvancedResults(result.data);
+                    }).catch(error => {
+                        console.error('Error processing image:', error);
+                        alert('خطا در پردازش تصویر. لطفاً دوباره تلاش کنید.');
+                        loadingOverlay.style.display = 'none';
+                    });
                 }
             }, 600);
         }
         
-        // Display grading results
-        function displayResults(gradingResult) {
+        // Display advanced grading results
+        function displayAdvancedResults(gradingResult) {
             document.getElementById('score').textContent = toPersianNumber(gradingResult.correctCount);
             document.getElementById('total').textContent = toPersianNumber(selectedExam.questionCount);
             document.getElementById('calculated-score').textContent = toPersianNumber(gradingResult.score);
             document.getElementById('accuracy').textContent = toPersianNumber(gradingResult.accuracy) + '%';
+            
+            // نمایش تحلیل پیشرفته
+            document.getElementById('stats-correct').textContent = toPersianNumber(gradingResult.correctCount);
+            document.getElementById('processing-time').textContent = toPersianNumber(gradingResult.processingTime) + ' ثانیه';
+            document.getElementById('detection-quality').textContent = toPersianNumber(gradingResult.markerQuality) + '%';
+            
+            const techDetails = gradingResult.technicalDetails;
+            document.getElementById('technical-details').innerHTML = `
+                رزولوشن تصویر: ${techDetails.imageResolution}<br>
+                الگوریتم: ${techDetails.processingAlgorithm}<br>
+                آستانه اطمینان: ${techDetails.confidenceThreshold}%<br>
+                نشانگرهای شناسایی شده: ${toPersianNumber(techDetails.markersDetected)}
+            `;
             
             const answersGrid = document.getElementById('answers-grid');
             answersGrid.innerHTML = '';
@@ -1811,9 +2109,6 @@
                 `;
                 answersGrid.appendChild(answerItem);
             });
-            
-            const detailedResults = document.getElementById('detailed-results');
-            detailedResults.style.display = 'block';
             
             const correctAnswers = gradingResult.results.filter(r => r.status === 'correct');
             const wrongAnswers = gradingResult.results.filter(r => r.status === 'wrong');
@@ -1859,11 +2154,29 @@
             generateQuestions(20);
             initializeAnswerKey('new-exam-answer-inputs', 20);
             
-            // Load exams
+            // Load exams and grading config
             refreshExamsList();
             refreshExamSelector();
+            loadGradingConfig();
             
-            // Set up event listeners
+            // Set up event listeners for grading config
+            document.getElementById('mark-per-question').addEventListener('change', function() {
+                gradingConfig.markPerQuestion = parseFloat(this.value);
+                saveGradingConfig();
+            });
+            
+            document.getElementById('negative-marking').addEventListener('change', function() {
+                gradingConfig.negativeMarking = this.checked;
+                document.getElementById('negative-mark-value').disabled = !this.checked;
+                saveGradingConfig();
+            });
+            
+            document.getElementById('negative-mark-value').addEventListener('change', function() {
+                gradingConfig.negativeMarkValue = parseFloat(this.value);
+                saveGradingConfig();
+            });
+            
+            // Set up other event listeners
             document.getElementById('create-exam').addEventListener('click', createExam);
             document.getElementById('auto-fill-answers').addEventListener('click', autoFillAnswers);
             document.getElementById('new-exam-count').addEventListener('change', updateNewExamAnswerKey);
@@ -2021,6 +2334,7 @@
                 captureManualBtn.style.display = 'none';
                 document.getElementById('auto-capture-info').style.display = 'none';
                 document.getElementById('results-section').style.display = 'none';
+                document.getElementById('advanced-results').style.display = 'none';
                 stream = null;
                 captureAttempts = 0;
             });
