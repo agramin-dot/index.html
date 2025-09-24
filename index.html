@@ -15,19 +15,13 @@
                 displayMath: [['$$', '$$'], ['\\[', '\\]']],
                 packages: {'[+]': ['mhchem']}
             },
-            loader: {load: ['[tex]/mhchem']},
-            startup: {
-                pageReady: () => {
-                    return MathJax.startup.defaultPageReady().then(() => {
-                        console.log('MathJax is ready');
-                    });
-                }
-            }
+            loader: {load: ['[tex]/mhchem']}
         };
     </script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     
     <style>
+        /* استایل‌ها مانند قبل باقی می‌مانند */
         @page {
             size: A4;
             margin: 0.2cm;
@@ -915,11 +909,14 @@
         // تابع برای نمایش سوالات
         function renderQuestions() {
             const questionsContainer = document.getElementById('questionsContainer');
+            if (!questionsContainer) return;
+            
             questionsContainer.innerHTML = '';
             
             questions.forEach((q, index) => {
                 const questionEl = document.createElement('div');
                 questionEl.className = 'question';
+                questionEl.setAttribute('data-index', index);
                 
                 let questionContent = `
                     <div class="question-actions no-print">
@@ -941,10 +938,10 @@
                 if (q.type === 'multiple-choice') {
                     questionContent += `
                         <div class="choices-row">
-                            <div class="choice">الف) ${q.choices[0]}</div>
-                            <div class="choice">ب) ${q.choices[1]}</div>
-                            <div class="choice">ج) ${q.choices[2]}</div>
-                            <div class="choice">د) ${q.choices[3]}</div>
+                            <div class="choice">الف) ${q.choices[0] || ''}</div>
+                            <div class="choice">ب) ${q.choices[1] || ''}</div>
+                            <div class="choice">ج) ${q.choices[2] || ''}</div>
+                            <div class="choice">د) ${q.choices[3] || ''}</div>
                         </div>
                     `;
                 } else if (q.type === 'descriptive') {
@@ -960,34 +957,9 @@
                     `;
                 } else if (q.type === 'fill-blank') {
                     // برای سوالات جای خالی فقط متن سوال نمایش داده می‌شود
-                    questionContent += ``;
                 }
                 
                 questionEl.innerHTML = questionContent;
-                
-                // اعمال سایز فونت فعلی
-                const questionText = questionEl.querySelector('.question-text');
-                if (questionText) {
-                    questionText.style.fontSize = currentQuestionFontSize + 'px';
-                    questionText.style.fontWeight = 'bold';
-                    questionText.style.color = '#000';
-                }
-                
-                // اعمال سایز فونت گزینه‌ها
-                const choices = questionEl.querySelectorAll('.choice');
-                choices.forEach(choice => {
-                    choice.style.fontSize = currentChoiceFontSize + 'px';
-                    choice.style.fontWeight = 'bold';
-                    choice.style.color = '#000';
-                });
-                
-                // اعمال استایل برای گزینه‌های درست/نادرست
-                const trueFalseOptions = questionEl.querySelectorAll('.true-false-option');
-                trueFalseOptions.forEach(option => {
-                    option.style.fontWeight = 'bold';
-                    option.style.color = '#000';
-                });
-                
                 questionsContainer.appendChild(questionEl);
             });
             
@@ -1015,29 +987,14 @@
                 
                 document.querySelectorAll('.question-text').forEach(el => {
                     el.style.fontSize = currentQuestionFontSize + 'px';
-                    el.style.fontWeight = 'bold';
-                    el.style.color = '#000';
                 });
                 
                 document.querySelectorAll('.choice').forEach(el => {
                     el.style.fontSize = currentChoiceFontSize + 'px';
-                    el.style.fontWeight = 'bold';
-                    el.style.color = '#000';
-                });
-                
-                document.querySelectorAll('.true-false-option').forEach(el => {
-                    el.style.fontWeight = 'bold';
-                    el.style.color = '#000';
                 });
                 
                 document.querySelectorAll('.school-name, .exam-title, #academicYear, .detail-item').forEach(el => {
                     el.style.fontSize = currentHeaderFontSize + 'px';
-                });
-                
-                // افزایش سایز فونت راهنما
-                document.querySelectorAll('.instructions, .instructions h3, .instructions li').forEach(el => {
-                    const currentSize = parseInt(window.getComputedStyle(el).fontSize);
-                    el.style.fontSize = (currentSize + delta) + 'px';
                 });
                 
                 alert(`سایز فونت همه متن‌ها تغییر کرد: سوالات ${currentQuestionFontSize}px، گزینه‌ها ${currentChoiceFontSize}px، سربرگ ${currentHeaderFontSize}px`);
@@ -1109,7 +1066,7 @@
         
         // تابع برای حذف سوال خاص
         function removeQuestionAtIndex(index) {
-            if (questions.length > 1) {
+            if (questions.length > 1 && index >= 0 && index < questions.length) {
                 questions.splice(index, 1);
                 // به روز رسانی شماره سوالات
                 questions.forEach((q, i) => {
@@ -1123,6 +1080,8 @@
         
         // تابع برای ویرایش سوال با قابلیت فرمول‌نویسی
         function editQuestion(index) {
+            if (index < 0 || index >= questions.length) return;
+            
             const q = questions[index];
             
             // ایجاد فرم ویرایش در مودال
@@ -1130,10 +1089,18 @@
             
             let modalBodyContent = `
                 <div class="tab-buttons">
-                    <button class="tab-button active" onclick="switchTab('text-tab')">متن سوال</button>
-                    <button class="tab-button" onclick="switchTab('math-tab')">فرمول‌نویسی</button>
-                </div>
-                
+                    <button class="tab-button active" onclick="switchTab(event, 'text-tab')">متن سوال</button>
+                    <button class="tab-button" onclick="switchTab(event, 'math-tab')">فرمول‌نویسی</button>
+            `;
+            
+            if (q.type === 'multiple-choice') {
+                modalBodyContent += `<button class="tab-button" onclick="switchTab(event, 'choices-tab')">گزینه‌ها</button>`;
+            }
+            
+            modalBodyContent += `</div>`;
+            
+            // تب متن سوال
+            modalBodyContent += `
                 <div id="text-tab" class="tab-content active">
                     <label for="editQuestionText">متن سوال:</label>
                     <textarea id="editQuestionText" class="modal-input" rows="3">${q.text}</textarea>
@@ -1141,52 +1108,50 @@
                     <label for="editQuestionScore">نمره سوال:</label>
                     <input type="number" id="editQuestionScore" class="modal-input" value="${q.score}" min="0.5" step="0.5">
                 </div>
-                
+            `;
+            
+            // تب فرمول‌نویسی
+            modalBodyContent += `
                 <div id="math-tab" class="tab-content">
                     <div class="math-editor">
                         <label>ویرایشگر فرمول:</label>
                         <textarea id="mathEditor" class="modal-input" rows="3" placeholder="فرمول خود را اینجا وارد کنید..."></textarea>
                         
                         <div class="math-buttons">
-                            <button class="math-button" onclick="insertMathSymbol('\\\\frac{a}{b}')">کسر</button>
-                            <button class="math-button" onclick="insertMathSymbol('x^{2}')">توان</button>
-                            <button class="math-button" onclick="insertMathSymbol('\\\\sqrt{x}')">ریشه</button>
-                            <button class="math-button" onclick="insertMathSymbol('\\\\int_{a}^{b} f(x) dx')">انتگرال</button>
-                            <button class="math-button" onclick="insertMathSymbol('\\\\sum_{i=1}^{n} i')">سیگما</button>
-                            <button class="math-button" onclick="insertMathSymbol('\\\\ce{H2O}')">فرمول شیمیایی</button>
-                            <button class="math-button" onclick="insertMathSymbol('\\\\ce{CH4 + 2O2 -> CO2 + 2H2O}')">واکنش شیمیایی</button>
-                            <button class="math-button" onclick="insertMathSymbol('\\\\alpha \\\\beta \\\\gamma')">حروف یونانی</button>
+                            <button type="button" class="math-button" onclick="insertMathSymbol('\\\\frac{a}{b}')">کسر</button>
+                            <button type="button" class="math-button" onclick="insertMathSymbol('x^{2}')">توان</button>
+                            <button type="button" class="math-button" onclick="insertMathSymbol('\\\\sqrt{x}')">ریشه</button>
+                            <button type="button" class="math-button" onclick="insertMathSymbol('\\\\int_{a}^{b} f(x) dx')">انتگرال</button>
+                            <button type="button" class="math-button" onclick="insertMathSymbol('\\\\sum_{i=1}^{n} i')">سیگما</button>
+                            <button type="button" class="math-button" onclick="insertMathSymbol('\\\\ce{H2O}')">فرمول شیمیایی</button>
+                            <button type="button" class="math-button" onclick="insertMathSymbol('\\\\ce{CH4 + 2O2 -> CO2 + 2H2O}')">واکنش شیمیایی</button>
+                            <button type="button" class="math-button" onclick="insertMathSymbol('\\\\alpha \\\\beta \\\\gamma')">حروف یونانی</button>
                         </div>
                         
                         <div class="math-preview" id="mathPreview">
                             پیش‌نمایش فرمول
                         </div>
                         
-                        <button class="modal-button" onclick="insertMathToQuestion()">افزودن فرمول به سوال</button>
+                        <button type="button" class="modal-button" onclick="insertMathToQuestion()">افزودن فرمول به سوال</button>
                     </div>
                 </div>
             `;
             
+            // تب گزینه‌ها (فقط برای سوالات چندگزینه‌ای)
             if (q.type === 'multiple-choice') {
                 modalBodyContent += `
                     <div id="choices-tab" class="tab-content">
                         <label>گزینه‌ها:</label>`;
                 for (let i = 0; i < 4; i++) {
                     modalBodyContent += `
-                        <input type="text" id="editChoice${i}" class="modal-input" value="${q.choices[i]}" placeholder="گزینه ${i+1}">
+                        <input type="text" id="editChoice${i}" class="modal-input" value="${q.choices[i] || ''}" placeholder="گزینه ${i+1}">
                     `;
                 }
                 modalBodyContent += `</div>`;
-                
-                // افزودن تب گزینه‌ها به دکمه‌های تب
-                const tabButtons = document.querySelector('.tab-buttons');
-                if (tabButtons) {
-                    tabButtons.innerHTML += `<button class="tab-button" onclick="switchTab('choices-tab')">گزینه‌ها</button>`;
-                }
             }
             
             modalBodyContent += `
-                <button class="modal-button" onclick="saveQuestionChanges(${index})">ذخیره تغییرات</button>
+                <button type="button" class="modal-button" onclick="saveQuestionChanges(${index})">ذخیره تغییرات</button>
             `;
             
             document.getElementById('modalBody').innerHTML = modalBodyContent;
@@ -1201,7 +1166,7 @@
         }
         
         // تابع برای سوئیچ بین تب‌ها
-        function switchTab(tabName) {
+        function switchTab(event, tabName) {
             // مخفی کردن همه تب‌ها
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('active');
@@ -1218,6 +1183,7 @@
                 targetTab.classList.add('active');
             }
             
+            // فعال کردن دکمه تب مربوطه
             if (event && event.target) {
                 event.target.classList.add('active');
             }
@@ -1285,7 +1251,7 @@
                 questionEditor.focus();
                 
                 // سوئیچ به تب متن سوال
-                switchTab('text-tab');
+                switchTab(null, 'text-tab');
             }
         }
         
@@ -1300,8 +1266,9 @@
                 
                 if (questions[index].type === 'multiple-choice') {
                     for (let i = 0; i < 4; i++) {
-                        const choiceText = document.getElementById(`editChoice${i}`).value;
-                        if (choiceText) {
+                        const choiceInput = document.getElementById(`editChoice${i}`);
+                        if (choiceInput) {
+                            const choiceText = choiceInput.value;
                             questions[index].choices[i] = choiceText;
                         }
                     }
@@ -1348,7 +1315,7 @@
                 
                 <p><strong>توجه:</strong> فرمول‌ها باید بین علامت‌های $...$ یا \\(...\\) قرار گیرند.</p>
                 
-                <button class="modal-button" onclick="closeModal()">بستن</button>
+                <button type="button" class="modal-button" onclick="closeModal()">بستن</button>
             `;
             
             document.getElementById('modalBody').innerHTML = modalBodyContent;
@@ -1408,7 +1375,7 @@
                 <label for="editTeacherName">نام دبیر:</label>
                 <input type="text" id="editTeacherName" class="modal-input" value="${document.getElementById('teacherName').textContent}">
                 
-                <button class="modal-button" onclick="saveExamInfoChanges()">ذخیره تغییرات</button>
+                <button type="button" class="modal-button" onclick="saveExamInfoChanges()">ذخیره تغییرات</button>
             `;
             
             document.getElementById('modalBody').innerHTML = modalBodyContent;
@@ -1445,7 +1412,7 @@
                 <label for="editInstructions">راهنمای آزمون (هر مورد در یک خط):</label>
                 <textarea id="editInstructions" class="modal-input" rows="5">${instructionsText}</textarea>
                 
-                <button class="modal-button" onclick="saveInstructionsChanges()">ذخیره تغییرات</button>
+                <button type="button" class="modal-button" onclick="saveInstructionsChanges()">ذخیره تغییرات</button>
             `;
             
             document.getElementById('modalBody').innerHTML = modalBodyContent;
@@ -1560,10 +1527,10 @@
                 if (q.type === 'multiple-choice') {
                     questionContent += \`
                         <div class="choices-row">
-                            <div class="choice">الف) \${q.choices[0]}</div>
-                            <div class="choice">ب) \${q.choices[1]}</div>
-                            <div class="choice">ج) \${q.choices[2]}</div>
-                            <div class="choice">د) \${q.choices[3]}</div>
+                            <div class="choice">الف) \${q.choices[0] || ''}</div>
+                            <div class="choice">ب) \${q.choices[1] || ''}</div>
+                            <div class="choice">ج) \${q.choices[2] || ''}</div>
+                            <div class="choice">د) \${q.choices[3] || ''}</div>
                         </div>
                     \`;
                 } else if (q.type === 'descriptive') {
