@@ -3,35 +3,1688 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>اپلیکیشن تصحیح خودکار پاسخنامه واقعی</title>
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <title>برگه امتحان - هنرستان فنی ماندگار شهید بهشتی دورود</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <!-- کتابخانه MathJax برای فرمول‌نویسی -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                packages: {'[+]': ['mhchem']}
+            },
+            loader: {load: ['[tex]/mhchem']},
+            startup: {
+                pageReady: () => {
+                    return MathJax.startup.defaultPageReady().then(() => {
+                        console.log('MathJax is ready');
+                    });
+                }
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
     <style>
-        *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
-        :root{--primary:#4a00e0;--secondary:#8e2de2;--accent:#00b09b;--danger:#dc3545;--light:#f5f7fa;--dark:#333}
-        body{background:linear-gradient(135deg,var(--primary) 0%,var(--secondary) 100%);color:var(--dark);min-height:100vh;padding:20px}
-        .container{max-width:1200px;margin:0 auto;background:rgba(255,255,255,.95);border-radius:15px;box-shadow:0 10px 30px rgba(0,0,0,.15);overflow:hidden}
-        header{background:linear-gradient(to right,var(--primary),var(--secondary));color:white;text-align:center;padding:25px 20px;position:relative}
-        header h1{font-size:1.8rem;margin-bottom:10px}header p{font-size:1rem;opacity:.9}
-        .tabs{display:flex;background:var(--light)}.tab-btn{flex:1;padding:15px;border:none;cursor:pointer;font-weight:600;transition:all .3s ease}
-        .tab-btn.active{background:white;color:var(--primary);border-bottom:3px solid var(--primary)}
-        .tab-content{display:none;padding:25px}.tab-content.active{display:block}
-        #camera-view{width:100%;height:400px;background:#000;position:relative;display:flex;justify-content:center;align-items:center;color:white}
-        .controls{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap}
-        button{padding:10px 15px;border:none;border-radius:8px;cursor:pointer;font-weight:600}
-        .btn-primary{background:var(--primary);color:white}.btn-success{background:var(--accent);color:white}
-        .btn-danger{background:var(--danger);color:white}.btn-secondary{background:#6c757d;color:white}
-        .results-section{background:#f0f9ff;padding:20px;border-radius:10px;margin-top:20px;display:none}
-        .answer-item{display:inline-block;margin:5px;padding:10px;border-radius:5px;font-weight:bold;min-width:40px;text-align:center}
-        .correct{background:#d4edda;color:#155724}.incorrect{background:#f8d7da;color:#721c24}.empty{background:#f8f9fa;color:#6c757d}
-        .a5-container{width:148mm;height:210mm;padding:8mm;margin:auto;background:white;box-shadow:0 0 10px rgba(0,0,0,.1);position:relative;page-break-inside:avoid;box-sizing:border-box}
-        .sheet-marker{position:absolute;width:15px;height:15px;background:black;border:2px solid white;box-shadow:0 0 0 2px black;z-index:10}
-        .sheet-marker.tl{top:5mm;left:5mm}.sheet-marker.tr{top:5mm;right:5mm}.sheet-marker.bl{bottom:5mm;left:5mm}.sheet-marker.br{bottom:5mm;right:5mm}
-        .student-info{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:10px;font-size:12px}
-        .info-item{display:flex;align-items:center}.info-item label{width:100px;font-weight:bold}.info-item span{flex:1;border-bottom:1px dashed #999;height:18px}
-        .questions-two-column{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
-        .question-item{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dotted #ccc;font-size:12px}
-        .option-bubble{width:18px;height:18px;border:1.5px solid #333;border-radius:50%;display:inline-flex;justify-content:center;align-items:center;font-size:10px;margin-left:4px}
-        .option-bubble.filled::after{content:'';width:12px;height:12px;background:black;border-radius:50%}
-        .results-summary{margin-top:10px;padding:10px;border:1px solid #ddd;border-radius:4px;background:#f9f9f9;font-size:12px}
-        .summary-grid{display:grid;grid-template-columns:1ب
+        @page {
+            size: A4;
+            margin: 0.2cm;
+        }
+        
+        body {
+            font-family: 'B Nazanin', Tahoma, sans-serif;
+            background: white;
+            color: #000;
+            padding: 2px;
+            margin: 0;
+            font-size: 11px;
+            line-height: 1.0;
+        }
+        
+        .exam-paper {
+            width: 100%;
+            max-width: 21cm;
+            margin: 0 auto;
+            background: white;
+            padding: 3px;
+            box-sizing: border-box;
+        }
+        
+        .exam-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 3px 0;
+            margin-bottom: 3px;
+            border-bottom: 1px solid #000;
+        }
+        
+        .logo-placeholder {
+            width: 70px;
+            height: 70px;
+            border: 1px solid #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            background: #f0f8ff;
+            flex-shrink: 0;
+        }
+        
+        .logo-placeholder img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+        
+        .school-info {
+            flex: 1;
+            text-align: center;
+            margin: 0 3px;
+        }
+        
+        .exam-details {
+            border: 1px solid #000;
+            padding: 3px;
+            border-radius: 3px;
+            background: #f8f9fa;
+            flex-shrink: 0;
+            width: 150px;
+        }
+        
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2px;
+            font-size: 10px;
+        }
+        
+        .school-name {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 1px;
+            color: #1a237e;
+        }
+        
+        .exam-title {
+            font-size: 12px;
+            font-weight: 500;
+            margin: 2px 0;
+            color: #283593;
+        }
+        
+        .student-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            padding: 3px;
+            border: 1px solid #000;
+            border-radius: 2px;
+            background: #fff3e0;
+            font-size: 10px;
+        }
+        
+        .info-field {
+            display: flex;
+            align-items: center;
+            margin: 0 3px;
+        }
+        
+        .info-field strong {
+            margin-left: 3px;
+            color: #5d4037;
+            font-size: 10px;
+        }
+        
+        .underline {
+            border-bottom: 1px dashed #000;
+            width: 70px;
+            height: 12px;
+            display: inline-block;
+            margin: 0 2px;
+        }
+        
+        .instructions {
+            background: #e3f2fd;
+            padding: 3px;
+            border: 1px solid #1565c0;
+            border-radius: 2px;
+            margin-bottom: 5px;
+            font-size: 11px;
+        }
+        
+        .instructions h3 {
+            margin: 0 3px 0 0;
+            font-size: 11px;
+            white-space: nowrap;
+            color: #0d47a1;
+            display: inline;
+        }
+        
+        .instructions ul {
+            display: inline;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        
+        .instructions li {
+            display: inline;
+            margin: 0 3px;
+            white-space: nowrap;
+            color: #1565c0;
+        }
+        
+        .questions-container {
+            margin-bottom: 5px;
+        }
+        
+        .question {
+            margin-bottom: 3px;
+            padding: 3px;
+            border: 1px solid #000;
+            border-radius: 2px;
+            page-break-inside: avoid;
+            position: relative;
+            background: #fafafa;
+        }
+        
+        .question-header {
+            margin-bottom: 2px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .question-number {
+            font-weight: bold;
+            font-size: 11px;
+            color: #d32f2f;
+        }
+        
+        .question-text {
+            font-size: 11px;
+            color: #000;
+            font-weight: bold;
+            flex-grow: 1;
+            margin: 0 10px;
+        }
+        
+        .question-score {
+            font-size: 10px;
+            color: #d32f2f;
+        }
+        
+        .choices-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 3px;
+        }
+        
+        .choice {
+            flex: 1;
+            padding: 2px 3px;
+            border: 1px solid #78909c;
+            margin: 0 2px;
+            text-align: center;
+            background: white;
+            font-size: 10px;
+            border-radius: 2px;
+            color: #000;
+            font-weight: bold;
+        }
+        
+        .descriptive-answer {
+            margin-top: 5px;
+            padding: 5px;
+            border: 1px dashed #78909c;
+            border-radius: 2px;
+            min-height: 40px;
+            background: #fff;
+        }
+        
+        .true-false-options {
+            display: flex;
+            justify-content: center;
+            margin-top: 5px;
+        }
+        
+        .true-false-option {
+            margin: 0 10px;
+            padding: 3px 10px;
+            border: 1px solid #78909c;
+            border-radius: 3px;
+            background: white;
+            color: #000;
+            font-weight: bold;
+        }
+        
+        .blank-space {
+            display: inline-block;
+            width: 100px;
+            border-bottom: 1px dashed #000;
+            margin: 0 5px;
+            height: 12px;
+        }
+        
+        .total-score {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 3px;
+            background: #f3e5f5;
+            border: 1px solid #7b1fa2;
+            border-radius: 2px;
+            margin-top: 5px;
+            font-weight: bold;
+            font-size: 11px;
+        }
+        
+        .score-text {
+            flex-grow: 1;
+            text-align: center;
+            color: #6a1b9a;
+        }
+        
+        .total-score-value {
+            color: #4a148c;
+        }
+        
+        .score-signature-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            padding: 5px 0;
+        }
+        
+        .student-score {
+            text-align: center;
+            font-weight: bold;
+            flex: 1;
+        }
+        
+        .score-line {
+            border-bottom: 1px dashed #ccc;
+            width: 100px;
+            height: 20px;
+            display: inline-block;
+            margin: 0 5px;
+        }
+        
+        .teacher-signature {
+            text-align: center;
+            flex: 1;
+            padding: 5px;
+        }
+        
+        .action-buttons {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            background: white;
+            padding: 5px;
+            border-radius: 8px;
+            box-shadow: 0 0 8px rgba(0,0,0,0.2);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .action-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+        }
+        
+        .action-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        .print-btn {
+            background: #1e40af;
+        }
+        
+        .pdf-btn {
+            background: #10b981;
+        }
+        
+        .save-btn {
+            background: #7c4dff;
+        }
+        
+        .save-as-btn {
+            background: #8b5cf6;
+        }
+        
+        .edit-info-btn {
+            background: #f59e0b;
+        }
+        
+        .edit-questions-btn {
+            background: #8b5cf6;
+        }
+        
+        .edit-instructions-btn {
+            background: #ec4899;
+        }
+        
+        .font-size-btn {
+            background: #6366f1;
+        }
+        
+        .header-font-size-btn {
+            background: #7e57c2;
+        }
+        
+        .choice-font-size-btn {
+            background: #8e24aa;
+        }
+        
+        .add-question-btn {
+            background: #22c55e;
+        }
+        
+        .remove-question-btn {
+            background: #ef4444;
+        }
+        
+        .add-image-btn {
+            background: #3b82f6;
+        }
+        
+        .question-type-btn {
+            background: #ff6d00;
+        }
+        
+        .math-btn {
+            background: #8e44ad;
+        }
+        
+        .question-actions {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            display: none;
+        }
+        
+        .question:hover .question-actions {
+            display: flex;
+        }
+        
+        .question-action-btn {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: none;
+            background: #3b82f6;
+            color: white;
+            cursor: pointer;
+            margin-right: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+        }
+        
+        .font-size-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            margin-top: 3px;
+        }
+        
+        .question-type-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            margin-top: 3px;
+        }
+        
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            margin: 3px 0;
+            padding: 3px;
+            background: #f5f5f5;
+            border-radius: 5px;
+        }
+        
+        .group-title {
+            font-size: 8px;
+            text-align: center;
+            color: #555;
+            margin-bottom: 2px;
+        }
+        
+        /* استایل‌های مربوط به فرمول‌ها */
+        .math-formula {
+            display: inline-block;
+            margin: 0 2px;
+            font-family: "Times New Roman", serif;
+        }
+        
+        .math-editor {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 5px;
+            margin: 5px 0;
+            background: #f9f9f9;
+        }
+        
+        .math-preview {
+            border: 1px dashed #aaa;
+            padding: 10px;
+            margin: 10px 0;
+            min-height: 40px;
+            background: white;
+            text-align: center;
+        }
+        
+        .math-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 3px;
+            margin: 5px 0;
+        }
+        
+        .math-button {
+            padding: 3px 6px;
+            background: #e0e0e0;
+            border: 1px solid #aaa;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 10px;
+        }
+        
+        .math-button:hover {
+            background: #d0d0d0;
+        }
+        
+        @media print {
+            body {
+                padding: 0;
+                background: white;
+                color: black;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            
+            .exam-paper {
+                padding: 3px;
+                width: 100%;
+                max-width: none;
+            }
+            
+            .no-print {
+                display: none;
+            }
+            
+            .question-actions {
+                display: none !important;
+            }
+            
+            .logo-placeholder {
+                border: 1px solid #000;
+                background: #f0f8ff !important;
+            }
+            
+            .exam-details {
+                background: #f8f9fa !important;
+                border: 1px solid #000 !important;
+            }
+            
+            .student-info {
+                background: #fff3e0 !important;
+                border: 1px solid #000 !important;
+            }
+            
+            .instructions {
+                background: #e3f2fd !important;
+                border: 1px solid #1565c0 !important;
+            }
+            
+            .question {
+                border: 1px solid #000 !important;
+                background: #fafafa !important;
+            }
+            
+            .choice {
+                border: 1px solid #78909c !important;
+                background: white !important;
+                color: black !important;
+                font-weight: bold !important;
+            }
+            
+            .descriptive-answer {
+                border: 1px dashed #78909c !important;
+                background: white !important;
+            }
+            
+            .true-false-option {
+                border: 1px solid #78909c !important;
+                background: white !important;
+                color: black !important;
+                font-weight: bold !important;
+            }
+            
+            .total-score {
+                background: #f3e5f5 !important;
+                border: 1px solid #7b1fa2 !important;
+            }
+            
+            .score-line {
+                border-bottom: 1px dashed #ccc !important;
+            }
+            
+            .action-buttons {
+                display: none;
+            }
+            
+            .math-editor, .math-buttons {
+                display: none;
+            }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .close {
+            color: #aaa;
+            float: left;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close:hover {
+            color: black;
+        }
+        
+        .modal-title {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #1a237e;
+        }
+        
+        .modal-input {
+            width: 100%;
+            padding: 8px;
+            margin: 8px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        
+        .modal-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+        }
+        
+        .modal-button:hover {
+            background-color: #45a049;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+        
+        .tab-button {
+            padding: 8px 15px;
+            background: #f0f0f0;
+            border: none;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+        }
+        
+        .tab-button.active {
+            background: white;
+            border-bottom: 2px solid #4CAF50;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="action-buttons no-print">
+        <div class="button-group">
+            <div class="group-title">عملیات اصلی</div>
+            <button class="action-btn print-btn" onclick="window.print()" title="چاپ برگه">
+                <i class="fas fa-print"></i>
+            </button>
+            <button class="action-btn pdf-btn" onclick="exportToPDF()" title="ذخیره به صورت PDF">
+                <i class="fas fa-file-pdf"></i>
+            </button>
+            <button class="action-btn save-btn" onclick="saveExam()" title="ذخیره آزمون">
+                <i class="fas fa-save"></i>
+            </button>
+            <button class="action-btn save-as-btn" onclick="saveExamAs()" title="ذخیره با نام جدید">
+                <i class="fas fa-file-download"></i>
+            </button>
+            <button class="action-btn add-image-btn" onclick="addImage()" title="افزودن لوگو">
+                <i class="fas fa-image"></i>
+            </button>
+        </div>
+        
+        <div class="button-group">
+            <div class="group-title">ویرایش اطلاعات</div>
+            <button class="action-btn edit-info-btn" onclick="editExamInfo()" title="ویرایش مشخصات آزمون">
+                <i class="fas fa-school"></i>
+            </button>
+            <button class="action-btn edit-instructions-btn" onclick="editInstructions()" title="ویرایش راهنمای آزمون">
+                <i class="fas fa-info-circle"></i>
+            </button>
+        </div>
+        
+        <div class="button-group">
+            <div class="group-title">اندازه فونت</div>
+            <button class="action-btn font-size-btn" onclick="changeFontSize(1, 'all')" title="افزایش سایز فونت همه متن‌ها">
+                <i class="fas fa-font"></i>+
+            </button>
+            <button class="action-btn font-size-btn" onclick="changeFontSize(-1, 'all')" title="کاهش سایز فونت همه متن‌ها">
+                <i class="fas fa-font"></i>-
+            </button>
+        </div>
+        
+        <div class="button-group">
+            <div class="group-title">مدیریت سوالات</div>
+            <button class="action-btn question-type-btn" onclick="addQuestion('multiple-choice')" title="افزودن سوال چهارگزینه‌ای">
+                <i class="fas fa-list-ol"></i>
+            </button>
+            <button class="action-btn question-type-btn" onclick="addQuestion('descriptive')" title="افزودن سوال تشریحی">
+                <i class="fas fa-align-left"></i>
+            </button>
+            <button class="action-btn question-type-btn" onclick="addQuestion('true-false')" title="افزودن سوال درست و نادرست">
+                <i class="fas fa-check-circle"></i>
+            </button>
+            <button class="action-btn question-type-btn" onclick="addQuestion('fill-blank')" title="افزودن سوال جای خالی">
+                <i class="fas fa-pen"></i>
+            </button>
+            
+            <button class="action-btn remove-question-btn" onclick="removeQuestion()" title="حذف آخرین سوال">
+                <i class="fas fa-minus"></i>
+            </button>
+        </div>
+        
+        <div class="button-group">
+            <div class="group-title">فرمول‌نویسی</div>
+            <button class="action-btn math-btn" onclick="showMathHelp()" title="راهنمای فرمول‌نویسی">
+                <i class="fas fa-square-root-alt"></i>
+            </button>
+        </div>
+    </div>
+
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 class="modal-title" id="modalTitle">ویرایش اطلاعات</h2>
+            <div id="modalBody">
+            </div>
+        </div>
+    </div>
+
+    <div class="exam-paper" id="examPaper">
+        <div class="exam-header">
+            <div class="exam-details">
+                <div class="detail-item">
+                    <span>تاریخ:</span>
+                    <span id="examDate">1404/03/25</span>
+                </div>
+                <div class="detail-item">
+                    <span>زمان:</span>
+                    <span id="examDuration">90 دقیقه</span>
+                </div>
+                <div class="detail-item">
+                    <span>دبیر:</span>
+                    <span id="teacherName">امین قائدرحمتی</span>
+                </div>
+            </div>
+            
+            <div class="school-info">
+                <div class="school-name" id="schoolName">هنرستان فنی ماندگار شهید بهشتی دورود</div>
+                <div class="exam-title" id="examTitle">نوبت امتحانی - درس: شیمی فنی</div>
+                <div id="academicYear">سال تحصیلی 1405-1404</div>
+            </div>
+            
+            <div class="logo-placeholder" id="logoPlaceholder" onclick="addImage()">
+                <i class="fas fa-plus"></i>
+            </div>
+        </div>
+        
+        <div class="student-info">
+            <div class="info-field">
+                <strong>نام و نام خانوادگی:</strong><div class="underline"></div>
+            </div>
+            <div class="info-field">
+                <strong>رشته تحصیلی:</strong><div class="underline"></div>
+            </div>
+            <div class="info-field">
+                <strong>شعبه کلاس:</strong><div class="underline"></div>
+            </div>
+        </div>
+        
+        <div class="instructions" id="instructions">
+            <h3><i class="fas fa-exclamation-circle"></i> راهنما:</h3>
+            <ul>
+                <li>پاسخ با خودکار مشکی یا آبی</li>
+                <li>زمان: ۹۰ دقیقه</li>
+                <li>نمره: ۲۰</li>
+                <li>فقط یک گزینه صحیح</li>
+                <li>برای فرمول‌ها از نمادهای استاندارد استفاده کنید</li>
+            </ul>
+        </div>
+        
+        <div class="questions-container" id="questionsContainer">
+        </div>
+        
+        <div class="total-score">
+            <div class="score-text">موفقیت شما آرزوی ماست | هنرستان فنی ماندگار شهید بهشتی دورود</div>
+            <div class="total-score-value">جمع نمرات: ۲۰ نمره</div>
+        </div>
+        
+        <div class="score-signature-container">
+            <div class="student-score">
+                نمره دانش آموز: <span class="score-line"></span>
+            </div>
+            <div class="teacher-signature">
+                امضای دبیر تصحیح کننده
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // داده‌های اولیه برای سوالات
+        let questions = [];
+        let currentQuestionFontSize = 11;
+        let currentChoiceFontSize = 10;
+        let currentHeaderFontSize = 11;
+        let currentFileName = "آزمون_ذخیره_شده";
+        
+        // تولید سوالات اولیه با فرمول‌های نمونه
+        function initializeQuestions() {
+            questions = [];
+            
+            // سوال اول با فرمول ریاضی
+            questions.push({
+                number: 1,
+                type: 'multiple-choice',
+                text: 'حاصل انتگرال $\\int x^2 dx$ برابر است با:',
+                choices: [
+                    '$\\frac{x^3}{3} + C$',
+                    '$x^3 + C$',
+                    '$2x + C$',
+                    '$\\frac{x^2}{2} + C$'
+                ],
+                score: 1
+            });
+            
+            // سوال دوم با فرمول شیمیایی
+            questions.push({
+                number: 2,
+                type: 'multiple-choice',
+                text: 'معادله شیمیایی صحیح برای سوختن متان کدام است؟',
+                choices: [
+                    '$\\ce{CH4 + 2O2 -> CO2 + 2H2O}$',
+                    '$\\ce{CH4 + O2 -> CO2 + H2O}$',
+                    '$\\ce{2CH4 + 3O2 -> 2CO2 + 4H2O}$',
+                    '$\\ce{CH4 + 3O2 -> CO2 + 2H2O}$'
+                ],
+                score: 1
+            });
+            
+            // سوال سوم با فرمول فیزیک
+            questions.push({
+                number: 3,
+                type: 'multiple-choice',
+                text: 'فرمول انرژی جنبشی یک جسم به جرم $m$ و سرعت $v$ چیست؟',
+                choices: [
+                    '$E_k = \\frac{1}{2}mv^2$',
+                    '$E_k = mv^2$',
+                    '$E_k = \\frac{1}{2}mv$',
+                    '$E_k = mgh$'
+                ],
+                score: 1
+            });
+            
+            // سوال چهارم تشریحی با فرمول
+            questions.push({
+                number: 4,
+                type: 'descriptive',
+                text: 'معادله واکنش تجزیه آب را نوشته و ضرایب استوکیومتری آن را مشخص کنید.',
+                score: 2
+            });
+            
+            // سوال پنجم جای خالی با فرمول
+            questions.push({
+                number: 5,
+                type: 'fill-blank',
+                text: 'فرمول محاسبه محیط دایره به شعاع $r$ برابر است با $P = 2\\pi r$ و مساحت آن $A = \\pi r^2$ است.',
+                score: 1
+            });
+            
+            renderQuestions();
+        }
+        
+        // تابع برای نمایش سوالات
+        function renderQuestions() {
+            const questionsContainer = document.getElementById('questionsContainer');
+            questionsContainer.innerHTML = '';
+            
+            questions.forEach((q, index) => {
+                const questionEl = document.createElement('div');
+                questionEl.className = 'question';
+                
+                let questionContent = `
+                    <div class="question-actions no-print">
+                        <button class="question-action-btn" onclick="editQuestion(${index})" title="ویرایش سوال">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="question-action-btn" onclick="removeQuestionAtIndex(${index})" title="حذف سوال">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="question-header">
+                        <span class="question-number">سوال ${q.number} - </span>
+                        <span class="question-text">${q.text}</span>
+                        <span class="question-score">${q.score} نمره</span>
+                    </div>
+                `;
+                
+                // افزودن بخش مربوط به هر نوع سوال
+                if (q.type === 'multiple-choice') {
+                    questionContent += `
+                        <div class="choices-row">
+                            <div class="choice">الف) ${q.choices[0]}</div>
+                            <div class="choice">ب) ${q.choices[1]}</div>
+                            <div class="choice">ج) ${q.choices[2]}</div>
+                            <div class="choice">د) ${q.choices[3]}</div>
+                        </div>
+                    `;
+                } else if (q.type === 'descriptive') {
+                    questionContent += `
+                        <div class="descriptive-answer">پاسخ:</div>
+                    `;
+                } else if (q.type === 'true-false') {
+                    questionContent += `
+                        <div class="true-false-options">
+                            <div class="true-false-option">درست</div>
+                            <div class="true-false-option">نادرست</div>
+                        </div>
+                    `;
+                } else if (q.type === 'fill-blank') {
+                    // برای سوالات جای خالی فقط متن سوال نمایش داده می‌شود
+                    questionContent += ``;
+                }
+                
+                questionEl.innerHTML = questionContent;
+                
+                // اعمال سایز فونت فعلی
+                const questionText = questionEl.querySelector('.question-text');
+                if (questionText) {
+                    questionText.style.fontSize = currentQuestionFontSize + 'px';
+                    questionText.style.fontWeight = 'bold';
+                    questionText.style.color = '#000';
+                }
+                
+                // اعمال سایز فونت گزینه‌ها
+                const choices = questionEl.querySelectorAll('.choice');
+                choices.forEach(choice => {
+                    choice.style.fontSize = currentChoiceFontSize + 'px';
+                    choice.style.fontWeight = 'bold';
+                    choice.style.color = '#000';
+                });
+                
+                // اعمال استایل برای گزینه‌های درست/نادرست
+                const trueFalseOptions = questionEl.querySelectorAll('.true-false-option');
+                trueFalseOptions.forEach(option => {
+                    option.style.fontWeight = 'bold';
+                    option.style.color = '#000';
+                });
+                
+                questionsContainer.appendChild(questionEl);
+            });
+            
+            // رندر کردن فرمول‌های ریاضی با MathJax
+            if (window.MathJax) {
+                MathJax.typesetPromise([questionsContainer]).catch(err => {
+                    console.error('MathJax typesetting error:', err);
+                });
+            }
+        }
+        
+        // تابع برای تغییر سایز فونت
+        function changeFontSize(delta, type) {
+            if (type === 'all') {
+                currentQuestionFontSize += delta;
+                currentChoiceFontSize += delta;
+                currentHeaderFontSize += delta;
+                
+                if (currentQuestionFontSize < 9) currentQuestionFontSize = 9;
+                if (currentQuestionFontSize > 14) currentQuestionFontSize = 14;
+                if (currentChoiceFontSize < 8) currentChoiceFontSize = 8;
+                if (currentChoiceFontSize > 12) currentChoiceFontSize = 12;
+                if (currentHeaderFontSize < 9) currentHeaderFontSize = 9;
+                if (currentHeaderFontSize > 14) currentHeaderFontSize = 14;
+                
+                document.querySelectorAll('.question-text').forEach(el => {
+                    el.style.fontSize = currentQuestionFontSize + 'px';
+                    el.style.fontWeight = 'bold';
+                    el.style.color = '#000';
+                });
+                
+                document.querySelectorAll('.choice').forEach(el => {
+                    el.style.fontSize = currentChoiceFontSize + 'px';
+                    el.style.fontWeight = 'bold';
+                    el.style.color = '#000';
+                });
+                
+                document.querySelectorAll('.true-false-option').forEach(el => {
+                    el.style.fontWeight = 'bold';
+                    el.style.color = '#000';
+                });
+                
+                document.querySelectorAll('.school-name, .exam-title, #academicYear, .detail-item').forEach(el => {
+                    el.style.fontSize = currentHeaderFontSize + 'px';
+                });
+                
+                // افزایش سایز فونت راهنما
+                document.querySelectorAll('.instructions, .instructions h3, .instructions li').forEach(el => {
+                    const currentSize = parseInt(window.getComputedStyle(el).fontSize);
+                    el.style.fontSize = (currentSize + delta) + 'px';
+                });
+                
+                alert(`سایز فونت همه متن‌ها تغییر کرد: سوالات ${currentQuestionFontSize}px، گزینه‌ها ${currentChoiceFontSize}px، سربرگ ${currentHeaderFontSize}px`);
+            }
+        }
+        
+        // تابع برای افزودن سوال
+        function addQuestion(type) {
+            const newNumber = questions.length + 1;
+            let newQuestion;
+            
+            switch(type) {
+                case 'multiple-choice':
+                    newQuestion = {
+                        number: newNumber,
+                        type: type,
+                        text: "متن سوال چهارگزینه‌ای را اینجا وارد کنید",
+                        choices: ["گزینه ۱", "گزینه ۲", "گزینه ۳", "گزینه ４"],
+                        score: 1
+                    };
+                    break;
+                case 'descriptive':
+                    newQuestion = {
+                        number: newNumber,
+                        type: type,
+                        text: "متن سوال تشریحی را اینجا وارد کنید",
+                        score: 2
+                    };
+                    break;
+                case 'true-false':
+                    newQuestion = {
+                        number: newNumber,
+                        type: type,
+                        text: "متن سوال درست و نادرست را اینجا وارد کنید",
+                        score: 1
+                    };
+                    break;
+                case 'fill-blank':
+                    newQuestion = {
+                        number: newNumber,
+                        type: type,
+                        text: "متن سوال جای خالی را اینجا وارد کنید",
+                        score: 1
+                    };
+                    break;
+                default:
+                    newQuestion = {
+                        number: newNumber,
+                        type: 'multiple-choice',
+                        text: "متن سوال جدید را اینجا وارد کنید",
+                        choices: ["گزینه ۱", "گزینه ۲", "گزینه ۳", "گزینه ４"],
+                        score: 1
+                    };
+            }
+            
+            questions.push(newQuestion);
+            renderQuestions();
+        }
+        
+        // تابع برای حذف سوال
+        function removeQuestion() {
+            if (questions.length > 1) {
+                questions.pop();
+                renderQuestions();
+            } else {
+                alert("حداقل باید یک سوال وجود داشته باشد");
+            }
+        }
+        
+        // تابع برای حذف سوال خاص
+        function removeQuestionAtIndex(index) {
+            if (questions.length > 1) {
+                questions.splice(index, 1);
+                // به روز رسانی شماره سوالات
+                questions.forEach((q, i) => {
+                    q.number = i + 1;
+                });
+                renderQuestions();
+            } else {
+                alert("حداقل باید یک سوال وجود داشته باشد");
+            }
+        }
+        
+        // تابع برای ویرایش سوال با قابلیت فرمول‌نویسی
+        function editQuestion(index) {
+            const q = questions[index];
+            
+            // ایجاد فرم ویرایش در مودال
+            document.getElementById('modalTitle').textContent = `ویرایش سوال ${q.number}`;
+            
+            let modalBodyContent = `
+                <div class="tab-buttons">
+                    <button class="tab-button active" onclick="switchTab('text-tab')">متن سوال</button>
+                    <button class="tab-button" onclick="switchTab('math-tab')">فرمول‌نویسی</button>
+                </div>
+                
+                <div id="text-tab" class="tab-content active">
+                    <label for="editQuestionText">متن سوال:</label>
+                    <textarea id="editQuestionText" class="modal-input" rows="3">${q.text}</textarea>
+                    
+                    <label for="editQuestionScore">نمره سوال:</label>
+                    <input type="number" id="editQuestionScore" class="modal-input" value="${q.score}" min="0.5" step="0.5">
+                </div>
+                
+                <div id="math-tab" class="tab-content">
+                    <div class="math-editor">
+                        <label>ویرایشگر فرمول:</label>
+                        <textarea id="mathEditor" class="modal-input" rows="3" placeholder="فرمول خود را اینجا وارد کنید..."></textarea>
+                        
+                        <div class="math-buttons">
+                            <button class="math-button" onclick="insertMathSymbol('\\\\frac{a}{b}')">کسر</button>
+                            <button class="math-button" onclick="insertMathSymbol('x^{2}')">توان</button>
+                            <button class="math-button" onclick="insertMathSymbol('\\\\sqrt{x}')">ریشه</button>
+                            <button class="math-button" onclick="insertMathSymbol('\\\\int_{a}^{b} f(x) dx')">انتگرال</button>
+                            <button class="math-button" onclick="insertMathSymbol('\\\\sum_{i=1}^{n} i')">سیگما</button>
+                            <button class="math-button" onclick="insertMathSymbol('\\\\ce{H2O}')">فرمول شیمیایی</button>
+                            <button class="math-button" onclick="insertMathSymbol('\\\\ce{CH4 + 2O2 -> CO2 + 2H2O}')">واکنش شیمیایی</button>
+                            <button class="math-button" onclick="insertMathSymbol('\\\\alpha \\\\beta \\\\gamma')">حروف یونانی</button>
+                        </div>
+                        
+                        <div class="math-preview" id="mathPreview">
+                            پیش‌نمایش فرمول
+                        </div>
+                        
+                        <button class="modal-button" onclick="insertMathToQuestion()">افزودن فرمول به سوال</button>
+                    </div>
+                </div>
+            `;
+            
+            if (q.type === 'multiple-choice') {
+                modalBodyContent += `
+                    <div id="choices-tab" class="tab-content">
+                        <label>گزینه‌ها:</label>`;
+                for (let i = 0; i < 4; i++) {
+                    modalBodyContent += `
+                        <input type="text" id="editChoice${i}" class="modal-input" value="${q.choices[i]}" placeholder="گزینه ${i+1}">
+                    `;
+                }
+                modalBodyContent += `</div>`;
+                
+                // افزودن تب گزینه‌ها به دکمه‌های تب
+                const tabButtons = document.querySelector('.tab-buttons');
+                if (tabButtons) {
+                    tabButtons.innerHTML += `<button class="tab-button" onclick="switchTab('choices-tab')">گزینه‌ها</button>`;
+                }
+            }
+            
+            modalBodyContent += `
+                <button class="modal-button" onclick="saveQuestionChanges(${index})">ذخیره تغییرات</button>
+            `;
+            
+            document.getElementById('modalBody').innerHTML = modalBodyContent;
+            document.getElementById('editModal').style.display = 'block';
+            
+            // افزودن event listener برای پیش‌نمایش فرمول
+            const mathEditor = document.getElementById('mathEditor');
+            if (mathEditor) {
+                mathEditor.addEventListener('input', updateMathPreview);
+                updateMathPreview(); // به روز رسانی اولیه پیش‌نمایش
+            }
+        }
+        
+        // تابع برای سوئیچ بین تب‌ها
+        function switchTab(tabName) {
+            // مخفی کردن همه تب‌ها
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // غیرفعال کردن همه دکمه‌های تب
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // فعال کردن تب انتخاب شده
+            const targetTab = document.getElementById(tabName);
+            if (targetTab) {
+                targetTab.classList.add('active');
+            }
+            
+            if (event && event.target) {
+                event.target.classList.add('active');
+            }
+        }
+        
+        // تابع برای به روز رسانی پیش‌نمایش فرمول
+        function updateMathPreview() {
+            const mathEditor = document.getElementById('mathEditor');
+            const preview = document.getElementById('mathPreview');
+            
+            if (!mathEditor || !preview) return;
+            
+            const mathText = mathEditor.value;
+            
+            if (mathText.trim() === '') {
+                preview.innerHTML = 'پیش‌نمایش فرمول';
+                return;
+            }
+            
+            // استفاده از MathJax برای رندر فرمول
+            preview.innerHTML = mathText;
+            
+            if (window.MathJax) {
+                MathJax.typesetPromise([preview]).catch(err => {
+                    console.error('MathJax preview error:', err);
+                    preview.innerHTML = '<span style="color:red">خطا در نمایش فرمول</span>';
+                });
+            }
+        }
+        
+        // تابع برای درج نمادهای ریاضی
+        function insertMathSymbol(symbol) {
+            const editor = document.getElementById('mathEditor');
+            if (!editor) return;
+            
+            const start = editor.selectionStart;
+            const end = editor.selectionEnd;
+            const text = editor.value;
+            const before = text.substring(0, start);
+            const after = text.substring(end, text.length);
+            
+            editor.value = before + symbol + after;
+            editor.selectionStart = editor.selectionEnd = start + symbol.length;
+            editor.focus();
+            
+            updateMathPreview();
+        }
+        
+        // تابع برای درج فرمول به سوال
+        function insertMathToQuestion() {
+            const mathText = document.getElementById('mathEditor').value;
+            const questionEditor = document.getElementById('editQuestionText');
+            
+            if (!mathText || !questionEditor) return;
+            
+            if (mathText.trim() !== '') {
+                const start = questionEditor.selectionStart;
+                const end = questionEditor.selectionEnd;
+                const text = questionEditor.value;
+                const before = text.substring(0, start);
+                const after = text.substring(end, text.length);
+                
+                questionEditor.value = before + mathText + after;
+                questionEditor.selectionStart = questionEditor.selectionEnd = start + mathText.length;
+                questionEditor.focus();
+                
+                // سوئیچ به تب متن سوال
+                switchTab('text-tab');
+            }
+        }
+        
+        // تابع برای ذخیره تغییرات سوال
+        function saveQuestionChanges(index) {
+            const newText = document.getElementById('editQuestionText').value;
+            const newScore = parseFloat(document.getElementById('editQuestionScore').value);
+            
+            if (newText && !isNaN(newScore)) {
+                questions[index].text = newText;
+                questions[index].score = newScore;
+                
+                if (questions[index].type === 'multiple-choice') {
+                    for (let i = 0; i < 4; i++) {
+                        const choiceText = document.getElementById(`editChoice${i}`).value;
+                        if (choiceText) {
+                            questions[index].choices[i] = choiceText;
+                        }
+                    }
+                }
+                
+                closeModal();
+                renderQuestions();
+            } else {
+                alert("لطفاً مقادیر معتبر وارد کنید");
+            }
+        }
+        
+        // تابع برای بستن مودال
+        function closeModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+        
+        // تابع برای نمایش راهنمای فرمول‌نویسی
+        function showMathHelp() {
+            document.getElementById('modalTitle').textContent = 'راهنمای فرمول‌نویسی';
+            
+            const modalBodyContent = `
+                <h3>نمادهای ریاضی:</h3>
+                <ul>
+                    <li>کسر: <code>\\frac{صورت}{مخرج}</code> → $\\frac{صورت}{مخرج}$</li>
+                    <li>توان: <code>x^{2}</code> → $x^{2}$</li>
+                    <li>ریشه: <code>\\sqrt{x}</code> → $\\sqrt{x}$</li>
+                    <li>انتگرال: <code>\\int_{a}^{b} f(x) dx</code> → $\\int_{a}^{b} f(x) dx$</li>
+                    <li>سیگما: <code>\\sum_{i=1}^{n} i</code> → $\\sum_{i=1}^{n} i$</li>
+                </ul>
+                
+                <h3>نمادهای شیمیایی:</h3>
+                <ul>
+                    <li>فرمول: <code>\\ce{H2O}</code> → $\\ce{H2O}$</li>
+                    <li>واکنش: <code>\\ce{CH4 + 2O2 -> CO2 + 2H2O}</code> → $\\ce{CH4 + 2O2 -> CO2 + 2H2O}$</li>
+                </ul>
+                
+                <h3>حروف یونانی:</h3>
+                <ul>
+                    <li>آلفا: <code>\\alpha</code> → $\\alpha$</li>
+                    <li>بتا: <code>\\beta</code> → $\\beta$</li>
+                    <li>گاما: <code>\\gamma</code> → $\\gamma$</li>
+                </ul>
+                
+                <p><strong>توجه:</strong> فرمول‌ها باید بین علامت‌های $...$ یا \\(...\\) قرار گیرند.</p>
+                
+                <button class="modal-button" onclick="closeModal()">بستن</button>
+            `;
+            
+            document.getElementById('modalBody').innerHTML = modalBodyContent;
+            document.getElementById('editModal').style.display = 'block';
+            
+            // رندر فرمول‌ها در راهنما
+            if (window.MathJax) {
+                setTimeout(() => {
+                    MathJax.typesetPromise([document.getElementById('modalBody')]);
+                }, 100);
+            }
+        }
+        
+        // تابع برای افزودن تصویر
+        function addImage() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        const logoPlaceholder = document.getElementById('logoPlaceholder');
+                        logoPlaceholder.innerHTML = '';
+                        const img = document.createElement('img');
+                        img.src = event.target.result;
+                        img.alt = "لوگوی مدرسه";
+                        logoPlaceholder.appendChild(img);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+            input.click();
+        }
+        
+        // تابع برای ویرایش اطلاعات آزمون
+        function editExamInfo() {
+            document.getElementById('modalTitle').textContent = 'ویرایش اطلاعات آزمون';
+            
+            const modalBodyContent = `
+                <label for="editSchoolName">نام مدرسه:</label>
+                <input type="text" id="editSchoolName" class="modal-input" value="${document.getElementById('schoolName').textContent}">
+                
+                <label for="editExamTitle">عنوان امتحان:</label>
+                <input type="text" id="editExamTitle" class="modal-input" value="${document.getElementById('examTitle').textContent}">
+                
+                <label for="editAcademicYear">سال تحصیلی:</label>
+                <input type="text" id="editAcademicYear" class="modal-input" value="${document.getElementById('academicYear').textContent}">
+                
+                <label for="editExamDate">تاریخ امتحان:</label>
+                <input type="text" id="editExamDate" class="modal-input" value="${document.getElementById('examDate').textContent}">
+                
+                <label for="editExamDuration">مدت زمان امتحان:</label>
+                <input type="text" id="editExamDuration" class="modal-input" value="${document.getElementById('examDuration').textContent}">
+                
+                <label for="editTeacherName">نام دبیر:</label>
+                <input type="text" id="editTeacherName" class="modal-input" value="${document.getElementById('teacherName').textContent}">
+                
+                <button class="modal-button" onclick="saveExamInfoChanges()">ذخیره تغییرات</button>
+            `;
+            
+            document.getElementById('modalBody').innerHTML = modalBodyContent;
+            document.getElementById('editModal').style.display = 'block';
+        }
+        
+        // تابع برای ذخیره تغییرات اطلاعات آزمون
+        function saveExamInfoChanges() {
+            const schoolName = document.getElementById('editSchoolName').value;
+            const examTitle = document.getElementById('editExamTitle').value;
+            const academicYear = document.getElementById('editAcademicYear').value;
+            const examDate = document.getElementById('editExamDate').value;
+            const examDuration = document.getElementById('editExamDuration').value;
+            const teacherName = document.getElementById('editTeacherName').value;
+            
+            if (schoolName) document.getElementById('schoolName').textContent = schoolName;
+            if (examTitle) document.getElementById('examTitle').textContent = examTitle;
+            if (academicYear) document.getElementById('academicYear').textContent = academicYear;
+            if (examDate) document.getElementById('examDate').textContent = examDate;
+            if (examDuration) document.getElementById('examDuration').textContent = examDuration;
+            if (teacherName) document.getElementById('teacherName').textContent = teacherName;
+            
+            closeModal();
+        }
+        
+        // تابع برای ویرایش راهنمای آزمون
+        function editInstructions() {
+            const currentInstructions = document.getElementById('instructions').querySelector('ul');
+            const instructionsText = Array.from(currentInstructions.querySelectorAll('li')).map(li => li.textContent).join('\n');
+            
+            document.getElementById('modalTitle').textContent = 'ویرایش راهنمای آزمون';
+            
+            const modalBodyContent = `
+                <label for="editInstructions">راهنمای آزمون (هر مورد در یک خط):</label>
+                <textarea id="editInstructions" class="modal-input" rows="5">${instructionsText}</textarea>
+                
+                <button class="modal-button" onclick="saveInstructionsChanges()">ذخیره تغییرات</button>
+            `;
+            
+            document.getElementById('modalBody').innerHTML = modalBodyContent;
+            document.getElementById('editModal').style.display = 'block';
+        }
+        
+        // تابع برای ذخیره تغییرات راهنمای آزمون
+        function saveInstructionsChanges() {
+            const instructionsText = document.getElementById('editInstructions').value;
+            
+            if (instructionsText) {
+                const instructionsList = instructionsText.split('\n');
+                let instructionsHTML = '';
+                
+                instructionsList.forEach(instruction => {
+                    if (instruction.trim() !== '') {
+                        instructionsHTML += `<li>${instruction.trim()}</li>`;
+                    }
+                });
+                
+                document.getElementById('instructions').innerHTML = '<h3><i class="fas fa-exclamation-circle"></i> راهنما:</h3><ul>' + instructionsHTML + '</ul>';
+            }
+            
+            closeModal();
+        }
+        
+        // تابع برای ذخیره آزمون
+        function saveExam() {
+            const examData = {
+                schoolName: document.getElementById('schoolName').textContent,
+                examTitle: document.getElementById('examTitle').textContent,
+                academicYear: document.getElementById('academicYear').textContent,
+                examDate: document.getElementById('examDate').textContent,
+                examDuration: document.getElementById('examDuration').textContent,
+                teacherName: document.getElementById('teacherName').textContent,
+                instructions: document.getElementById('instructions').innerHTML,
+                questions: questions,
+                logo: document.getElementById('logoPlaceholder').querySelector('img') ? 
+                      document.getElementById('logoPlaceholder').querySelector('img').src : null
+            };
+            
+            localStorage.setItem('savedExam', JSON.stringify(examData));
+            alert("آزمون با موفقیت ذخیره شد!");
+        }
+        
+        // تابع برای ذخیره آزمون با نام جدید (فرمت HTML)
+        function saveExamAs() {
+            const fileName = prompt("لطفاً نامی برای فایل انتخاب کنید:", currentFileName);
+            
+            if (fileName) {
+                currentFileName = fileName;
+                
+                // ایجاد یک کپی از محتوای HTML فعلی
+                const examContent = document.getElementById('examPaper').outerHTML;
+                
+                // ایجاد HTML کامل با استایل‌ها و اسکریپت‌ها
+                const fullHTML = `<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${document.getElementById('schoolName').textContent} - ${document.getElementById('examTitle').textContent}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"><\/script>
+    
+    <!-- افزودن کتابخانه MathJax -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        /* استایل‌های کامل ... */
+        ${document.querySelector('style').innerHTML}
+    </style>
+    
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                packages: {'[+]': ['mhchem']}
+            },
+            loader: {load: ['[tex]/mhchem']}
+        };
+    </script>
+</head>
+<body>
+    ${examContent}
+    
+    <script>
+        // بارگذاری داده‌های آزمون
+        let questions = ${JSON.stringify(questions)};
+        
+        // تابع رندر سوالات
+        function renderQuestions() {
+            const questionsContainer = document.getElementById('questionsContainer');
+            if (!questionsContainer) return;
+            
+            questionsContainer.innerHTML = '';
+            
+            questions.forEach((q, index) => {
+                const questionEl = document.createElement('div');
+                questionEl.className = 'question';
+                
+                let questionContent = \`
+                    <div class="question-header">
+                        <span class="question-number">سوال \${q.number} - </span>
+                        <span class="question-text">\${q.text}</span>
+                        <span class="question-score">\${q.score} نمره</span>
+                    </div>
+                \`;
+                
+                if (q.type === 'multiple-choice') {
+                    questionContent += \`
+                        <div class="choices-row">
+                            <div class="choice">الف) \${q.choices[0]}</div>
+                            <div class="choice">ب) \${q.choices[1]}</div>
+                            <div class="choice">ج) \${q.choices[2]}</div>
+                            <div class="choice">د) \${q.choices[3]}</div>
+                        </div>
+                    \`;
+                } else if (q.type === 'descriptive') {
+                    questionContent += \`
+                        <div class="descriptive-answer">پاسخ:</div>
+                    \`;
+                }
+                
+                questionEl.innerHTML = questionContent;
+                questionsContainer.appendChild(questionEl);
+            });
+            
+            // رندر فرمول‌ها با MathJax
+            if (window.MathJax) {
+                MathJax.typesetPromise([questionsContainer]);
+            }
+        }
+        
+        // بارگذاری اولیه
+        window.addEventListener('load', function() {
+            renderQuestions();
+        });
+    <\/script>
+</body>
+</html>`;
+                
+                const blob = new Blob([fullHTML], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${fileName}.html`;
+                document.body.appendChild(a);
+                a.click();
+                
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 100);
+                
+                alert(`آزمون با نام "${fileName}" ذخیره شد!`);
+            }
+        }
+        
+        // تابع برای بارگذاری آزمون ذخیره شده
+        function loadExam() {
+            const savedExam = localStorage.getItem('savedExam');
+            if (savedExam) {
+                const examData = JSON.parse(savedExam);
+                
+                document.getElementById('schoolName').textContent = examData.schoolName;
+                document.getElementById('examTitle').textContent = examData.examTitle;
+                document.getElementById('academicYear').textContent = examData.academicYear;
+                document.getElementById('examDate').textContent = examData.examDate;
+                document.getElementById('examDuration').textContent = examData.examDuration;
+                document.getElementById('teacherName').textContent = examData.teacherName;
+                document.getElementById('instructions').innerHTML = examData.instructions;
+                
+                if (examData.logo) {
+                    const logoPlaceholder = document.getElementById('logoPlaceholder');
+                    logoPlaceholder.innerHTML = '';
+                    const img = document.createElement('img');
+                    img.src = examData.logo;
+                    img.alt = "لوگوی مدرسه";
+                    logoPlaceholder.appendChild(img);
+                }
+                
+                questions = examData.questions;
+                renderQuestions();
+                
+                alert("آزمون ذخیره شده با موفقیت بارگذاری شد!");
+            } else {
+                alert("هیچ آزمون ذخیره شده‌ای پیدا نشد!");
+            }
+        }
+        
+        // تابع برای تبدیل به فایل PDF
+        function exportToPDF() {
+            const element = document.getElementById('examPaper');
+            
+            // ایجاد options برای html2pdf
+            const opt = {
+                margin: [2, 2, 2, 2],
+                filename: `${currentFileName}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { 
+                    scale: 2, 
+                    useCORS: true,
+                    backgroundColor: '#ffffff',
+                    logging: false,
+                    width: 794,
+                    height: element.scrollHeight
+                },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            
+            // استفاده از html2pdf برای تولید PDF
+            html2pdf().set(opt).from(element).save();
+        }
+        
+        // بارگذاری خودکار آزمون ذخیره شده هنگام بارگذاری صفحه
+        window.addEventListener('load', function() {
+            const savedExam = localStorage.getItem('savedExam');
+            if (savedExam) {
+                if (confirm("آیا مایلید آزمون ذخیره شده بارگذاری شود؟")) {
+                    loadExam();
+                } else {
+                    initializeQuestions();
+                }
+            } else {
+                initializeQuestions();
+            }
+        });
+        
+        // بستن مودال با کلیک خارج منو
+        window.onclick = function(event) {
+            const modal = document.getElementById('editModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        };
+    </script>
+</body>
+</html>
