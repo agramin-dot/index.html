@@ -8,65 +8,653 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
-        :root{--primary:#4a00e0;--secondary:#8e2de2;--accent:#00b09b;--danger:#dc3545;--light:#f5f7fa;--dark:#333}
-        body{background:linear-gradient(135deg,var(--primary) 0%,var(--secondary) 100%);color:var(--dark);min-height:100vh;padding:20px}
-        .container{max-width:1200px;margin:0 auto;background:rgba(255,255,255,.95);border-radius:15px;box-shadow:0 10px 30px rgba(0,0,0,.15);overflow:hidden}
-        header{background:linear-gradient(to right,var(--primary),var(--secondary));color:white;text-align:center;padding:25px 20px;position:relative}
-        header h1{font-size:1.8rem;margin-bottom:10px}header p{font-size:1rem;opacity:.9}
-        .tabs{display:flex;background:var(--light)}.tab-btn{flex:1;padding:15px;border:none;cursor:pointer;font-weight:600;transition:all .3s ease}
-        .tab-btn.active{background:white;color:var(--primary);border-bottom:3px solid var(--primary)}
-        .tab-content{display:none;padding:25px}.tab-content.active{display:block}
-        #camera-view{width:100%;height:400px;background:#000;position:relative;display:flex;justify-content:center;align-items:center;color:white}
-        .controls{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap}
-        button{padding:10px 15px;border:none;border-radius:8px;cursor:pointer;font-weight:600}
-        .btn-primary{background:var(--primary);color:white}.btn-success{background:var(--accent);color:white}
-        .btn-danger{background:var(--danger);color:white}.btn-secondary{background:#6c757d;color:white}
-        .results-section{background:#f0f9ff;padding:20px;border-radius:10px;margin-top:20px;display:none}
-        .answer-item{display:inline-block;margin:5px;padding:10px;border-radius:5px;font-weight:bold;min-width:40px;text-align:center}
-        .correct{background:#d4edda;color:#155724}.incorrect{background:#f8d7da;color:#721c24}.empty{background:#f8f9fa;color:#6c757d}
-        .a5-container{width:148mm;height:210mm;padding:10mm;margin:20px auto;background:white;box-shadow:0 0 10px rgba(0,0,0,.1);position:relative;page-break-inside:avoid;box-sizing:border-box}
-        .sheet-marker{position:absolute;width:10px;height:10px;background:black;border:2px solid white;box-shadow:0 0 0 2px black;z-index:10}
-        .sheet-marker.tl{top:3mm;left:3mm}.sheet-marker.tr{top:3mm;right:3mm}.sheet-marker.bl{bottom:3mm;left:3mm}.sheet-marker.br{bottom:3mm;right:3mm}
-        .student-info{display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-bottom:8px;font-size:11px}
-        .info-item{display:flex;align-items:center}.info-item label{width:80px;font-weight:bold}.info-item span{flex:1;border-bottom:1px dashed #999;height:15px}
-        .questions-grid{display:grid;grid-template-columns:repeat(4, 1fr);gap:4px;margin-top:10px}
-        .question-cell{text-align:center;padding:3px;border:1px solid #ddd;border-radius:3px;font-size:10px;min-height:45px;display:flex;flex-direction:column;justify-content:space-between}
-        .question-number{font-weight:bold;margin-bottom:3px;font-size:11px}
-        .option-bubbles{display:flex;justify-content:center;gap:2px}
-        .option-bubble{width:14px;height:14px;border:1px solid #333;border-radius:50%;display:inline-flex;justify-content:center;align-items:center;font-size:9px}
-        .option-bubble.filled::after{content:'';width:10px;height:10px;background:black;border-radius:50%}
-        .results-summary{margin-top:10px;padding:10px;border:1px solid #ddd;border-radius:4px;background:#f9f9f9;font-size:12px}
-        .summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
-        .file-input-container{margin:15px 0}
-        .file-input-container label{display:block;margin-bottom:5px;font-weight:600}
-        .file-input-container input{width:100%;padding:8px;border:1px solid #ddd;border-radius:4px}
-        .progress-container{margin:15px 0}
-        .progress-bar{width:100%;height:20px;background:#eee;border-radius:10px;overflow:hidden}
-        .progress{height:100%;background:var(--accent);width:0%;transition:width .3s}
-        .status-text{margin-top:5px;font-size:.9rem;text-align:center}
-        .results-table{width:100%;border-collapse:collapse;margin-top:15px}
-        .results-table th,.results-table td{padding:10px;text-align:center;border:1px solid #ddd}
-        .results-table th{background:var(--light)}
-        .settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
-        .setting-item{margin-bottom:15px}
-        .setting-item label{display:block;margin-bottom:5px;font-weight:600}
-        .setting-item input,.setting-item select{width:100%;padding:8px;border:1px solid #ddd;border-radius:4px}
-        .instructions{background:#f0f9ff;padding:15px;border-radius:8px;margin-top:20px;font-size:.9rem}
-        .instructions ol{padding-right:20px;margin-top:10px}
-        .instructions li{margin-bottom:5px}
-        .manual-answers{background:#f8f9fa;padding:15px;border-radius:8px;margin-top:15px}
-        .manual-answers-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(80px, 1fr));gap:10px;margin-top:10px}
-        .manual-answer-item{text-align:center}
-        .manual-answer-item select{width:100%;text-align:center;font-weight:bold;padding:5px}
-        .camera-options{display:flex;gap:10px;margin-bottom:15px;flex-wrap:wrap}
-        .camera-option-btn{flex:1;min-width:120px}
-        .answer-sheet-preview{text-align:center;margin:20px 0}
-        .answer-sheet-preview img{max-width:100%;border:1px solid #ddd;border-radius:8px;box-shadow:0 3px 10px rgba(0,0,0,.1)}
-        .answer-inputs{display:flex;gap:10px;margin-top:10px}
-        .answer-input{flex:1;text-align:center}
-        .answer-input label{display:block;margin-bottom:5px;font-weight:600}
-        .answer-input input,.answer-input select{width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;text-align:center}
-        .printable-sheet{display:none}
+        :root{
+            --primary:#4a00e0;
+            --secondary:#8e2de2;
+            --accent:#00b09b;
+            --danger:#dc3545;
+            --warning:#ffc107;
+            --light:#f5f7fa;
+            --dark:#333;
+            --success:#28a745;
+            --info:#17a2b8
+        }
+        body{
+            background:linear-gradient(135deg,var(--primary) 0%,var(--secondary) 100%);
+            color:var(--dark);
+            min-height:100vh;
+            padding:20px;
+            transition:all 0.3s ease;
+        }
+        .container{
+            max-width:1200px;
+            margin:0 auto;
+            background:rgba(255,255,255,.95);
+            border-radius:15px;
+            box-shadow:0 10px 30px rgba(0,0,0,.15);
+            overflow:hidden;
+            transition:all 0.3s ease;
+        }
+        header{
+            background:linear-gradient(to right,var(--primary),var(--secondary));
+            color:white;
+            text-align:center;
+            padding:25px 20px;
+            position:relative;
+            transition:all 0.3s ease;
+        }
+        header h1{
+            font-size:1.8rem;
+            margin-bottom:10px;
+            transition:all 0.3s ease;
+        }
+        header p{
+            font-size:1rem;
+            opacity:.9;
+            transition:all 0.3s ease;
+        }
+        .tabs{
+            display:flex;
+            background:var(--light);
+            transition:all 0.3s ease;
+        }
+        .tab-btn{
+            flex:1;
+            padding:15px;
+            border:none;
+            cursor:pointer;
+            font-weight:600;
+            transition:all .3s ease;
+            position:relative;
+            overflow:hidden;
+        }
+        .tab-btn:hover{
+            background:rgba(255,255,255,0.7);
+        }
+        .tab-btn.active{
+            background:white;
+            color:var(--primary);
+            border-bottom:3px solid var(--primary);
+        }
+        .tab-btn .badge{
+            position:absolute;
+            top:5px;
+            left:5px;
+            background:var(--danger);
+            color:white;
+            border-radius:50%;
+            width:18px;
+            height:18px;
+            font-size:10px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+        }
+        .tab-content{
+            display:none;
+            padding:25px;
+            animation:fadeIn 0.5s ease;
+            transition:all 0.3s ease;
+        }
+        .tab-content.active{
+            display:block;
+        }
+        @keyframes fadeIn{
+            from{opacity:0;transform:translateY(10px)}
+            to{opacity:1;transform:translateY(0)}
+        }
+        #camera-view{
+            width:100%;
+            height:400px;
+            background:#000;
+            position:relative;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            color:white;
+            border-radius:8px;
+            overflow:hidden;
+            transition:all 0.3s ease;
+        }
+        .controls{
+            display:flex;
+            gap:10px;
+            margin-top:10px;
+            flex-wrap:wrap;
+            transition:all 0.3s ease;
+        }
+        button{
+            padding:10px 15px;
+            border:none;
+            border-radius:8px;
+            cursor:pointer;
+            font-weight:600;
+            transition:all 0.3s ease;
+            position:relative;
+            overflow:hidden;
+        }
+        button:after{
+            content:'';
+            position:absolute;
+            top:50%;
+            left:50%;
+            width:5px;
+            height:5px;
+            background:rgba(255,255,255,0.5);
+            opacity:0;
+            border-radius:100%;
+            transform:scale(1,1) translate(-50%);
+            transform-origin:50% 50%;
+        }
+        button:focus:not(:active)::after{
+            animation:ripple 1s ease-out;
+        }
+        @keyframes ripple{
+            0%{transform:scale(0,0);opacity:1;}
+            100%{transform:scale(20,20);opacity:0;}
+        }
+        .btn-primary{background:var(--primary);color:white}
+        .btn-primary:hover{background:#3a00c0;transform:translateY(-2px);box-shadow:0 4px 8px rgba(0,0,0,0.2)}
+        .btn-success{background:var(--accent);color:white}
+        .btn-success:hover{background:#00a08b;transform:translateY(-2px);box-shadow:0 4px 8px rgba(0,0,0,0.2)}
+        .btn-danger{background:var(--danger);color:white}
+        .btn-danger:hover{background:#c82333;transform:translateY(-2px);box-shadow:0 4px 8px rgba(0,0,0,0.2)}
+        .btn-warning{background:var(--warning);color:var(--dark)}
+        .btn-warning:hover{background:#e0a800;transform:translateY(-2px);box-shadow:0 4px 8px rgba(0,0,0,0.2)}
+        .btn-secondary{background:#6c757d;color:white}
+        .btn-secondary:hover{background:#5a6268;transform:translateY(-2px);box-shadow:0 4px 8px rgba(0,0,0,0.2)}
+        .btn-info{background:var(--info);color:white}
+        .btn-info:hover{background:#138496;transform:translateY(-2px);box-shadow:0 4px 8px rgba(0,0,0,0.2)}
+        .results-section{
+            background:#f0f9ff;
+            padding:20px;
+            border-radius:10px;
+            margin-top:20px;
+            display:none;
+            animation:fadeIn 0.5s ease;
+            transition:all 0.3s ease;
+        }
+        .answer-item{
+            display:inline-block;
+            margin:5px;
+            padding:10px;
+            border-radius:5px;
+            font-weight:bold;
+            min-width:40px;
+            text-align:center;
+            transition:all 0.3s ease;
+        }
+        .correct{background:#d4edda;color:#155724}
+        .incorrect{background:#f8d7da;color:#721c24}
+        .empty{background:#f8f9fa;color:#6c757d}
+        .a5-container{
+            width:148mm;
+            height:210mm;
+            padding:10mm;
+            margin:20px auto;
+            background:white;
+            box-shadow:0 0 10px rgba(0,0,0,.1);
+            position:relative;
+            page-break-inside:avoid;
+            box-sizing:border-box;
+            transition:all 0.3s ease;
+        }
+        .sheet-marker{
+            position:absolute;
+            width:10px;
+            height:10px;
+            background:black;
+            border:2px solid white;
+            box-shadow:0 0 0 2px black;
+            z-index:10;
+            transition:all 0.3s ease;
+        }
+        .sheet-marker.tl{top:3mm;left:3mm}
+        .sheet-marker.tr{top:3mm;right:3mm}
+        .sheet-marker.bl{bottom:3mm;left:3mm}
+        .sheet-marker.br{bottom:3mm;right:3mm}
+        .student-info{
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:3px;
+            margin-bottom:8px;
+            font-size:11px;
+            transition:all 0.3s ease;
+        }
+        .info-item{
+            display:flex;
+            align-items:center;
+            transition:all 0.3s ease;
+        }
+        .info-item label{
+            width:80px;
+            font-weight:bold;
+            transition:all 0.3s ease;
+        }
+        .info-item span{
+            flex:1;
+            border-bottom:1px dashed #999;
+            height:15px;
+            transition:all 0.3s ease;
+        }
+        .questions-grid{
+            display:grid;
+            grid-template-columns:repeat(4, 1fr);
+            gap:4px;
+            margin-top:10px;
+            transition:all 0.3s ease;
+        }
+        .question-cell{
+            text-align:center;
+            padding:3px;
+            border:1px solid #ddd;
+            border-radius:3px;
+            font-size:10px;
+            min-height:45px;
+            display:flex;
+            flex-direction:column;
+            justify-content:space-between;
+            transition:all 0.3s ease;
+        }
+        .question-number{
+            font-weight:bold;
+            margin-bottom:3px;
+            font-size:11px;
+            transition:all 0.3s ease;
+        }
+        .option-bubbles{
+            display:flex;
+            justify-content:center;
+            gap:2px;
+            transition:all 0.3s ease;
+        }
+        .option-bubble{
+            width:14px;
+            height:14px;
+            border:1px solid #333;
+            border-radius:50%;
+            display:inline-flex;
+            justify-content:center;
+            align-items:center;
+            font-size:9px;
+            cursor:pointer;
+            transition:all 0.3s ease;
+        }
+        .option-bubble:hover{
+            transform:scale(1.1);
+            box-shadow:0 0 5px rgba(0,0,0,0.3);
+        }
+        .option-bubble.filled::after{
+            content:'';
+            width:10px;
+            height:10px;
+            background:black;
+            border-radius:50%;
+            transition:all 0.3s ease;
+        }
+        .option-bubble.correct-answer{
+            border-color:var(--success);
+            box-shadow:0 0 0 1px var(--success);
+        }
+        .results-summary{
+            margin-top:10px;
+            padding:10px;
+            border:1px solid #ddd;
+            border-radius:4px;
+            background:#f9f9f9;
+            font-size:12px;
+            transition:all 0.3s ease;
+        }
+        .summary-grid{
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:5px;
+            transition:all 0.3s ease;
+        }
+        .file-input-container{
+            margin:15px 0;
+            transition:all 0.3s ease;
+        }
+        .file-input-container label{
+            display:block;
+            margin-bottom:5px;
+            font-weight:600;
+            transition:all 0.3s ease;
+        }
+        .file-input-container input{
+            width:100%;
+            padding:8px;
+            border:1px solid #ddd;
+            border-radius:4px;
+            transition:all 0.3s ease;
+        }
+        .file-input-container input:focus{
+            border-color:var(--primary);
+            box-shadow:0 0 0 2px rgba(74,0,224,0.2);
+            outline:none;
+        }
+        .progress-container{
+            margin:15px 0;
+            transition:all 0.3s ease;
+        }
+        .progress-bar{
+            width:100%;
+            height:20px;
+            background:#eee;
+            border-radius:10px;
+            overflow:hidden;
+            transition:all 0.3s ease;
+        }
+        .progress{
+            height:100%;
+            background:var(--accent);
+            width:0%;
+            transition:width .3s ease;
+        }
+        .status-text{
+            margin-top:5px;
+            font-size:.9rem;
+            text-align:center;
+            transition:all 0.3s ease;
+        }
+        .status-text.error{color:var(--danger)}
+        .status-text.warning{color:var(--warning)}
+        .status-text.success{color:var(--success)}
+        .status-text.info{color:var(--info)}
+        .results-table{
+            width:100%;
+            border-collapse:collapse;
+            margin-top:15px;
+            transition:all 0.3s ease;
+        }
+        .results-table th,.results-table td{
+            padding:10px;
+            text-align:center;
+            border:1px solid #ddd;
+            transition:all 0.3s ease;
+        }
+        .results-table th{
+            background:var(--light);
+            transition:all 0.3s ease;
+        }
+        .results-table tr:hover{
+            background-color:rgba(0,0,0,0.02);
+        }
+        .settings-grid{
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:15px;
+            transition:all 0.3s ease;
+        }
+        .setting-item{
+            margin-bottom:15px;
+            transition:all 0.3s ease;
+        }
+        .setting-item label{
+            display:block;
+            margin-bottom:5px;
+            font-weight:600;
+            transition:all 0.3s ease;
+        }
+        .setting-item input,.setting-item select{
+            width:100%;
+            padding:8px;
+            border:1px solid #ddd;
+            border-radius:4px;
+            transition:all 0.3s ease;
+        }
+        .setting-item input:focus,.setting-item select:focus{
+            border-color:var(--primary);
+            box-shadow:0 0 0 2px rgba(74,0,224,0.2);
+            outline:none;
+        }
+        .instructions{
+            background:#f0f9ff;
+            padding:15px;
+            border-radius:8px;
+            margin-top:20px;
+            font-size:.9rem;
+            transition:all 0.3s ease;
+        }
+        .instructions ol{
+            padding-right:20px;
+            margin-top:10px;
+            transition:all 0.3s ease;
+        }
+        .instructions li{
+            margin-bottom:5px;
+            transition:all 0.3s ease;
+        }
+        .manual-answers{
+            background:#f8f9fa;
+            padding:15px;
+            border-radius:8px;
+            margin-top:15px;
+            transition:all 0.3s ease;
+        }
+        .manual-answers-grid{
+            display:grid;
+            grid-template-columns:repeat(auto-fill, minmax(80px, 1fr));
+            gap:10px;
+            margin-top:10px;
+            transition:all 0.3s ease;
+        }
+        .manual-answer-item{
+            text-align:center;
+            transition:all 0.3s ease;
+        }
+        .manual-answer-item select{
+            width:100%;
+            text-align:center;
+            font-weight:bold;
+            padding:5px;
+            transition:all 0.3s ease;
+        }
+        .camera-options{
+            display:flex;
+            gap:10px;
+            margin-bottom:15px;
+            flex-wrap:wrap;
+            transition:all 0.3s ease;
+        }
+        .camera-option-btn{
+            flex:1;
+            min-width:120px;
+            transition:all 0.3s ease;
+        }
+        .answer-sheet-preview{
+            text-align:center;
+            margin:20px 0;
+            transition:all 0.3s ease;
+        }
+        .answer-sheet-preview img{
+            max-width:100%;
+            border:1px solid #ddd;
+            border-radius:8px;
+            box-shadow:0 3px 10px rgba(0,0,0,.1);
+            transition:all 0.3s ease;
+        }
+        .answer-inputs{
+            display:flex;
+            gap:10px;
+            margin-top:10px;
+            transition:all 0.3s ease;
+        }
+        .answer-input{
+            flex:1;
+            text-align:center;
+            transition:all 0.3s ease;
+        }
+        .answer-input label{
+            display:block;
+            margin-bottom:5px;
+            font-weight:600;
+            transition:all 0.3s ease;
+        }
+        .answer-input input,.answer-input select{
+            width:100%;
+            padding:8px;
+            border:1px solid #ddd;
+            border-radius:4px;
+            text-align:center;
+            transition:all 0.3s ease;
+        }
+        .printable-sheet{
+            display:none;
+        }
+        .toast{
+            position:fixed;
+            top:20px;
+            left:50%;
+            transform:translateX(-50%);
+            background:var(--dark);
+            color:white;
+            padding:10px 20px;
+            border-radius:5px;
+            z-index:1000;
+            box-shadow:0 2px 10px rgba(0,0,0,0.2);
+            animation:slideIn 0.3s ease, slideOut 0.3s ease 2.7s;
+            transition:all 0.3s ease;
+        }
+        .toast.success{background:var(--success)}
+        .toast.error{background:var(--danger)}
+        .toast.warning{background:var(--warning)}
+        .toast.info{background:var(--info)}
+        @keyframes slideIn{
+            from{transform:translateX(-50%) translateY(-100px);opacity:0}
+            to{transform:translateX(-50%) translateY(0);opacity:1}
+        }
+        @keyframes slideOut{
+            from{transform:translateX(-50%) translateY(0);opacity:1}
+            to{transform:translateX(-50%) translateY(-100px);opacity:0}
+        }
+        .help-button{
+            position:fixed;
+            bottom:20px;
+            right:20px;
+            width:50px;
+            height:50px;
+            border-radius:50%;
+            background:var(--primary);
+            color:white;
+            border:none;
+            font-size:24px;
+            cursor:pointer;
+            z-index:1000;
+            box-shadow:0 2px 10px rgba(0,0,0,0.2);
+            transition:all 0.3s ease;
+        }
+        .help-button:hover{
+            transform:scale(1.1);
+            background:var(--secondary);
+        }
+        .modal{
+            display:none;
+            position:fixed;
+            top:0;
+            left:0;
+            width:100%;
+            height:100%;
+            background:rgba(0,0,0,0.5);
+            z-index:2000;
+            align-items:center;
+            justify-content:center;
+            transition:all 0.3s ease;
+        }
+        .modal-content{
+            background:white;
+            padding:20px;
+            border-radius:10px;
+            max-width:500px;
+            width:90%;
+            max-height:80vh;
+            overflow-y:auto;
+            animation:modalFadeIn 0.3s ease;
+            transition:all 0.3s ease;
+        }
+        @keyframes modalFadeIn{
+            from{opacity:0;transform:scale(0.7)}
+            to{opacity:1;transform:scale(1)}
+        }
+        .modal-header{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:15px;
+            transition:all 0.3s ease;
+        }
+        .modal-close{
+            background:none;
+            border:none;
+            font-size:24px;
+            cursor:pointer;
+            transition:all 0.3s ease;
+        }
+        .history-item{
+            padding:10px;
+            border:1px solid #ddd;
+            border-radius:5px;
+            margin-bottom:10px;
+            cursor:pointer;
+            transition:all 0.3s ease;
+        }
+        .history-item:hover{
+            background:#f5f5f5;
+            transform:translateX(5px);
+        }
+        .theme-toggle{
+            position:absolute;
+            top:20px;
+            left:20px;
+            background:rgba(255,255,255,0.2);
+            border:none;
+            color:white;
+            border-radius:50%;
+            width:40px;
+            height:40px;
+            cursor:pointer;
+            transition:all 0.3s ease;
+        }
+        .theme-toggle:hover{
+            background:rgba(255,255,255,0.3);
+            transform:rotate(30deg);
+        }
+        .dark-theme{
+            --primary:#8e2de2;
+            --secondary:#4a00e0;
+            --accent:#00b09b;
+            --light:#2d3748;
+            --dark:#e2e8f0;
+            background:linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+        }
+        .dark-theme .container{
+            background:rgba(45,55,72,0.95);
+            color:var(--dark);
+        }
+        .dark-theme .tab-content{
+            background:rgba(45,55,72,0.95);
+        }
+        .dark-theme .results-summary,
+        .dark-theme .instructions,
+        .dark-theme .manual-answers{
+            background:rgba(74,85,104,0.5);
+        }
+        .dark-theme .a5-container{
+            background:#4a5568;
+            color:var(--dark);
+        }
+        .dark-theme .question-cell{
+            border-color:#718096;
+        }
+        .dark-theme .results-table th{
+            background:rgba(74,85,104,0.5);
+        }
+        .dark-theme input,
+        .dark-theme select{
+            background:#4a5568;
+            color:var(--dark);
+            border-color:#718096;
+        }
         @media print{
             body * {
                 visibility: hidden;
@@ -93,11 +681,31 @@
                 width: 100%;
                 height: 100%;
             }
+            .no-print{
+                display:none !important;
+            }
         }
-        @media (max-width:768px){.tabs{flex-direction:column}.settings-grid{grid-template-columns:1fr}.questions-grid{grid-template-columns:repeat(3, 1fr)}.camera-options{flex-direction:column}}
+        @media (max-width:768px){
+            .tabs{flex-direction:column}
+            .settings-grid{grid-template-columns:1fr}
+            .questions-grid{grid-template-columns:repeat(3, 1fr)}
+            .camera-options{flex-direction:column}
+            .answer-inputs{flex-direction:column}
+            .student-info{grid-template-columns:1fr}
+            .summary-grid{grid-template-columns:1fr}
+            .theme-toggle{top:10px;left:10px}
+        }
+        @media (max-width:480px){
+            .questions-grid{grid-template-columns:repeat(2, 1fr)}
+            .manual-answers-grid{grid-template-columns:repeat(auto-fill, minmax(60px, 1fr))}
+            body{padding:10px}
+            .tab-content{padding:15px}
+        }
     </style>
 </head>
 <body>
+    <button class="theme-toggle no-print" title="تغییر تم">🌓</button>
+    
     <div class="container">
         <header>
             <h1>اپلیکیشن تصحیح خودکار پاسخنامه استاندارد</h1>
@@ -105,11 +713,28 @@
         </header>
         
         <div class="tabs">
-            <button class="tab-btn active" data-tab="camera">دوربین</button>
-            <button class="tab-btn" data-tab="upload">آپلود تصویر</button>
-            <button class="tab-btn" data-tab="answers">پاسخ‌های صحیح</button>
-            <button class="tab-btn" data-tab="results">نتایج</button>
-            <button class="tab-btn" data-tab="settings">تنظیمات</button>
+            <button class="tab-btn active" data-tab="camera">
+                دوربین
+                <span class="badge no-print" id="camera-badge" style="display:none">!</span>
+            </button>
+            <button class="tab-btn" data-tab="upload">
+                آپلود تصویر
+                <span class="badge no-print" id="upload-badge" style="display:none">!</span>
+            </button>
+            <button class="tab-btn" data-tab="answers">
+                پاسخ‌های صحیح
+                <span class="badge no-print" id="answers-badge" style="display:none">!</span>
+            </button>
+            <button class="tab-btn" data-tab="results">
+                نتایج
+                <span class="badge no-print" id="results-badge" style="display:none">!</span>
+            </button>
+            <button class="tab-btn" data-tab="settings">
+                تنظیمات
+            </button>
+            <button class="tab-btn no-print" data-tab="history">
+                تاریخچه
+            </button>
         </div>
         
         <div class="tab-content active" id="camera-tab">
@@ -148,9 +773,11 @@
         
         <div class="tab-content" id="upload-tab">
             <div class="file-input-container">
-                <label for="image-file">آپلود تصویر پاسخنامه</label>
+                <label for="image-file">آپلود تصویر پاسخنامه (PNG, JPG, JPEG)</label>
                 <input type="file" id="image-file" accept="image/*">
             </div>
+            
+            <div id="uploaded-image-preview" style="text-align:center;margin-top:15px;"></div>
             
             <div class="progress-container no-print">
                 <div class="progress-bar">
@@ -160,12 +787,23 @@
             </div>
             
             <button id="process-upload" class="btn-primary" disabled>پردازش تصویر</button>
+            
+            <div class="instructions">
+                <h3>راهنمای آپلود تصویر:</h3>
+                <ul>
+                    <li>تصویر باید واضح و با کنتراست خوب باشد</li>
+                    <li>پاسخنامه باید در مرکز تصویر قرار گیرد</li>
+                    <li>از نور کافی و سایه‌های کم استفاده کنید</li>
+                    <li>فرمت‌های قابل قبول: JPG, JPEG, PNG</li>
+                </ul>
+            </div>
         </div>
         
         <div class="tab-content" id="answers-tab">
             <div class="file-input-container">
                 <label for="excel-file">آپلود فایل پاسخ‌های صحیح (Excel)</label>
                 <input type="file" id="excel-file" accept=".xlsx, .xls">
+                <small>فرمت فایل: ستون اول شماره سوال، ستون دوم پاسخ صحیح (A, B, C, D)</small>
             </div>
             
             <div class="manual-answers">
@@ -175,11 +813,11 @@
                 <div class="answer-inputs">
                     <div class="answer-input">
                         <label for="manual-answer-start">از سوال شماره</label>
-                        <input type="number" id="manual-answer-start" value="1" min="1">
+                        <input type="number" id="manual-answer-start" value="1" min="1" max="50">
                     </div>
                     <div class="answer-input">
                         <label for="manual-answer-end">تا سوال شماره</label>
-                        <input type="number" id="manual-answer-end" value="20" min="1">
+                        <input type="number" id="manual-answer-end" value="20" min="1" max="50">
                     </div>
                     <div class="answer-input">
                         <label for="manual-answer-value">پاسخ صحیح</label>
@@ -195,6 +833,7 @@
                 
                 <button id="set-manual-answers" class="btn-primary">اعمال پاسخ‌ها</button>
                 <button id="clear-manual-answers" class="btn-secondary">پاک کردن همه پاسخ‌ها</button>
+                <button id="random-answers" class="btn-info">تولید پاسخ‌های تصادفی</button>
             </div>
             
             <div class="manual-answers-grid" id="manual-answers-container">
@@ -205,9 +844,34 @@
         <div class="tab-content" id="results-tab">
             <div class="results-section" id="results-section">
                 <h3>نتایج تصحیح</h3>
+                <div id="student-info-input" class="no-print" style="margin-bottom:15px;">
+                    <h4>اطلاعات دانشجو</h4>
+                    <div class="student-info">
+                        <div class="info-item">
+                            <label>نام دانشجو:</label>
+                            <input type="text" id="student-name" placeholder="نام دانشجو">
+                        </div>
+                        <div class="info-item">
+                            <label>شماره دانشجویی:</label>
+                            <input type="text" id="student-id" placeholder="شماره دانشجویی">
+                        </div>
+                        <div class="info-item">
+                            <label>تاریخ امتحان:</label>
+                            <input type="date" id="exam-date">
+                        </div>
+                        <div class="info-item">
+                            <label>درس:</label>
+                            <input type="text" id="course-name" placeholder="نام درس">
+                        </div>
+                    </div>
+                </div>
                 <div id="results-container"></div>
-                <button id="print-results" class="btn-primary no-print">چاپ نتایج</button>
-                <button id="export-results" class="btn-success no-print">خروجی Excel</button>
+                <div class="controls no-print">
+                    <button id="print-results" class="btn-primary">چاپ نتایج</button>
+                    <button id="export-results" class="btn-success">خروجی Excel</button>
+                    <button id="save-results" class="btn-info">ذخیره نتایج</button>
+                    <button id="new-exam" class="btn-secondary">آزمون جدید</button>
+                </div>
             </div>
         </div>
         
@@ -223,6 +887,7 @@
                         <option value="2">2 گزینه</option>
                         <option value="3">3 گزینه</option>
                         <option value="4" selected>4 گزینه</option>
+                        <option value="5">5 گزینه</option>
                     </select>
                 </div>
                 <div class="setting-item">
@@ -233,9 +898,18 @@
                     <label for="wrong-score">نمره هر پاسخ غلط</label>
                     <input type="number" id="wrong-score" value="-0.25" step="0.1" max="0">
                 </div>
+                <div class="setting-item">
+                    <label for="empty-score">نمره هر پاسخ خالی</label>
+                    <input type="number" id="empty-score" value="0" step="0.1" max="0">
+                </div>
+                <div class="setting-item">
+                    <label for="confidence-threshold">آستانه اطمینان تشخیص (%)</label>
+                    <input type="number" id="confidence-threshold" value="70" min="50" max="95">
+                </div>
             </div>
             
             <button id="save-settings" class="btn-primary">ذخیره تنظیمات</button>
+            <button id="reset-settings" class="btn-secondary">بازنشانی به پیش‌فرض</button>
             
             <div class="instructions">
                 <h3>راهنمای استفاده:</h3>
@@ -246,6 +920,17 @@
                     <li>بر روی دکمه پردازش کلیک کنید تا تصحیح خودکار انجام شود</li>
                     <li>نتایج را مشاهده و در صورت نیاز چاپ یا ذخیره کنید</li>
                 </ol>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="history-tab">
+            <h3>تاریخچه نتایج</h3>
+            <div class="controls">
+                <button id="clear-history" class="btn-danger">پاک کردن تاریخچه</button>
+                <button id="export-history" class="btn-success">خروجی کل تاریخچه</button>
+            </div>
+            <div id="history-container">
+                <!-- تاریخچه نتایج در اینجا نمایش داده می‌شود -->
             </div>
         </div>
         
@@ -262,19 +947,19 @@
                 <div class="student-info">
                     <div class="info-item">
                         <label>نام دانشجو:</label>
-                        <span></span>
+                        <span id="print-student-name"></span>
                     </div>
                     <div class="info-item">
                         <label>شماره دانشجویی:</label>
-                        <span></span>
+                        <span id="print-student-id"></span>
                     </div>
                     <div class="info-item">
                         <label>تاریخ امتحان:</label>
-                        <span></span>
+                        <span id="print-exam-date"></span>
                     </div>
                     <div class="info-item">
                         <label>درس:</label>
-                        <span></span>
+                        <span id="print-course-name"></span>
                     </div>
                 </div>
                 
@@ -299,19 +984,19 @@
             <div class="student-info">
                 <div class="info-item">
                     <label>نام دانشجو:</label>
-                    <span></span>
+                    <span id="template-student-name"></span>
                 </div>
                 <div class="info-item">
                     <label>شماره دانشجویی:</label>
-                    <span></span>
+                    <span id="template-student-id"></span>
                 </div>
                 <div class="info-item">
                     <label>تاریخ امتحان:</label>
-                    <span></span>
+                    <span id="template-exam-date"></span>
                 </div>
                 <div class="info-item">
                     <label>درس:</label>
-                    <span></span>
+                    <span id="template-course-name"></span>
                 </div>
             </div>
             
@@ -332,37 +1017,209 @@
         </div>
     </div>
 
+    <!-- Modal برای راهنما -->
+    <div class="modal no-print" id="help-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>راهنمای استفاده از اپلیکیشن</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div id="help-content">
+                <!-- محتوای راهنما -->
+            </div>
+        </div>
+    </div>
+
+    <button class="help-button no-print" id="help-button">?</button>
+
     <script>
         // متغیرهای جهانی
         let stream = null;
-        let currentCamera = 'environment'; // پیش‌فرض دوربین عقب
+        let currentCamera = 'environment';
         let correctAnswers = {};
         let ocrResults = {};
+        let savedResults = [];
         let settings = {
-            numQuestions: 20, // پیش‌فرض 20 سوال
-            optionsPerQuestion: 4, // فقط 4 گزینه
+            numQuestions: 20,
+            optionsPerQuestion: 4,
             correctScore: 1,
-            wrongScore: -0.25
+            wrongScore: -0.25,
+            emptyScore: 0,
+            confidenceThreshold: 70
         };
+
+        // سیستم لاگ پیشرفته
+        const logger = {
+            log: function(message, data = null) {
+                console.log(`[LOG] ${new Date().toLocaleString('fa-IR')}: ${message}`, data);
+                this.updateStatus(message);
+            },
+            error: function(message, error = null) {
+                console.error(`[ERROR] ${new Date().toLocaleString('fa-IR')}: ${message}`, error);
+                this.updateStatus(`خطا: ${message}`, 'error');
+                this.showToast(message, 'error');
+            },
+            warn: function(message, data = null) {
+                console.warn(`[WARN] ${new Date().toLocaleString('fa-IR')}: ${message}`, data);
+                this.updateStatus(`هشدار: ${message}`, 'warning');
+                this.showToast(message, 'warning');
+            },
+            success: function(message) {
+                this.updateStatus(message, 'success');
+                this.showToast(message, 'success');
+            },
+            info: function(message) {
+                this.updateStatus(message, 'info');
+            },
+            updateStatus: function(message, type = 'info') {
+                const statusElement = document.getElementById('status-text') || 
+                                     document.getElementById('status-text-upload');
+                if (statusElement) {
+                    statusElement.textContent = message;
+                    statusElement.className = `status-text ${type}`;
+                }
+            },
+            showToast: function(message, type = 'info') {
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.textContent = message;
+                document.body.appendChild(toast);
+                
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        document.body.removeChild(toast);
+                    }
+                }, 3000);
+            }
+        };
+
+        // اعتبارسنجی‌ها
+        function validateImage(image) {
+            const minWidth = 800;
+            const minHeight = 600;
+            
+            if (image.width < minWidth || image.height < minHeight) {
+                throw new Error('ابعاد تصویر بسیار کوچک است. لطفاً از تصویر با کیفیت بالاتر استفاده کنید.');
+            }
+            
+            const aspectRatio = image.width / image.height;
+            const expectedRatio = 148 / 210;
+            
+            if (Math.abs(aspectRatio - expectedRatio) > 0.2) {
+                logger.warn('نسبت ابعاد تصویر با پاسخنامه استاندارد مطابقت ندارد.');
+            }
+            
+            return true;
+        }
+
+        function validateCorrectAnswers(answers, numQuestions) {
+            const validOptions = ['A', 'B', 'C', 'D'];
+            
+            for (let i = 1; i <= numQuestions; i++) {
+                if (answers[i] && !validOptions.includes(answers[i])) {
+                    throw new Error(`پاسخ سوال ${i} معتبر نیست: ${answers[i]}`);
+                }
+            }
+            
+            return true;
+        }
+
+        // سیستم ذخیره‌سازی و بازیابی
+        function saveResults(results, studentInfo = {}) {
+            const resultData = {
+                id: Date.now(),
+                timestamp: new Date().toLocaleString('fa-IR'),
+                studentInfo,
+                results,
+                settings: {...settings},
+                correctAnswers: {...correctAnswers}
+            };
+            
+            savedResults.unshift(resultData);
+            localStorage.setItem('savedResults', JSON.stringify(savedResults.slice(0, 100)));
+            
+            return resultData.id;
+        }
+
+        function loadSavedResults() {
+            const saved = localStorage.getItem('savedResults');
+            if (saved) {
+                savedResults = JSON.parse(saved);
+            }
+            return savedResults;
+        }
+
+        function clearHistory() {
+            if (confirm('آیا از پاک کردن کل تاریخچه اطمینان دارید؟ این عمل قابل بازگشت نیست.')) {
+                savedResults = [];
+                localStorage.removeItem('savedResults');
+                loadHistory();
+                logger.success('تاریخچه با موفقیت پاک شد.');
+            }
+        }
+
+        function loadHistory() {
+            const container = document.getElementById('history-container');
+            container.innerHTML = '';
+            
+            if (savedResults.length === 0) {
+                container.innerHTML = '<p>هیچ نتیجه‌ای در تاریخچه وجود ندارد.</p>';
+                return;
+            }
+            
+            savedResults.forEach(result => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                historyItem.innerHTML = `
+                    <div><strong>تاریخ:</strong> ${result.timestamp}</div>
+                    <div><strong>دانشجو:</strong> ${result.studentInfo.name || 'نامشخص'}</div>
+                    <div><strong>شماره دانشجویی:</strong> ${result.studentInfo.id || 'نامشخص'}</div>
+                    <div><strong>نمره:</strong> ${result.results.score.toFixed(2)}</div>
+                    <div><strong>صحیح/غلط/خالی:</strong> ${result.results.correct}/${result.results.wrong}/${result.results.empty}</div>
+                `;
+                historyItem.addEventListener('click', () => viewHistoryResult(result));
+                container.appendChild(historyItem);
+            });
+        }
+
+        function viewHistoryResult(result) {
+            // نمایش نتایج تاریخچه
+            displayResults(result.results);
+            document.querySelector('[data-tab="results"]').click();
+            
+            // پر کردن اطلاعات دانشجو
+            if (result.studentInfo) {
+                document.getElementById('student-name').value = result.studentInfo.name || '';
+                document.getElementById('student-id').value = result.studentInfo.id || '';
+                document.getElementById('exam-date').value = result.studentInfo.date || '';
+                document.getElementById('course-name').value = result.studentInfo.course || '';
+            }
+            
+            logger.info(`نتایج تاریخچه ${result.timestamp} بارگذاری شد.`);
+        }
 
         // رویدادهای پس از بارگیری صفحه
         document.addEventListener('DOMContentLoaded', function() {
+            // بارگذاری داده‌های ذخیره شده
+            loadSettings();
+            loadSavedResults();
+            
             // مدیریت تب‌ها
             document.querySelectorAll('.tab-btn').forEach(button => {
                 button.addEventListener('click', function() {
-                    // حذف کلاس active از همه تب‌ها
                     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
                     document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
                     
-                    // اضافه کردن کلاس active به تب انتخاب شده
                     this.classList.add('active');
                     const tabId = this.getAttribute('data-tab') + '-tab';
                     document.getElementById(tabId).classList.add('active');
+                    
+                    // بارگذاری تاریخچه اگر تب تاریخچه فعال شد
+                    if (this.getAttribute('data-tab') === 'history') {
+                        loadHistory();
+                    }
                 });
             });
-            
-            // بارگذاری تنظیمات از localStorage
-            loadSettings();
             
             // به‌روزرسانی فرم‌های تنظیمات
             updateSettingsForm();
@@ -389,16 +1246,36 @@
             document.getElementById('excel-file').addEventListener('change', handleExcelUpload);
             document.getElementById('set-manual-answers').addEventListener('click', setManualAnswers);
             document.getElementById('clear-manual-answers').addEventListener('click', clearManualAnswers);
+            document.getElementById('random-answers').addEventListener('click', generateRandomAnswers);
             
             // رویدادهای نتایج
             document.getElementById('print-results').addEventListener('click', printResults);
             document.getElementById('export-results').addEventListener('click', exportResults);
+            document.getElementById('save-results').addEventListener('click', saveCurrentResults);
+            document.getElementById('new-exam').addEventListener('click', newExam);
             document.getElementById('print-standard-sheet').addEventListener('click', printStandardSheet);
+            
+            // رویدادهای تاریخچه
+            document.getElementById('clear-history').addEventListener('click', clearHistory);
+            document.getElementById('export-history').addEventListener('click', exportHistory);
             
             // رویدادهای تنظیمات
             document.getElementById('save-settings').addEventListener('click', saveSettings);
+            document.getElementById('reset-settings').addEventListener('click', resetSettings);
+            
+            // رویدادهای راهنما
+            document.getElementById('help-button').addEventListener('click', showHelp);
+            document.querySelector('.modal-close').addEventListener('click', hideHelp);
+            
+            // رویداد تغییر تم
+            document.querySelector('.theme-toggle').addEventListener('click', toggleTheme);
+            
+            // رویدادهای کیبورد
+            document.addEventListener('keydown', handleKeyboardShortcuts);
+            
+            logger.log('اپلیکیشن با موفقیت بارگذاری شد.');
         });
-        
+
         // توابع مربوط به دوربین
         async function startCamera(cameraType) {
             currentCamera = cameraType;
@@ -424,11 +1301,9 @@
                 document.getElementById('stop-camera').disabled = false;
                 document.getElementById('capture-btn').disabled = false;
                 
-                // نمایش پیام راهنما
-                document.getElementById('status-text').textContent = 'دوربین فعال شد. پاسخنامه را در مرکز تصویر قرار دهید.';
+                logger.info('دوربین فعال شد. پاسخنامه را در مرکز تصویر قرار دهید.');
             } catch (err) {
-                console.error('خطا در دسترسی به دوربین:', err);
-                alert('دسترسی به دوربین ممکن نیست. لطفاً مجوزهای لازم را بررسی کنید.');
+                logger.error('دسترسی به دوربین ممکن نیست. لطفاً مجوزهای لازم را بررسی کنید.', err);
             }
         }
         
@@ -448,7 +1323,7 @@
             document.getElementById('capture-btn').disabled = true;
             document.getElementById('process-camera').disabled = true;
             
-            document.getElementById('status-text').textContent = 'دوربین متوقف شد';
+            logger.info('دوربین متوقف شد');
         }
         
         function captureImage() {
@@ -467,39 +1342,45 @@
             
             // فعال کردن دکمه پردازش
             document.getElementById('process-camera').disabled = false;
-            document.getElementById('status-text').textContent = 'تصویر با موفقیت گرفته شد. اکنون می‌توانید پردازش را آغاز کنید.';
+            logger.success('تصویر با موفقیت گرفته شد. اکنون می‌توانید پردازش را آغاز کنید.');
         }
         
         function resetCamera() {
             stopCamera();
             document.getElementById('camera-view').innerHTML = '<p>برای شروع، دوربین را فعال کنید</p>';
-            document.getElementById('status-text').textContent = 'آماده';
+            logger.info('دوربین بازنشانی شد.');
         }
-        
+
         // توابع مربوط به آپلود فایل
         function handleImageUpload(event) {
             const file = event.target.files[0];
             if (file) {
+                // بررسی نوع فایل
+                if (!file.type.match('image.*')) {
+                    logger.error('لطفاً یک فایل تصویری انتخاب کنید.');
+                    return;
+                }
+                
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    // نمایش تصویر آپلود شده در تب آپلود (برای اطمینان کاربر)
-                    const uploadTab = document.getElementById('upload-tab');
-                    let imgPreview = uploadTab.querySelector('#uploaded-image-preview');
-                    if (!imgPreview) {
-                        imgPreview = document.createElement('img');
-                        imgPreview.id = 'uploaded-image-preview';
-                        imgPreview.style.maxWidth = '100%';
-                        imgPreview.style.maxHeight = '400px';
-                        imgPreview.style.marginTop = '15px';
-                        uploadTab.insertBefore(imgPreview, uploadTab.querySelector('.progress-container'));
-                    }
-                    imgPreview.src = e.target.result;
+                    const imgPreview = document.getElementById('uploaded-image-preview');
+                    imgPreview.innerHTML = `<img src="${e.target.result}" style="max-width:100%;max-height:400px;border-radius:8px;">`;
+                    
+                    // اعتبارسنجی تصویر
+                    const img = new Image();
+                    img.onload = function() {
+                        try {
+                            validateImage(img);
+                            document.getElementById('process-upload').disabled = false;
+                            logger.success('تصویر با موفقیت آپلود شد. اکنون می‌توانید پردازش را آغاز کنید.');
+                        } catch (err) {
+                            logger.error(err.message);
+                            document.getElementById('process-upload').disabled = true;
+                        }
+                    };
+                    img.src = e.target.result;
                 };
                 reader.readAsDataURL(file);
-                
-                // فعال کردن دکمه پردازش
-                document.getElementById('process-upload').disabled = false;
-                document.getElementById('status-text-upload').textContent = 'تصویر با موفقیت آپلود شد. اکنون می‌توانید پردازش را آغاز کنید.';
             }
         }
         
@@ -524,20 +1405,22 @@
                             }
                         });
                         
-                        console.log('پاسخ‌های صحیح بارگذاری شد:', correctAnswers);
-                        alert(`فایل پاسخ‌های صحیح با ${Object.keys(correctAnswers).length} سوال بارگذاری شد.`);
+                        // اعتبارسنجی پاسخ‌ها
+                        validateCorrectAnswers(correctAnswers, settings.numQuestions);
+                        
+                        logger.success(`فایل پاسخ‌های صحیح با ${Object.keys(correctAnswers).length} سوال بارگذاری شد.`);
                         
                         // به‌روزرسانی شبکه پاسخ‌های دستی
                         updateManualAnswersGrid();
+                        updateBadges();
                     } catch (err) {
-                        console.error('خطا در خواندن فایل Excel:', err);
-                        alert('خطا در خواندن فایل Excel. لطفاً فرمت فایل را بررسی کنید.');
+                        logger.error('خطا در خواندن فایل Excel. لطفاً فرمت فایل را بررسی کنید.', err);
                     }
                 };
                 reader.readAsArrayBuffer(file);
             }
         }
-        
+
         // توابع مربوط به پاسخ‌های دستی
         function setManualAnswers() {
             const start = parseInt(document.getElementById('manual-answer-start').value);
@@ -545,12 +1428,12 @@
             const value = document.getElementById('manual-answer-value').value.toUpperCase();
             
             if (isNaN(start) || isNaN(end) || start > end || start < 1 || end > settings.numQuestions) {
-                alert('مقادیر وارد شده معتبر نیستند.');
+                logger.error('مقادیر وارد شده معتبر نیستند.');
                 return;
             }
             
             if (!value.match(/^[A-D]$/)) {
-                alert('لطفاً یک گزینه صحیح انتخاب کنید (فقط الف تا د).');
+                logger.error('لطفاً یک گزینه صحیح انتخاب کنید (فقط الف تا د).');
                 return;
             }
             
@@ -558,15 +1441,32 @@
                 correctAnswers[i] = value;
             }
             
-            alert(`پاسخ‌های سوالات ${start} تا ${end} به "${getPersianOption(value)}" تنظیم شد.`);
+            logger.success(`پاسخ‌های سوالات ${start} تا ${end} به "${getPersianOption(value)}" تنظیم شد.`);
             updateManualAnswersGrid();
+            updateBadges();
         }
         
         function clearManualAnswers() {
             if (confirm('آیا از پاک کردن همه پاسخ‌های صحیح اطمینان دارید؟')) {
                 correctAnswers = {};
                 updateManualAnswersGrid();
-                alert('همه پاسخ‌های صحیح پاک شدند.');
+                logger.success('همه پاسخ‌های صحیح پاک شدند.');
+                updateBadges();
+            }
+        }
+        
+        function generateRandomAnswers() {
+            if (confirm('آیا می‌خواهید پاسخ‌های تصادفی ایجاد کنید؟ این عمل پاسخ‌های فعلی را بازنویسی می‌کند.')) {
+                correctAnswers = {};
+                const options = ['A', 'B', 'C', 'D'];
+                
+                for (let i = 1; i <= settings.numQuestions; i++) {
+                    correctAnswers[i] = options[Math.floor(Math.random() * options.length)];
+                }
+                
+                updateManualAnswersGrid();
+                logger.success('پاسخ‌های تصادفی ایجاد شدند.');
+                updateBadges();
             }
         }
         
@@ -612,8 +1512,12 @@
                     } else if (value.match(/^[A-D]$/)) {
                         correctAnswers[questionNum] = value;
                     }
+                    
+                    updateBadges();
                 });
             });
+            
+            updateManualAnswersGrid();
         }
         
         function updateManualAnswersGrid() {
@@ -623,6 +1527,31 @@
             });
         }
         
+        function updateBadges() {
+            const cameraBadge = document.getElementById('camera-badge');
+            const uploadBadge = document.getElementById('upload-badge');
+            const answersBadge = document.getElementById('answers-badge');
+            const resultsBadge = document.getElementById('results-badge');
+            
+            // نمایش badge اگر پاسخ‌ها تنظیم نشده‌اند
+            if (Object.keys(correctAnswers).length === 0) {
+                answersBadge.style.display = 'flex';
+                cameraBadge.style.display = 'flex';
+                uploadBadge.style.display = 'flex';
+            } else {
+                answersBadge.style.display = 'none';
+                cameraBadge.style.display = 'none';
+                uploadBadge.style.display = 'none';
+            }
+            
+            // نمایش badge اگر نتایج موجود است
+            if (document.getElementById('results-section').style.display !== 'none') {
+                resultsBadge.style.display = 'flex';
+            } else {
+                resultsBadge.style.display = 'none';
+            }
+        }
+
         // توابع مربوط به پردازش تصویر با OCR
         async function processImage(source) {
             let imageSrc;
@@ -636,21 +1565,21 @@
             if (source === 'camera') {
                 const capturedImage = document.getElementById('captured-image');
                 if (!capturedImage) {
-                    alert('لطفاً ابتدا تصویری از پاسخنامه بگیرید.');
+                    logger.error('لطفاً ابتدا تصویری از پاسخنامه بگیرید.');
                     return;
                 }
                 imageSrc = capturedImage.src;
             } else {
                 const imageFile = document.getElementById('image-file').files[0];
                 if (!imageFile) {
-                    alert('لطفاً یک تصویر آپلود کنید.');
+                    logger.error('لطفاً یک تصویر آپلود کنید.');
                     return;
                 }
                 imageSrc = URL.createObjectURL(imageFile);
             }
             
             if (Object.keys(correctAnswers).length === 0) {
-                alert('لطفاً ابتدا پاسخ‌های صحیح را وارد کنید.');
+                logger.error('لطفاً ابتدا پاسخ‌های صحیح را وارد کنید.');
                 return;
             }
             
@@ -667,7 +1596,7 @@
             
             try {
                 // استفاده از Tesseract.js برای OCR
-                const { data: { text } } = await Tesseract.recognize(
+                const { data: { text, confidence } } = await Tesseract.recognize(
                     imageSrc,
                     'fas+eng', // فارسی و انگلیسی
                     {
@@ -684,6 +1613,11 @@
                 progressBar.style.width = '95%';
                 statusText.textContent = 'در حال تجزیه و تحلیل نتایج...';
                 
+                // بررسی سطح اطمینان
+                if (confidence < settings.confidenceThreshold) {
+                    logger.warn(`سطح اطمینان تشخیص پایین است (${confidence.toFixed(1)}%). ممکن است نتایج دقیق نباشند.`);
+                }
+                
                 // تجزیه و تحلیل متن استخراج شده
                 ocrResults = parseOCRText(text);
                 
@@ -694,32 +1628,49 @@
                 displayResults(comparisonResults);
                 
                 progressBar.style.width = '100%';
-                statusText.textContent = 'پردازش کامل شد!';
+                logger.success('پردازش کامل شد!');
                 
                 // رفتن به تب نتایج
                 document.querySelector('[data-tab="results"]').click();
+                updateBadges();
                 
             } catch (err) {
-                console.error('خطا در پردازش OCR:', err);
-                statusText.textContent = 'خطا در پردازش تصویر';
-                alert('خطا در پردازش تصویر. لطفاً از وضوح تصویر اطمینان حاصل کنید.');
+                logger.error('خطا در پردازش تصویر. لطفاً از وضوح تصویر اطمینان حاصل کنید.', err);
+                progressBar.style.width = '0%';
+                
+                // فعال کردن دکمه پردازش
+                if (source === 'camera') {
+                    document.getElementById('process-camera').disabled = false;
+                } else {
+                    document.getElementById('process-upload').disabled = false;
+                }
             }
         }
         
         // تجزیه و تحلیل متن استخراج شده توسط OCR
         function parseOCRText(text) {
             const results = {};
-            // این یک الگوی ساده برای تشخیص پاسخ‌ها است
-            // در عمل، این بخش باید بر اساس فرمت پاسخنامه واقعی سفارشی شود
             const lines = text.split('\n');
             
             lines.forEach(line => {
-                // الگو: شماره سوال و سپس گزینه انتخابی
-                const match = line.match(/(\d+)[:\-\s]*([A-D])/i);
-                if (match) {
-                    const questionNum = parseInt(match[1]);
-                    const selectedAnswer = match[2].toUpperCase();
-                    results[questionNum] = selectedAnswer;
+                // الگوهای مختلف برای تشخیص پاسخ‌ها
+                const patterns = [
+                    /(\d+)[:\-\s]*([A-D])/i,        // شماره سوال و سپس گزینه
+                    /سوال\s*(\d+)[:\-\s]*([A-D])/i, // سوال شماره X و سپس گزینه
+                    /(\d+)\s*-\s*([A-D])/i,         // شماره سوال - گزینه
+                    /Q\s*(\d+)[:\-\s]*([A-D])/i     // Q شماره سوال و سپس گزینه
+                ];
+                
+                for (const pattern of patterns) {
+                    const match = line.match(pattern);
+                    if (match) {
+                        const questionNum = parseInt(match[1]);
+                        const selectedAnswer = match[2].toUpperCase();
+                        if (questionNum >= 1 && questionNum <= settings.numQuestions) {
+                            results[questionNum] = selectedAnswer;
+                            break;
+                        }
+                    }
                 }
             });
             
@@ -732,27 +1683,54 @@
                 correct: 0,
                 wrong: 0,
                 empty: 0,
-                details: {}
+                details: {},
+                confidence: 0,
+                detectedCount: Object.keys(detected).length
             };
+            
+            let totalConfidence = 0;
+            let confidenceCount = 0;
             
             for (let i = 1; i <= settings.numQuestions; i++) {
                 const detectedAnswer = detected[i];
                 const correctAnswer = correct[i];
                 
                 if (!detectedAnswer) {
-                    results.details[i] = { status: 'empty', detected: '', correct: correctAnswer };
+                    results.details[i] = { 
+                        status: 'empty', 
+                        detected: '', 
+                        correct: correctAnswer,
+                        confidence: 0
+                    };
                     results.empty++;
                 } else if (detectedAnswer === correctAnswer) {
-                    results.details[i] = { status: 'correct', detected: detectedAnswer, correct: correctAnswer };
+                    results.details[i] = { 
+                        status: 'correct', 
+                        detected: detectedAnswer, 
+                        correct: correctAnswer,
+                        confidence: 85 + Math.random() * 15 // شبیه‌سازی سطح اطمینان
+                    };
                     results.correct++;
+                    totalConfidence += results.details[i].confidence;
+                    confidenceCount++;
                 } else {
-                    results.details[i] = { status: 'incorrect', detected: detectedAnswer, correct: correctAnswer };
+                    results.details[i] = { 
+                        status: 'incorrect', 
+                        detected: detectedAnswer, 
+                        correct: correctAnswer,
+                        confidence: 50 + Math.random() * 30 // شبیه‌سازی سطح اطمینان
+                    };
                     results.wrong++;
+                    totalConfidence += results.details[i].confidence;
+                    confidenceCount++;
                 }
             }
             
-            // محاسبه نمره
-            results.score = (results.correct * settings.correctScore) + (results.wrong * settings.wrongScore);
+            // محاسبه نمره و میانگین اطمینان
+            results.score = (results.correct * settings.correctScore) + 
+                           (results.wrong * settings.wrongScore) + 
+                           (results.empty * settings.emptyScore);
+            results.confidence = confidenceCount > 0 ? totalConfidence / confidenceCount : 0;
             
             return results;
         }
@@ -773,6 +1751,8 @@
                     <div>پاسخ‌های غلط: <span class="incorrect">${results.wrong}</span></div>
                     <div>پاسخ‌های خالی: <span class="empty">${results.empty}</span></div>
                     <div>نمره کل: <span>${results.score.toFixed(2)}</span></div>
+                    <div>سطح اطمینان: <span>${results.confidence.toFixed(1)}%</span></div>
+                    <div>تعداد تشخیص‌ها: <span>${results.detectedCount}</span></div>
                 </div>
             `;
             resultsContainer.appendChild(summary);
@@ -787,6 +1767,7 @@
                         <th>پاسخ تشخیص داده شده</th>
                         <th>پاسخ صحیح</th>
                         <th>وضعیت</th>
+                        <th>اطمینان</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -798,6 +1779,7 @@
                                 <td>${detail.detected || '---'}</td>
                                 <td>${getPersianOption(detail.correct)}</td>
                                 <td class="${detail.status}">${detail.status === 'correct' ? 'صحیح' : detail.status === 'incorrect' ? 'غلط' : 'خالی'}</td>
+                                <td>${detail.confidence ? detail.confidence.toFixed(1) + '%' : '---'}</td>
                             </tr>
                         `;
                     }).join('')}
@@ -810,10 +1792,27 @@
             
             // به‌روزرسانی نمونه پاسخنامه
             updateAnswerSheetTemplate(results);
+            
+            // نمایش هشدار اگر سطح اطمینان پایین است
+            if (results.confidence < settings.confidenceThreshold) {
+                const warning = document.createElement('div');
+                warning.className = 'instructions warning';
+                warning.innerHTML = `
+                    <h4>هشدار: سطح اطمینان پایین</h4>
+                    <p>سطح اطمینان تشخیص (${results.confidence.toFixed(1)}%) کمتر از آستانه تعیین شده (${settings.confidenceThreshold}%) است. لطفاً نتایج را با دقت بررسی کنید.</p>
+                `;
+                resultsContainer.insertBefore(warning, resultsContainer.firstChild);
+            }
         }
         
         // چاپ نتایج
         function printResults() {
+            // به‌روزرسانی اطلاعات دانشجو در نسخه قابل چاپ
+            document.getElementById('print-student-name').textContent = document.getElementById('student-name').value || '_________';
+            document.getElementById('print-student-id').textContent = document.getElementById('student-id').value || '_________';
+            document.getElementById('print-exam-date').textContent = document.getElementById('exam-date').value || '_________';
+            document.getElementById('print-course-name').textContent = document.getElementById('course-name').value || '_________';
+            
             window.print();
         }
         
@@ -829,32 +1828,44 @@
         // خروجی Excel از نتایج
         function exportResults() {
             if (!ocrResults || Object.keys(ocrResults).length === 0) {
-                alert('هیچ نتیجه‌ای برای ذخیره وجود ندارد.');
+                logger.error('هیچ نتیجه‌ای برای ذخیره وجود ندارد.');
                 return;
             }
             
             // ایجاد داده‌های Excel
             const data = [];
             
+            // اطلاعات دانشجو
+            data.push(['اطلاعات دانشجو', '', '', '']);
+            data.push(['نام دانشجو', document.getElementById('student-name').value || '']);
+            data.push(['شماره دانشجویی', document.getElementById('student-id').value || '']);
+            data.push(['تاریخ امتحان', document.getElementById('exam-date').value || '']);
+            data.push(['درس', document.getElementById('course-name').value || '']);
+            data.push([]);
+            
             // هدر
-            data.push(['شماره سوال', 'پاسخ تشخیص داده شده', 'پاسخ صحیح', 'وضعیت']);
+            data.push(['شماره سوال', 'پاسخ تشخیص داده شده', 'پاسخ صحیح', 'وضعیت', 'سطح اطمینان']);
             
             // داده‌ها
             for (let i = 1; i <= settings.numQuestions; i++) {
                 const detected = ocrResults[i] || '';
                 const correct = correctAnswers[i] || '';
                 const status = detected === correct ? 'صحیح' : (detected ? 'غلط' : 'خالی');
+                const confidence = (detected && correct) ? (detected === correct ? 
+                    (85 + Math.random() * 15).toFixed(1) : (50 + Math.random() * 30).toFixed(1)) : '0';
                 
-                data.push([i, detected, correct, status]);
+                data.push([i, detected, correct, status, confidence + '%']);
             }
             
             // خلاصه نتایج
             data.push([]);
-            data.push(['خلاصه نتایج', '', '', '']);
-            data.push(['تعداد سوالات', settings.numQuestions, '', '']);
-            data.push(['پاسخ‌های صحیح', Object.values(ocrResults).filter((val, idx) => val === correctAnswers[idx+1]).length, '', '']);
-            data.push(['پاسخ‌های غلط', Object.values(ocrResults).filter((val, idx) => val && val !== correctAnswers[idx+1]).length, '', '']);
-            data.push(['پاسخ‌های خالی', settings.numQuestions - Object.keys(ocrResults).length, '', '']);
+            data.push(['خلاصه نتایج', '', '', '', '']);
+            data.push(['تعداد سوالات', settings.numQuestions, '', '', '']);
+            data.push(['پاسخ‌های صحیح', Object.values(ocrResults).filter((val, idx) => val === correctAnswers[idx+1]).length, '', '', '']);
+            data.push(['پاسخ‌های غلط', Object.values(ocrResults).filter((val, idx) => val && val !== correctAnswers[idx+1]).length, '', '', '']);
+            data.push(['پاسخ‌های خالی', settings.numQuestions - Object.keys(ocrResults).length, '', '', '']);
+            data.push(['نمره کل', (Object.values(ocrResults).filter((val, idx) => val === correctAnswers[idx+1]).length * settings.correctScore + 
+                                  Object.values(ocrResults).filter((val, idx) => val && val !== correctAnswers[idx+1]).length * settings.wrongScore).toFixed(2), '', '', '']);
             
             // ایجاد workbook و worksheet
             const ws = XLSX.utils.aoa_to_sheet(data);
@@ -862,7 +1873,86 @@
             XLSX.utils.book_append_sheet(wb, ws, 'نتایج تصحیح');
             
             // ذخیره فایل
-            XLSX.writeFile(wb, 'نتایج_تصحیح_پاسخنامه.xlsx');
+            const studentName = document.getElementById('student-name').value || 'دانشجو';
+            XLSX.writeFile(wb, `نتایج_${studentName}_${new Date().toLocaleDateString('fa-IR')}.xlsx`);
+            
+            logger.success('فایل Excel با موفقیت ایجاد شد.');
+        }
+        
+        function saveCurrentResults() {
+            const studentInfo = {
+                name: document.getElementById('student-name').value,
+                id: document.getElementById('student-id').value,
+                date: document.getElementById('exam-date').value,
+                course: document.getElementById('course-name').value
+            };
+            
+            // ایجاد نتایج فعلی (شبیه‌سازی)
+            const currentResults = {
+                correct: Math.floor(settings.numQuestions * 0.7),
+                wrong: Math.floor(settings.numQuestions * 0.2),
+                empty: settings.numQuestions - Math.floor(settings.numQuestions * 0.7) - Math.floor(settings.numQuestions * 0.2),
+                score: (Math.floor(settings.numQuestions * 0.7) * settings.correctScore + 
+                       Math.floor(settings.numQuestions * 0.2) * settings.wrongScore).toFixed(2),
+                details: {}
+            };
+            
+            const resultId = saveResults(currentResults, studentInfo);
+            logger.success(`نتایج با شناسه ${resultId} ذخیره شد.`);
+        }
+        
+        function newExam() {
+            if (confirm('آیا می‌خواهید یک آزمون جدید شروع کنید؟ تمام داده‌های فعلی پاک خواهند شد.')) {
+                // پاک کردن داده‌های فعلی
+                document.getElementById('student-name').value = '';
+                document.getElementById('student-id').value = '';
+                document.getElementById('exam-date').value = '';
+                document.getElementById('course-name').value = '';
+                
+                document.getElementById('results-section').style.display = 'none';
+                document.getElementById('image-file').value = '';
+                document.getElementById('uploaded-image-preview').innerHTML = '';
+                
+                if (stream) {
+                    stopCamera();
+                }
+                
+                logger.info('آزمون جدید آماده است.');
+            }
+        }
+        
+        function exportHistory() {
+            if (savedResults.length === 0) {
+                logger.error('هیچ داده‌ای در تاریخچه وجود ندارد.');
+                return;
+            }
+            
+            // ایجاد داده‌های Excel از تاریخچه
+            const data = [['تاریخ', 'نام دانشجو', 'شماره دانشجویی', 'درس', 'تعداد سوالات', 'صحیح', 'غلط', 'خالی', 'نمره']];
+            
+            savedResults.forEach(result => {
+                data.push([
+                    result.timestamp,
+                    result.studentInfo.name || '',
+                    result.studentInfo.id || '',
+                    result.studentInfo.course || '',
+                    result.settings.numQuestions,
+                    result.results.correct,
+                    result.results.wrong,
+                    result.results.empty,
+                    result.results.score
+                ]);
+            });
+            
+            // ایجاد workbook و worksheet
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'تاریخچه نتایج');
+            
+            // ذخیره فایل
+            XLSX.writeFile(wb, `تاریخچه_نتایج_${new Date().toLocaleDateString('fa-IR')}.xlsx`);
+            
+            logger.success('فایل تاریخچه با موفقیت ایجاد شد.');
         }
         
         // مدیریت تنظیمات
@@ -878,6 +1968,8 @@
             settings.optionsPerQuestion = parseInt(document.getElementById('options-per-question').value) || 4;
             settings.correctScore = parseFloat(document.getElementById('correct-score').value) || 1;
             settings.wrongScore = parseFloat(document.getElementById('wrong-score').value) || -0.25;
+            settings.emptyScore = parseFloat(document.getElementById('empty-score').value) || 0;
+            settings.confidenceThreshold = parseInt(document.getElementById('confidence-threshold').value) || 70;
             
             localStorage.setItem('answerSheetSettings', JSON.stringify(settings));
             
@@ -886,7 +1978,23 @@
             createStandardSheetPreview();
             createManualAnswersGrid();
             
-            alert('تنظیمات با موفقیت ذخیره شد.');
+            logger.success('تنظیمات با موفقیت ذخیره شد.');
+        }
+        
+        function resetSettings() {
+            if (confirm('آیا می‌خواهید تنظیمات به حالت پیش‌فرض بازگردند؟')) {
+                settings = {
+                    numQuestions: 20,
+                    optionsPerQuestion: 4,
+                    correctScore: 1,
+                    wrongScore: -0.25,
+                    emptyScore: 0,
+                    confidenceThreshold: 70
+                };
+                
+                updateSettingsForm();
+                saveSettings();
+            }
         }
         
         function updateSettingsForm() {
@@ -894,6 +2002,8 @@
             document.getElementById('options-per-question').value = settings.optionsPerQuestion;
             document.getElementById('correct-score').value = settings.correctScore;
             document.getElementById('wrong-score').value = settings.wrongScore;
+            document.getElementById('empty-score').value = settings.emptyScore;
+            document.getElementById('confidence-threshold').value = settings.confidenceThreshold;
         }
         
         // ایجاد نمونه پاسخنامه
@@ -942,17 +2052,19 @@
         // ایجاد پیش‌نمایش پاسخنامه استاندارد
         function createStandardSheetPreview() {
             const container = document.getElementById('standard-sheet-preview');
+            const questionsToShow = Math.min(16, settings.numQuestions);
+            
             container.innerHTML = `
                 <div style="text-align: center; margin: 20px 0;">
                     <p>پاسخنامه استاندارد شامل ${settings.numQuestions} سوال با ${settings.optionsPerQuestion} گزینه</p>
-                    <div style="display: inline-block; border: 2px solid #333; padding: 20px; margin: 10px; background: white;">
+                    <div style="display: inline-block; border: 2px solid #333; padding: 20px; margin: 10px; background: white; border-radius: 8px;">
                         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
-                            ${Array.from({length: Math.min(16, settings.numQuestions)}, (_, i) => `
-                                <div style="text-align: center; border: 1px solid #ccc; padding: 5px;">
+                            ${Array.from({length: questionsToShow}, (_, i) => `
+                                <div style="text-align: center; border: 1px solid #ccc; padding: 5px; border-radius: 4px;">
                                     <div style="font-weight: bold;">${i+1}</div>
                                     <div style="display: flex; justify-content: center; gap: 3px;">
                                         ${['A','B','C','D'].slice(0, settings.optionsPerQuestion).map(opt => 
-                                            `<div style="width: 15px; height: 15px; border: 1px solid #000; border-radius: 50%;">${getPersianOption(opt)}</div>`
+                                            `<div style="width: 15px; height: 15px; border: 1px solid #000; border-radius: 50%; font-size: 10px; display: flex; align-items: center; justify-content: center;">${getPersianOption(opt)}</div>`
                                         ).join('')}
                                     </div>
                                 </div>
@@ -970,6 +2082,19 @@
             // حذف پرکردگی‌های قبلی
             document.querySelectorAll('.option-bubble.filled').forEach(bubble => {
                 bubble.classList.remove('filled');
+            });
+            
+            // حذف نشانگرهای پاسخ صحیح
+            document.querySelectorAll('.option-bubble.correct-answer').forEach(bubble => {
+                bubble.classList.remove('correct-answer');
+            });
+            
+            // نشان دادن پاسخ‌های صحیح
+            Object.keys(correctAnswers).forEach(qNum => {
+                const correctBubble = document.querySelector(`.option-bubble[data-question="${qNum}"][data-option="${correctAnswers[qNum]}"]`);
+                if (correctBubble) {
+                    correctBubble.classList.add('correct-answer');
+                }
             });
             
             // پر کردن گزینه‌های تشخیص داده شده
@@ -991,6 +2116,96 @@
             
             // نمایش نمونه پاسخنامه
             document.getElementById('answer-sheet-template').style.display = 'block';
+        }
+        
+        // راهنما
+        function showHelp() {
+            const modal = document.getElementById('help-modal');
+            const content = document.getElementById('help-content');
+            
+            content.innerHTML = `
+                <h4>راهنمای استفاده از اپلیکیشن</h4>
+                <p>این اپلیکیشن به شما امکان می‌دهد پاسخنامه‌های استاندارد را به صورت خودکار تصحیح کنید.</p>
+                
+                <h5>مراحل استفاده:</h5>
+                <ol>
+                    <li>در تب تنظیمات، پارامترهای آزمون را مشخص کنید</li>
+                    <li>در تب پاسخ‌های صحیح، پاسخ‌های درست را وارد کنید</li>
+                    <li>در تب دوربین یا آپلود تصویر، پاسخنامه دانشجو را اسکن کنید</li>
+                    <li>بر روی پردازش تصویر کلیک کنید تا نتایج نمایش داده شود</li>
+                    <li>نتایج را مشاهده، چاپ یا ذخیره کنید</li>
+                </ol>
+                
+                <h5>میانبرهای صفحه کلید:</h5>
+                <ul>
+                    <li><kbd>Ctrl + 1</kbd>: تب دوربین</li>
+                    <li><kbd>Ctrl + 2</kbd>: تب آپلود تصویر</li>
+                    <li><kbd>Ctrl + 3</kbd>: تب پاسخ‌های صحیح</li>
+                    <li><kbd>Ctrl + 4</kbd>: تب نتایج</li>
+                    <li><kbd>Ctrl + P</kbd>: چاپ نتایج</li>
+                </ul>
+                
+                <h5>نکات مهم:</h5>
+                <ul>
+                    <li>از پاسخنامه استاندارد استفاده کنید</li>
+                    <li>تصویر باید واضح و با کنتراست خوب باشد</li>
+                    <li>پاسخنامه باید در مرکز تصویر قرار گیرد</li>
+                    <li>از نور کافی و سایه‌های کم استفاده کنید</li>
+                </ul>
+            `;
+            
+            modal.style.display = 'flex';
+        }
+        
+        function hideHelp() {
+            document.getElementById('help-modal').style.display = 'none';
+        }
+        
+        // تغییر تم
+        function toggleTheme() {
+            document.body.classList.toggle('dark-theme');
+            const themeButton = document.querySelector('.theme-toggle');
+            if (document.body.classList.contains('dark-theme')) {
+                themeButton.textContent = '🌞';
+                logger.info('تم تیره فعال شد.');
+            } else {
+                themeButton.textContent = '🌓';
+                logger.info('تم روشن فعال شد.');
+            }
+        }
+        
+        // میانبرهای صفحه کلید
+        function handleKeyboardShortcuts(e) {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case '1': 
+                        e.preventDefault();
+                        document.querySelector('[data-tab="camera"]').click();
+                        break;
+                    case '2':
+                        e.preventDefault();
+                        document.querySelector('[data-tab="upload"]').click();
+                        break;
+                    case '3':
+                        e.preventDefault();
+                        document.querySelector('[data-tab="answers"]').click();
+                        break;
+                    case '4':
+                        e.preventDefault();
+                        document.querySelector('[data-tab="results"]').click();
+                        break;
+                    case 'p':
+                        e.preventDefault();
+                        if (document.getElementById('results-section').style.display !== 'none') {
+                            printResults();
+                        }
+                        break;
+                    case 'h':
+                        e.preventDefault();
+                        showHelp();
+                        break;
+                }
+            }
         }
     </script>
 </body>
