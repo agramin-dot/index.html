@@ -57,7 +57,7 @@
         .manual-answers{background:#f8f9fa;padding:15px;border-radius:8px;margin-top:15px}
         .manual-answers-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(80px, 1fr));gap:10px;margin-top:10px}
         .manual-answer-item{text-align:center}
-        .manual-answer-item input{width:100%;text-align:center;font-weight:bold}
+        .manual-answer-item select{width:100%;text-align:center;font-weight:bold;padding:5px}
         .camera-options{display:flex;gap:10px;margin-bottom:15px;flex-wrap:wrap}
         .camera-option-btn{flex:1;min-width:120px}
         .answer-sheet-preview{text-align:center;margin:20px 0}
@@ -65,8 +65,15 @@
         .answer-inputs{display:flex;gap:10px;margin-top:10px}
         .answer-input{flex:1;text-align:center}
         .answer-input label{display:block;margin-bottom:5px;font-weight:600}
-        .answer-input input{width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;text-align:center}
-        @media print{.no-print{display:none}.a5-container{box-shadow:none;margin:0}}
+        .answer-input input,.answer-input select{width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;text-align:center}
+        .printable-sheet{display:none}
+        @media print{
+            .no-print{display:none}
+            .a5-container{box-shadow:none;margin:0}
+            .printable-sheet{display:block}
+            body{background:white;padding:0}
+            .container{max-width:100%;box-shadow:none;border-radius:0}
+        }
         @media (max-width:768px){.tabs{flex-direction:column}.settings-grid{grid-template-columns:1fr}.questions-grid{grid-template-columns:repeat(3, 1fr)}.camera-options{flex-direction:column}}
     </style>
 </head>
@@ -112,6 +119,7 @@
             <div class="answer-sheet-preview">
                 <h3>پاسخنامه استاندارد</h3>
                 <p>برای بهترین نتایج، از پاسخنامه استاندارد زیر استفاده کنید:</p>
+                <button id="print-standard-sheet" class="btn-primary no-print">چاپ پاسخنامه استاندارد</button>
                 <div id="standard-sheet-preview">
                     <!-- پاسخنامه استاندارد در اینجا نمایش داده می‌شود -->
                 </div>
@@ -151,11 +159,19 @@
                     </div>
                     <div class="answer-input">
                         <label for="manual-answer-end">تا سوال شماره</label>
-                        <input type="number" id="manual-answer-end" value="50" min="1">
+                        <input type="number" id="manual-answer-end" value="20" min="1">
                     </div>
                     <div class="answer-input">
                         <label for="manual-answer-value">پاسخ صحیح</label>
-                        <input type="text" id="manual-answer-value" placeholder="A, B, C, ..." maxlength="1">
+                        <select id="manual-answer-value">
+                            <option value="">-- انتخاب کنید --</option>
+                            <option value="A">الف</option>
+                            <option value="B">ب</option>
+                            <option value="C">ج</option>
+                            <option value="D">د</option>
+                            <option value="E">ه</option>
+                            <option value="F">و</option>
+                        </select>
                     </div>
                 </div>
                 
@@ -181,7 +197,7 @@
             <div class="settings-grid">
                 <div class="setting-item">
                     <label for="num-questions">تعداد سوالات</label>
-                    <input type="number" id="num-questions" value="50" min="1" max="200">
+                    <input type="number" id="num-questions" value="20" min="1" max="200">
                 </div>
                 <div class="setting-item">
                     <label for="options-per-question">تعداد گزینه‌های هر سوال</label>
@@ -208,6 +224,45 @@
                     <li>بر روی دکمه پردازش کلیک کنید تا تصحیح خودکار انجام شود</li>
                     <li>نتایج را مشاهده و در صورت نیاز چاپ یا ذخیره کنید</li>
                 </ol>
+            </div>
+        </div>
+        
+        <!-- پاسخنامه استاندارد قابل چاپ -->
+        <div class="printable-sheet">
+            <div class="a5-container">
+                <div class="sheet-marker tl"></div>
+                <div class="sheet-marker tr"></div>
+                <div class="sheet-marker bl"></div>
+                <div class="sheet-marker br"></div>
+                
+                <h3 style="text-align: center; margin-bottom: 10px;">پاسخنامه استاندارد</h3>
+                
+                <div class="student-info">
+                    <div class="info-item">
+                        <label>نام دانشجو:</label>
+                        <span></span>
+                    </div>
+                    <div class="info-item">
+                        <label>شماره دانشجویی:</label>
+                        <span></span>
+                    </div>
+                    <div class="info-item">
+                        <label>تاریخ امتحان:</label>
+                        <span></span>
+                    </div>
+                    <div class="info-item">
+                        <label>درس:</label>
+                        <span></span>
+                    </div>
+                </div>
+                
+                <div class="questions-grid" id="printable-questions-container">
+                    <!-- سوالات به صورت دینامیک ایجاد می‌شوند -->
+                </div>
+                
+                <div style="margin-top: 20px; text-align: center; font-size: 12px;">
+                    <p>برای علامت‌گذاری پاسخ صحیح، دایره مربوط به گزینه مورد نظر را کاملاً پر کنید.</p>
+                </div>
             </div>
         </div>
         
@@ -262,7 +317,7 @@
         let correctAnswers = {};
         let ocrResults = {};
         let settings = {
-            numQuestions: 50,
+            numQuestions: 20, // پیش‌فرض 20 سوال
             optionsPerQuestion: 4,
             correctScore: 1,
             wrongScore: -0.25
@@ -292,6 +347,7 @@
             
             // ایجاد نمونه پاسخنامه
             createAnswerSheetTemplate();
+            createPrintableSheet();
             createStandardSheetPreview();
             createManualAnswersGrid();
             
@@ -315,6 +371,7 @@
             // رویدادهای نتایج
             document.getElementById('print-results').addEventListener('click', printResults);
             document.getElementById('export-results').addEventListener('click', exportResults);
+            document.getElementById('print-standard-sheet').addEventListener('click', printStandardSheet);
             
             // رویدادهای تنظیمات
             document.getElementById('save-settings').addEventListener('click', saveSettings);
@@ -471,7 +528,7 @@
             }
             
             if (!value.match(/^[A-F]$/)) {
-                alert('پاسخ باید یک حرف بین A تا F باشد.');
+                alert('لطفاً یک گزینه صحیح انتخاب کنید.');
                 return;
             }
             
@@ -479,7 +536,7 @@
                 correctAnswers[i] = value;
             }
             
-            alert(`پاسخ‌های سوالات ${start} تا ${end} به "${value}" تنظیم شد.`);
+            alert(`پاسخ‌های سوالات ${start} تا ${end} به "${getPersianOption(value)}" تنظیم شد.`);
             updateManualAnswersGrid();
         }
         
@@ -491,6 +548,19 @@
             }
         }
         
+        // تبدیل حروف انگلیسی به فارسی
+        function getPersianOption(option) {
+            const optionsMap = {
+                'A': 'الف',
+                'B': 'ب',
+                'C': 'ج',
+                'D': 'د',
+                'E': 'ه',
+                'F': 'و'
+            };
+            return optionsMap[option] || option;
+        }
+        
         function createManualAnswersGrid() {
             const container = document.getElementById('manual-answers-container');
             container.innerHTML = '';
@@ -500,14 +570,22 @@
                 answerItem.className = 'manual-answer-item';
                 answerItem.innerHTML = `
                     <label for="answer-${i}">سوال ${i}</label>
-                    <input type="text" id="answer-${i}" class="manual-answer-input" maxlength="1" data-question="${i}">
+                    <select id="answer-${i}" class="manual-answer-input" data-question="${i}">
+                        <option value="">--</option>
+                        <option value="A">الف</option>
+                        <option value="B">ب</option>
+                        <option value="C">ج</option>
+                        <option value="D">د</option>
+                        <option value="E">ه</option>
+                        <option value="F">و</option>
+                    </select>
                 `;
                 container.appendChild(answerItem);
             }
             
             // افزودن رویداد تغییر به فیلدهای ورودی
-            document.querySelectorAll('.manual-answer-input').forEach(input => {
-                input.addEventListener('change', function() {
+            document.querySelectorAll('.manual-answer-input').forEach(select => {
+                select.addEventListener('change', function() {
                     const questionNum = parseInt(this.getAttribute('data-question'));
                     const value = this.value.toUpperCase();
                     
@@ -515,18 +593,15 @@
                         delete correctAnswers[questionNum];
                     } else if (value.match(/^[A-F]$/)) {
                         correctAnswers[questionNum] = value;
-                    } else {
-                        this.value = '';
-                        alert('پاسخ باید یک حرف بین A تا F باشد.');
                     }
                 });
             });
         }
         
         function updateManualAnswersGrid() {
-            document.querySelectorAll('.manual-answer-input').forEach(input => {
-                const questionNum = parseInt(input.getAttribute('data-question'));
-                input.value = correctAnswers[questionNum] || '';
+            document.querySelectorAll('.manual-answer-input').forEach(select => {
+                const questionNum = parseInt(select.getAttribute('data-question'));
+                select.value = correctAnswers[questionNum] || '';
             });
         }
         
@@ -703,7 +778,7 @@
                             <tr>
                                 <td>${qNum}</td>
                                 <td>${detail.detected || '---'}</td>
-                                <td>${detail.correct}</td>
+                                <td>${getPersianOption(detail.correct)}</td>
                                 <td class="${detail.status}">${detail.status === 'correct' ? 'صحیح' : detail.status === 'incorrect' ? 'غلط' : 'خالی'}</td>
                             </tr>
                         `;
@@ -722,6 +797,23 @@
         // چاپ نتایج
         function printResults() {
             window.print();
+        }
+        
+        // چاپ پاسخنامه استاندارد
+        function printStandardSheet() {
+            // به‌روزرسانی پاسخنامه قابل چاپ
+            createPrintableSheet();
+            
+            // چاپ فقط پاسخنامه استاندارد
+            const originalContents = document.body.innerHTML;
+            const printableSheet = document.querySelector('.printable-sheet').innerHTML;
+            
+            document.body.innerHTML = printableSheet;
+            window.print();
+            document.body.innerHTML = originalContents;
+            
+            // بازگرداندن رویدادها
+            window.location.reload();
         }
         
         // خروجی Excel از نتایج
@@ -772,7 +864,7 @@
         }
         
         function saveSettings() {
-            settings.numQuestions = parseInt(document.getElementById('num-questions').value) || 50;
+            settings.numQuestions = parseInt(document.getElementById('num-questions').value) || 20;
             settings.optionsPerQuestion = parseInt(document.getElementById('options-per-question').value) || 4;
             settings.correctScore = parseFloat(document.getElementById('correct-score').value) || 1;
             settings.wrongScore = parseFloat(document.getElementById('wrong-score').value) || -0.25;
@@ -780,6 +872,7 @@
             localStorage.setItem('answerSheetSettings', JSON.stringify(settings));
             
             createAnswerSheetTemplate();
+            createPrintableSheet();
             createStandardSheetPreview();
             createManualAnswersGrid();
             
@@ -806,7 +899,7 @@
                 questionCell.innerHTML = `
                     <div class="question-number">${i}</div>
                     <div class="option-bubbles">
-                        ${options.map(opt => `<span class="option-bubble" data-question="${i}" data-option="${opt}">${opt}</span>`).join('')}
+                        ${options.map(opt => `<span class="option-bubble" data-question="${i}" data-option="${opt}">${getPersianOption(opt)}</span>`).join('')}
                     </div>
                 `;
                 container.appendChild(questionCell);
@@ -814,6 +907,26 @@
             
             // به‌روزرسانی تعداد سوالات در خلاصه
             document.getElementById('total-questions').textContent = settings.numQuestions;
+        }
+        
+        // ایجاد پاسخنامه قابل چاپ
+        function createPrintableSheet() {
+            const container = document.getElementById('printable-questions-container');
+            container.innerHTML = '';
+            
+            const options = ['A', 'B', 'C', 'D', 'E', 'F'].slice(0, settings.optionsPerQuestion);
+            
+            for (let i = 1; i <= settings.numQuestions; i++) {
+                const questionCell = document.createElement('div');
+                questionCell.className = 'question-cell';
+                questionCell.innerHTML = `
+                    <div class="question-number">${i}</div>
+                    <div class="option-bubbles">
+                        ${options.map(opt => `<span class="option-bubble">${getPersianOption(opt)}</span>`).join('')}
+                    </div>
+                `;
+                container.appendChild(questionCell);
+            }
         }
         
         // ایجاد پیش‌نمایش پاسخنامه استاندارد
@@ -829,7 +942,7 @@
                                     <div style="font-weight: bold;">${i+1}</div>
                                     <div style="display: flex; justify-content: center; gap: 3px;">
                                         ${['A','B','C','D','E','F'].slice(0, settings.optionsPerQuestion).map(opt => 
-                                            `<div style="width: 15px; height: 15px; border: 1px solid #000; border-radius: 50%;"></div>`
+                                            `<div style="width: 15px; height: 15px; border: 1px solid #000; border-radius: 50%;">${getPersianOption(opt)}</div>`
                                         ).join('')}
                                     </div>
                                 </div>
