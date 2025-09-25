@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>اپلیکیشن تصحیح خودکار پاسخنامه واقعی</title>
+    <title>اپلیکیشن تصحیح خودکار پاسخنامه استاندارد</title>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
@@ -29,10 +29,12 @@
         .sheet-marker.tl{top:5mm;left:5mm}.sheet-marker.tr{top:5mm;right:5mm}.sheet-marker.bl{bottom:5mm;left:5mm}.sheet-marker.br{bottom:5mm;right:5mm}
         .student-info{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:10px;font-size:12px}
         .info-item{display:flex;align-items:center}.info-item label{width:100px;font-weight:bold}.info-item span{flex:1;border-bottom:1px dashed #999;height:18px}
-        .questions-two-column{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
-        .question-item{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dotted #ccc;font-size:12px}
-        .option-bubble{width:18px;height:18px;border:1.5px solid #333;border-radius:50%;display:inline-flex;justify-content:center;align-items:center;font-size:10px;margin-left:4px}
-        .option-bubble.filled::after{content:'';width:12px;height:12px;background:black;border-radius:50%}
+        .questions-grid{display:grid;grid-template-columns:repeat(5, 1fr);gap:5px;margin-top:15px}
+        .question-cell{text-align:center;padding:5px;border:1px solid #ddd;border-radius:4px;font-size:12px}
+        .question-number{font-weight:bold;margin-bottom:5px}
+        .option-bubbles{display:flex;justify-content:center;gap:3px}
+        .option-bubble{width:16px;height:16px;border:1px solid #333;border-radius:50%;display:inline-flex;justify-content:center;align-items:center;font-size:9px}
+        .option-bubble.filled::after{content:'';width:10px;height:10px;background:black;border-radius:50%}
         .results-summary{margin-top:10px;padding:10px;border:1px solid #ddd;border-radius:4px;background:#f9f9f9;font-size:12px}
         .summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
         .file-input-container{margin:15px 0}
@@ -52,38 +54,50 @@
         .instructions{background:#f0f9ff;padding:15px;border-radius:8px;margin-top:20px;font-size:.9rem}
         .instructions ol{padding-right:20px;margin-top:10px}
         .instructions li{margin-bottom:5px}
+        .manual-answers{background:#f8f9fa;padding:15px;border-radius:8px;margin-top:15px}
+        .manual-answers-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(80px, 1fr));gap:10px;margin-top:10px}
+        .manual-answer-item{text-align:center}
+        .manual-answer-item input{width:100%;text-align:center;font-weight:bold}
+        .camera-options{display:flex;gap:10px;margin-bottom:15px;flex-wrap:wrap}
+        .camera-option-btn{flex:1;min-width:120px}
+        .answer-sheet-preview{text-align:center;margin:20px 0}
+        .answer-sheet-preview img{max-width:100%;border:1px solid #ddd;border-radius:8px;box-shadow:0 3px 10px rgba(0,0,0,.1)}
+        .answer-inputs{display:flex;gap:10px;margin-top:10px}
+        .answer-input{flex:1;text-align:center}
+        .answer-input label{display:block;margin-bottom:5px;font-weight:600}
+        .answer-input input{width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;text-align:center}
         @media print{.no-print{display:none}.a5-container{box-shadow:none;margin:0}}
-        @media (max-width:768px){.tabs{flex-direction:column}.settings-grid{grid-template-columns:1fr}.questions-two-column{grid-template-columns:1fr}}
+        @media (max-width:768px){.tabs{flex-direction:column}.settings-grid{grid-template-columns:1fr}.questions-grid{grid-template-columns:repeat(3, 1fr)}.camera-options{flex-direction:column}}
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>اپلیکیشن تصحیح خودکار پاسخنامه واقعی</h1>
+            <h1>اپلیکیشن تصحیح خودکار پاسخنامه استاندارد</h1>
             <p>با استفاده از هوش مصنوعی و پردازش تصویر، پاسخنامه‌های شما را به صورت خودکار تصحیح می‌کند</p>
         </header>
         
         <div class="tabs">
             <button class="tab-btn active" data-tab="camera">دوربین</button>
             <button class="tab-btn" data-tab="upload">آپلود تصویر</button>
+            <button class="tab-btn" data-tab="answers">پاسخ‌های صحیح</button>
             <button class="tab-btn" data-tab="results">نتایج</button>
             <button class="tab-btn" data-tab="settings">تنظیمات</button>
         </div>
         
         <div class="tab-content active" id="camera-tab">
+            <div class="camera-options">
+                <button id="start-camera-back" class="btn-primary camera-option-btn">دوربین اصلی (عقب)</button>
+                <button id="start-camera-front" class="btn-secondary camera-option-btn">دوربین سلفی (جلو)</button>
+            </div>
+            
             <div id="camera-view">
                 <p>برای شروع، دوربین را فعال کنید</p>
             </div>
             <div class="controls">
-                <button id="start-camera" class="btn-primary">شروع دوربین</button>
                 <button id="capture-btn" class="btn-success" disabled>عکس‌برداری</button>
                 <button id="stop-camera" class="btn-danger" disabled>توقف دوربین</button>
                 <button id="reset-btn" class="btn-secondary">بازنشانی</button>
-            </div>
-            
-            <div class="file-input-container">
-                <label for="excel-file-camera">آپلود فایل پاسخ‌های صحیح (Excel)</label>
-                <input type="file" id="excel-file-camera" accept=".xlsx, .xls">
             </div>
             
             <div class="progress-container no-print">
@@ -94,17 +108,20 @@
             </div>
             
             <button id="process-camera" class="btn-primary" disabled>پردازش تصویر</button>
+            
+            <div class="answer-sheet-preview">
+                <h3>پاسخنامه استاندارد</h3>
+                <p>برای بهترین نتایج، از پاسخنامه استاندارد زیر استفاده کنید:</p>
+                <div id="standard-sheet-preview">
+                    <!-- پاسخنامه استاندارد در اینجا نمایش داده می‌شود -->
+                </div>
+            </div>
         </div>
         
         <div class="tab-content" id="upload-tab">
             <div class="file-input-container">
                 <label for="image-file">آپلود تصویر پاسخنامه</label>
                 <input type="file" id="image-file" accept="image/*">
-            </div>
-            
-            <div class="file-input-container">
-                <label for="excel-file-upload">آپلود فایل پاسخ‌های صحیح (Excel)</label>
-                <input type="file" id="excel-file-upload" accept=".xlsx, .xls">
             </div>
             
             <div class="progress-container no-print">
@@ -115,6 +132,40 @@
             </div>
             
             <button id="process-upload" class="btn-primary" disabled>پردازش تصویر</button>
+        </div>
+        
+        <div class="tab-content" id="answers-tab">
+            <div class="file-input-container">
+                <label for="excel-file">آپلود فایل پاسخ‌های صحیح (Excel)</label>
+                <input type="file" id="excel-file" accept=".xlsx, .xls">
+            </div>
+            
+            <div class="manual-answers">
+                <h3>ورود دستی پاسخ‌های صحیح</h3>
+                <p>می‌توانید پاسخ‌های صحیح را به صورت دستی وارد کنید:</p>
+                
+                <div class="answer-inputs">
+                    <div class="answer-input">
+                        <label for="manual-answer-start">از سوال شماره</label>
+                        <input type="number" id="manual-answer-start" value="1" min="1">
+                    </div>
+                    <div class="answer-input">
+                        <label for="manual-answer-end">تا سوال شماره</label>
+                        <input type="number" id="manual-answer-end" value="50" min="1">
+                    </div>
+                    <div class="answer-input">
+                        <label for="manual-answer-value">پاسخ صحیح</label>
+                        <input type="text" id="manual-answer-value" placeholder="A, B, C, ..." maxlength="1">
+                    </div>
+                </div>
+                
+                <button id="set-manual-answers" class="btn-primary">اعمال پاسخ‌ها</button>
+                <button id="clear-manual-answers" class="btn-secondary">پاک کردن همه پاسخ‌ها</button>
+            </div>
+            
+            <div class="manual-answers-grid" id="manual-answers-container">
+                <!-- پاسخ‌های دستی در اینجا نمایش داده می‌شوند -->
+            </div>
         </div>
         
         <div class="tab-content" id="results-tab">
@@ -146,11 +197,13 @@
                 </div>
             </div>
             
+            <button id="save-settings" class="btn-primary">ذخیره تنظیمات</button>
+            
             <div class="instructions">
                 <h3>راهنمای استفاده:</h3>
                 <ol>
                     <li>ابتدا تعداد سوالات و گزینه‌ها را در بخش تنظیمات مشخص کنید</li>
-                    <li>فایل Excel حاوی پاسخ‌های صحیح را آپلود کنید (ستون اول شماره سوال، ستون دوم گزینه صحیح)</li>
+                    <li>پاسخ‌های صحیح را از طریق تب "پاسخ‌های صحیح" وارد کنید (اکسل یا دستی)</li>
                     <li>از طریق دوربین یا آپلود تصویر، پاسخنامه را وارد سیستم کنید</li>
                     <li>بر روی دکمه پردازش کلیک کنید تا تصحیح خودکار انجام شود</li>
                     <li>نتایج را مشاهده و در صورت نیاز چاپ یا ذخیره کنید</li>
@@ -185,7 +238,7 @@
                 </div>
             </div>
             
-            <div class="questions-two-column" id="questions-container">
+            <div class="questions-grid" id="questions-container">
                 <!-- سوالات به صورت دینامیک ایجاد می‌شوند -->
             </div>
             
@@ -205,6 +258,7 @@
     <script>
         // متغیرهای جهانی
         let stream = null;
+        let currentCamera = 'environment'; // پیش‌فرض دوربین عقب
         let correctAnswers = {};
         let ocrResults = {};
         let settings = {
@@ -238,9 +292,12 @@
             
             // ایجاد نمونه پاسخنامه
             createAnswerSheetTemplate();
+            createStandardSheetPreview();
+            createManualAnswersGrid();
             
             // رویدادهای دوربین
-            document.getElementById('start-camera').addEventListener('click', startCamera);
+            document.getElementById('start-camera-back').addEventListener('click', () => startCamera('environment'));
+            document.getElementById('start-camera-front').addEventListener('click', () => startCamera('user'));
             document.getElementById('stop-camera').addEventListener('click', stopCamera);
             document.getElementById('capture-btn').addEventListener('click', captureImage);
             document.getElementById('reset-btn').addEventListener('click', resetCamera);
@@ -248,34 +305,48 @@
             
             // رویدادهای آپلود
             document.getElementById('image-file').addEventListener('change', handleImageUpload);
-            document.getElementById('excel-file-camera').addEventListener('change', handleExcelUpload);
-            document.getElementById('excel-file-upload').addEventListener('change', handleExcelUpload);
             document.getElementById('process-upload').addEventListener('click', () => processImage('upload'));
+            
+            // رویدادهای پاسخ‌های صحیح
+            document.getElementById('excel-file').addEventListener('change', handleExcelUpload);
+            document.getElementById('set-manual-answers').addEventListener('click', setManualAnswers);
+            document.getElementById('clear-manual-answers').addEventListener('click', clearManualAnswers);
             
             // رویدادهای نتایج
             document.getElementById('print-results').addEventListener('click', printResults);
             document.getElementById('export-results').addEventListener('click', exportResults);
             
             // رویدادهای تنظیمات
-            document.getElementById('num-questions').addEventListener('change', updateSettings);
-            document.getElementById('options-per-question').addEventListener('change', updateSettings);
-            document.getElementById('correct-score').addEventListener('change', updateSettings);
-            document.getElementById('wrong-score').addEventListener('change', updateSettings);
+            document.getElementById('save-settings').addEventListener('click', saveSettings);
         });
         
         // توابع مربوط به دوربین
-        async function startCamera() {
+        async function startCamera(cameraType) {
+            currentCamera = cameraType;
+            
             try {
-                stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                const constraints = {
+                    video: { 
+                        facingMode: cameraType,
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    }
+                };
+                
+                stream = await navigator.mediaDevices.getUserMedia(constraints);
                 const cameraView = document.getElementById('camera-view');
                 cameraView.innerHTML = '<video id="video" autoplay playsinline style="width:100%;height:100%;object-fit:contain;"></video>';
                 const video = document.getElementById('video');
                 video.srcObject = stream;
                 
                 // فعال/غیرفعال کردن دکمه‌ها
-                document.getElementById('start-camera').disabled = true;
+                document.getElementById('start-camera-back').disabled = true;
+                document.getElementById('start-camera-front').disabled = true;
                 document.getElementById('stop-camera').disabled = false;
                 document.getElementById('capture-btn').disabled = false;
+                
+                // نمایش پیام راهنما
+                document.getElementById('status-text').textContent = 'دوربین فعال شد. پاسخنامه را در مرکز تصویر قرار دهید.';
             } catch (err) {
                 console.error('خطا در دسترسی به دوربین:', err);
                 alert('دسترسی به دوربین ممکن نیست. لطفاً مجوزهای لازم را بررسی کنید.');
@@ -292,9 +363,13 @@
             cameraView.innerHTML = '<p>دوربین متوقف شد</p>';
             
             // فعال/غیرفعال کردن دکمه‌ها
-            document.getElementById('start-camera').disabled = false;
+            document.getElementById('start-camera-back').disabled = false;
+            document.getElementById('start-camera-front').disabled = false;
             document.getElementById('stop-camera').disabled = true;
             document.getElementById('capture-btn').disabled = true;
+            document.getElementById('process-camera').disabled = true;
+            
+            document.getElementById('status-text').textContent = 'دوربین متوقف شد';
         }
         
         function captureImage() {
@@ -313,12 +388,13 @@
             
             // فعال کردن دکمه پردازش
             document.getElementById('process-camera').disabled = false;
+            document.getElementById('status-text').textContent = 'تصویر با موفقیت گرفته شد. اکنون می‌توانید پردازش را آغاز کنید.';
         }
         
         function resetCamera() {
             stopCamera();
-            document.getElementById('process-camera').disabled = true;
             document.getElementById('camera-view').innerHTML = '<p>برای شروع، دوربین را فعال کنید</p>';
+            document.getElementById('status-text').textContent = 'آماده';
         }
         
         // توابع مربوط به آپلود فایل
@@ -344,6 +420,7 @@
                 
                 // فعال کردن دکمه پردازش
                 document.getElementById('process-upload').disabled = false;
+                document.getElementById('status-text-upload').textContent = 'تصویر با موفقیت آپلود شد. اکنون می‌توانید پردازش را آغاز کنید.';
             }
         }
         
@@ -370,6 +447,9 @@
                         
                         console.log('پاسخ‌های صحیح بارگذاری شد:', correctAnswers);
                         alert(`فایل پاسخ‌های صحیح با ${Object.keys(correctAnswers).length} سوال بارگذاری شد.`);
+                        
+                        // به‌روزرسانی شبکه پاسخ‌های دستی
+                        updateManualAnswersGrid();
                     } catch (err) {
                         console.error('خطا در خواندن فایل Excel:', err);
                         alert('خطا در خواندن فایل Excel. لطفاً فرمت فایل را بررسی کنید.');
@@ -377,6 +457,77 @@
                 };
                 reader.readAsArrayBuffer(file);
             }
+        }
+        
+        // توابع مربوط به پاسخ‌های دستی
+        function setManualAnswers() {
+            const start = parseInt(document.getElementById('manual-answer-start').value);
+            const end = parseInt(document.getElementById('manual-answer-end').value);
+            const value = document.getElementById('manual-answer-value').value.toUpperCase();
+            
+            if (isNaN(start) || isNaN(end) || start > end || start < 1 || end > settings.numQuestions) {
+                alert('مقادیر وارد شده معتبر نیستند.');
+                return;
+            }
+            
+            if (!value.match(/^[A-F]$/)) {
+                alert('پاسخ باید یک حرف بین A تا F باشد.');
+                return;
+            }
+            
+            for (let i = start; i <= end; i++) {
+                correctAnswers[i] = value;
+            }
+            
+            alert(`پاسخ‌های سوالات ${start} تا ${end} به "${value}" تنظیم شد.`);
+            updateManualAnswersGrid();
+        }
+        
+        function clearManualAnswers() {
+            if (confirm('آیا از پاک کردن همه پاسخ‌های صحیح اطمینان دارید؟')) {
+                correctAnswers = {};
+                updateManualAnswersGrid();
+                alert('همه پاسخ‌های صحیح پاک شدند.');
+            }
+        }
+        
+        function createManualAnswersGrid() {
+            const container = document.getElementById('manual-answers-container');
+            container.innerHTML = '';
+            
+            for (let i = 1; i <= settings.numQuestions; i++) {
+                const answerItem = document.createElement('div');
+                answerItem.className = 'manual-answer-item';
+                answerItem.innerHTML = `
+                    <label for="answer-${i}">سوال ${i}</label>
+                    <input type="text" id="answer-${i}" class="manual-answer-input" maxlength="1" data-question="${i}">
+                `;
+                container.appendChild(answerItem);
+            }
+            
+            // افزودن رویداد تغییر به فیلدهای ورودی
+            document.querySelectorAll('.manual-answer-input').forEach(input => {
+                input.addEventListener('change', function() {
+                    const questionNum = parseInt(this.getAttribute('data-question'));
+                    const value = this.value.toUpperCase();
+                    
+                    if (value === '') {
+                        delete correctAnswers[questionNum];
+                    } else if (value.match(/^[A-F]$/)) {
+                        correctAnswers[questionNum] = value;
+                    } else {
+                        this.value = '';
+                        alert('پاسخ باید یک حرف بین A تا F باشد.');
+                    }
+                });
+            });
+        }
+        
+        function updateManualAnswersGrid() {
+            document.querySelectorAll('.manual-answer-input').forEach(input => {
+                const questionNum = parseInt(input.getAttribute('data-question'));
+                input.value = correctAnswers[questionNum] || '';
+            });
         }
         
         // توابع مربوط به پردازش تصویر با OCR
@@ -406,7 +557,7 @@
             }
             
             if (Object.keys(correctAnswers).length === 0) {
-                alert('لطفاً ابتدا فایل پاسخ‌های صحیح را آپلود کنید.');
+                alert('لطفاً ابتدا پاسخ‌های صحیح را وارد کنید.');
                 return;
             }
             
@@ -621,17 +772,18 @@
         }
         
         function saveSettings() {
-            localStorage.setItem('answerSheetSettings', JSON.stringify(settings));
-        }
-        
-        function updateSettings() {
             settings.numQuestions = parseInt(document.getElementById('num-questions').value) || 50;
             settings.optionsPerQuestion = parseInt(document.getElementById('options-per-question').value) || 4;
             settings.correctScore = parseFloat(document.getElementById('correct-score').value) || 1;
             settings.wrongScore = parseFloat(document.getElementById('wrong-score').value) || -0.25;
             
-            saveSettings();
+            localStorage.setItem('answerSheetSettings', JSON.stringify(settings));
+            
             createAnswerSheetTemplate();
+            createStandardSheetPreview();
+            createManualAnswersGrid();
+            
+            alert('تنظیمات با موفقیت ذخیره شد.');
         }
         
         function updateSettingsForm() {
@@ -646,41 +798,48 @@
             const container = document.getElementById('questions-container');
             container.innerHTML = '';
             
-            const half = Math.ceil(settings.numQuestions / 2);
             const options = ['A', 'B', 'C', 'D', 'E', 'F'].slice(0, settings.optionsPerQuestion);
             
-            // ستون اول
-            let column1 = document.createElement('div');
-            for (let i = 1; i <= half; i++) {
-                const questionItem = document.createElement('div');
-                questionItem.className = 'question-item';
-                questionItem.innerHTML = `
-                    <span>${i}.</span>
-                    <div>
+            for (let i = 1; i <= settings.numQuestions; i++) {
+                const questionCell = document.createElement('div');
+                questionCell.className = 'question-cell';
+                questionCell.innerHTML = `
+                    <div class="question-number">${i}</div>
+                    <div class="option-bubbles">
                         ${options.map(opt => `<span class="option-bubble" data-question="${i}" data-option="${opt}">${opt}</span>`).join('')}
                     </div>
                 `;
-                column1.appendChild(questionItem);
+                container.appendChild(questionCell);
             }
-            container.appendChild(column1);
-            
-            // ستون دوم
-            let column2 = document.createElement('div');
-            for (let i = half + 1; i <= settings.numQuestions; i++) {
-                const questionItem = document.createElement('div');
-                questionItem.className = 'question-item';
-                questionItem.innerHTML = `
-                    <span>${i}.</span>
-                    <div>
-                        ${options.map(opt => `<span class="option-bubble" data-question="${i}" data-option="${opt}">${opt}</span>`).join('')}
-                    </div>
-                `;
-                column2.appendChild(questionItem);
-            }
-            container.appendChild(column2);
             
             // به‌روزرسانی تعداد سوالات در خلاصه
             document.getElementById('total-questions').textContent = settings.numQuestions;
+        }
+        
+        // ایجاد پیش‌نمایش پاسخنامه استاندارد
+        function createStandardSheetPreview() {
+            const container = document.getElementById('standard-sheet-preview');
+            container.innerHTML = `
+                <div style="text-align: center; margin: 20px 0;">
+                    <p>پاسخنامه استاندارد شامل ${settings.numQuestions} سوال با ${settings.optionsPerQuestion} گزینه</p>
+                    <div style="display: inline-block; border: 2px solid #333; padding: 20px; margin: 10px; background: white;">
+                        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;">
+                            ${Array.from({length: Math.min(20, settings.numQuestions)}, (_, i) => `
+                                <div style="text-align: center; border: 1px solid #ccc; padding: 5px;">
+                                    <div style="font-weight: bold;">${i+1}</div>
+                                    <div style="display: flex; justify-content: center; gap: 3px;">
+                                        ${['A','B','C','D','E','F'].slice(0, settings.optionsPerQuestion).map(opt => 
+                                            `<div style="width: 15px; height: 15px; border: 1px solid #000; border-radius: 50%;"></div>`
+                                        ).join('')}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        ${settings.numQuestions > 20 ? `<p style="margin-top: 10px;">... و ${settings.numQuestions - 20} سوال دیگر</p>` : ''}
+                    </div>
+                    <p style="margin-top: 10px;">برای بهترین نتایج، از پاسخنامه با این فرمت استفاده کنید.</p>
+                </div>
+            `;
         }
         
         // به‌روزرسانی نمونه پاسخنامه با نتایج
