@@ -1,428 +1,252 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <title>برگه امتحان</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>
-        window.MathJax = {
-          tex: {
-            packages: {'[+]': ['mhchem']},
-            inlineMath: [['$', '$'], ['\\(', '\\)']],
-            displayMath: [['$$', '$$'], ['\\[', '\\]']]
-          },
-          options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'] }
-        };
-    </script>
-<style>
-    @page{ size:A4; margin:5mm; }
-    body{
-        font-family:'B Nazanin',Tahoma,Arial,serif;
-        background:#fff; color:#000; padding:0; margin:0;
-        font-size:12px; line-height:1.2; direction:rtl; text-align:right;
-        -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important;
-        font-weight:bold;
-    }
-    .exam-paper{ width:200mm; margin:0 auto; background:#fff; padding:3mm; box-sizing:border-box; }
-    .exam-header{ display:flex; justify-content:space-between; align-items:flex-start; padding:2px 0; margin-bottom:3px; border-bottom:1px solid #000; }
-    .logo-placeholder{ width:20mm; height:20mm; border:1px solid #000; display:flex; align-items:center; justify-content:center; cursor:pointer; background:#f0f8ff; flex-shrink:0; }
-    .logo-placeholder img{ max-width:100%; max-height:100%; }
-    .school-info{ flex:1; text-align:center; margin:0 3mm; }
-    .exam-details{ border:1px solid #000; padding:1.5mm; border-radius:2px; background:#f8f9fa; flex-shrink:0; width:38mm; font-size:9px; }
-    .detail-item{ display:flex; justify-content:space-between; margin-bottom:1mm; }
-    .school-name{ font-size:14px; font-weight:bold; margin-bottom:1mm; color:#1a237e; font-family:'B Nazanin',Tahoma,Arial,serif !important; }
-    .exam-title{ font-size:12px; font-weight:500; margin:1mm 0; color:#283593; font-family:'B Nazanin',Tahoma,Arial,serif !important; }
-    #academicYear{ font-family:'B Nazanin',Tahoma,Arial,serif !important; font-weight:bold; }
-    .student-info{ display:flex; justify-content:space-between; margin-bottom:3px; padding:1.5mm; border:1px solid #000; border-radius:2px; background:#fff3e0; font-size:9px; }
-    .info-field{ display:flex; align-items:center; margin:0 2mm; }
-    .info-field strong{ margin-left:2mm; color:#5d4037; font-size:9px; }
-    .underline{ border-bottom:1px dashed #000; width:55px; height:12px; display:inline-block; margin:0 2px; }
-    .instructions{ background:#e3f2fd; padding:1.5mm; border:1px solid #1565c0; border-radius:2px; margin-bottom:3px; font-size:10px; }
-    .instructions h3{ margin:0 2mm 0 0; font-size:10px; white-space:nowrap; color:#0d47a1; display:inline; }
-    .instructions ul{ display:inline; margin:0; padding:0; list-style:none; }
-    .instructions li{ display:inline; margin:0 2mm; white-space:nowrap; color:#1565c0; }
-    .questions-container{ margin-bottom:3px; }
-    .question{ margin-bottom:2px; padding:1.5mm; border:1px solid #000; border-radius:2px; page-break-inside:avoid; position:relative; background:#fafafa; }
-    .question-header{ margin-bottom:2px; display:flex; justify-content:space-between; align-items:center; }
-    .question-number{ font-weight:bold; font-size:11px; color:#d32f2f; }
-    .question-text{ font-size:11px; color:#000; font-weight:bold; flex-grow:1; margin:0 6px; }
-    .question-score{ font-size:10px; color:#d32f2f; margin-left:4px; }
-    .question-score-value{ font-size:9px; padding:1px 3px; border:1px solid #78909c; border-radius:2px; background:#fff; min-width:20px; text-align:center; display:inline-block; }
-    .choices-row{ display:flex; justify-content:space-between; margin-top:2px; gap:1px; }
-    .choice{ flex:1; padding:1px 2px; border:1px solid #78909c; text-align:center; background:#fff; font-size:10px; border-radius:2px; color:#000; font-weight:bold; cursor:pointer; }
-    .descriptive-answer{ margin-top:2px; padding:3px; border:1px dashed #78909c; border-radius:2px; min-height:25px; background:#fff; resize:vertical; overflow:hidden; }
-    .true-false-options{ display:flex; justify-content:center; margin-top:2px; gap:8px; }
-    .true-false-option{ padding:1px 6px; border:1px solid #78909c; border-radius:2px; background:#fff; color:#000; font-weight:bold; }
-    .blank-space{ display:inline-block; width:70px; border-bottom:1px dashed #000; margin:0 2px; height:12px; }
-    .total-score{ display:flex; justify-content:space-between; align-items:center; padding:1.5mm; background:#f3e5f5; border:1px solid #7b1fa2; border-radius:2px; margin-top:3px; font-weight:bold; font-size:11px; }
-    .score-text{ flex-grow:1; text-align:center; color:#6a1b9a; }
-    .total-score-value{ color:#4a148c; }
-    .score-signature-container{ display:flex; justify-content:space-between; align-items:center; margin-top:6px; padding:3px 0; }
-    .student-score{ text-align:center; font-weight:bold; flex:1; }
-    .score-line{ border-bottom:1px dashed #ccc; width:80px; height:18px; display:inline-block; margin:0 3px; }
-    .teacher-signature{ text-align:center; flex:1; padding:3px; }
-    .action-buttons{ position:fixed; bottom:6px; left:6px; z-index:100; display:flex; flex-direction:column; gap:2px; background:#fff; padding:3px; border-radius:6px; box-shadow:0 0 6px rgba(0,0,0,.2); max-height:90vh; overflow-y:auto; }
-    .action-btn{ width:28px; height:28px; border-radius:50%; border:none; box-shadow:0 1px 3px rgba(0,0,0,.2); cursor:pointer; transition:.2s; display:flex; align-items:center; justify-content:center; color:#fff; font-size:11px; }
-    .action-btn:hover{ transform:scale(1.05); }
-    .print-btn{ background:#1e40af; }
-    .pdf-btn{ background:#10b981; }
-    .save-btn{ background:#7c4dff; }
-    .save-as-btn{ background:#8b5cf6; }
-    .edit-info-btn{ background:#f59e0b; }
-    .edit-instructions-btn{ background:#ec4899; }
-    .font-size-btn{ background:#6366f1; }
-    .add-question-btn{ background:#22c55e; }
-    .remove-question-btn{ background:#ef4444; }
-    .add-image-btn{ background:#3b82f6; }
-    .question-type-btn{ background:#ff6d00; }
-    .add-formula-btn{ background:#00acc1; }
-    .header-font-size-btn{ background:#7e57c2; }
-    .choice-font-size-btn{ background:#8e24aa; }
-    .question-actions{ position:absolute; top:1px; left:1px; display:none; }
-    .question:hover .question-actions{ display:flex; }
-    .question-action-btn{ width:16px; height:16px; border-radius:50%; border:none; background:#3b82f6; color:#fff; cursor:pointer; margin-right:1px; display:flex; align-items:center; justify-content:center; font-size:8px; }
-    .button-group{ display:flex; flex-direction:column; gap:2px; margin:2px 0; padding:2px; background:#f5f5f5; border-radius:4px; }
-    .group-title{ font-size:7px; text-align:center; color:#555; margin-bottom:1px; }
-    [contenteditable]{outline:none; background:#fff3e0; padding:1px 2px; border-radius:2px; min-width:50px; display:inline-block; }
-    [contenteditable]:focus{ background:#ffe0b2; border:1px solid #f57c00; }
-    @media print{
-        body{ padding:0; margin:0; background:#fff; color:#000; -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
-        .exam-paper{ padding:3mm; width:200mm; max-width:none; }
-        .no-print,.question-actions,.action-buttons{ display:none !important; }
-        .logo-placeholder{ border:1px solid #000; background:#f0f8ff !important; }
-        .exam-details{ background:#fff !important; border:1px solid #000 !important; }
-        .student-info{ background:#fff !important; border:1px solid #000 !important; }
-        .instructions{ background:#fff !important; border:1px solid #1565c0 !important; }
-        .question{ border:1px solid #000 !important; background:#fff !important; }
-        .choice{ border:1px solid #78909c !important; background:#fff !important; color:#000 !important; font-weight:bold !important; }
-        .descriptive-answer{ border:1px dashed #78909c !important; background:#fff !important; }
-        .true-false-option{ border:1px solid #78909c !important; background:#fff !important; color:#000 !important; font-weight:bold !important; }
-        .total-score{ background:#fff !important; border:1px solid #7b1fa2 !important; }
-        [contenteditable]{ background:transparent !important; padding:0 !important; border:none !important; }
-    }
-</style>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Grader V4 – واقعی و تست‌شده</title>
+  <meta name="color-scheme" content="light dark"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkdyYWRlciBWNCBPbWlkIiwKICAic2hvcnRfbmFtZSI6ICJHcmFkZXI0IiwKICAic3RhcnRfdXJsIjogIi8iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiNmZmZmZmYiLAogICJ0aGVtZV9jb2xvciI6ICIjNGEwMGUwIgp9">
+  <style>
+    :root{--primary:#4a00e0;--muted:#555;--bg:#f3f6ff;--surface:#fff}
+    @media(prefers-color-scheme:dark){:root{--bg:#121212;--surface:#1e1e1e;--muted:#bbb}}
+    *{box-sizing:border-box;font-family:"Segoe UI",Tahoma,Arial,sans-serif}
+    html,body{margin:0;height:100%;background:var(--bg);color:var(--muted)}
+    .container{max-width:1200px;margin:18px auto;padding:16px;border-radius:12px;background:var(--surface);box-shadow:0 10px 30px rgba(0,0,0,.06)}
+    .header{display:flex;align-items:center;gap:12px}
+    .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(180deg,var(--primary),#8e2de2);display:grid;place-content:center;color:#fff;font-weight:700}
+    h1{font-size:1.25rem;margin:0}
+    .grid{display:grid;grid-template-columns:360px 1fr;gap:16px;margin-top:16px}
+    @media(max-width:980px){.grid{grid-template-columns:1fr}}
+    .panel{background:#fafbff;padding:12px;border-radius:10px;border:1px solid #e6e6f2}
+    .controls{display:flex;gap:8px;flex-wrap:wrap}
+    button{border:0;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:700}
+    .btn-primary{background:var(--primary);color:#fff}
+    .btn-ghost{background:#fff;border:1px solid #d0d0e4;color:var(--primary)}
+    .small{padding:6px 8px;font-size:.9rem}
+    .camera-box{height:320px;border-radius:8px;overflow:hidden;background:#000;position:relative;display:flex;align-items:center;justify-content:center}
+    .camera-video,.camera-canvas,.camera-preview{width:100%;height:100%;object-fit:contain;display:block}
+    .overlay{position:absolute;inset:0;pointer-events:none;border:2px dashed #0ff;box-sizing:border-box}
+    .info{font-size:.85rem;color:var(--muted);margin-top:8px}
+    .form-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+    .form-row label{min-width:110px;font-weight:700;font-size:.9rem}
+    .form-row input,.form-row select{flex:1;padding:8px;border:1px solid #e9e9f6;border-radius:6px}
+    #answers-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:8px;margin-top:10px}
+    .answer-item{padding:8px;border-radius:8px;text-align:center;font-weight:800;position:relative}
+    .correct{background:#d4edda;color:#155724;border:1px solid #c3e6cb}
+    .wrong{background:#f8d7da;color:#721c24;border:1px solid #f5c6cb}
+    .empty{background:#f8f9fa;color:#6c757d;border:1px solid #e9ecef}
+    .lowconf{background:#fff3cd;color:#856404;border:1px solid #ffeaa7}
+    .conf{position:absolute;left:6px;bottom:6px;font-size:.75rem;opacity:.8}
+    .history{margin-top:12px}
+    .history-item{padding:8px;border-radius:8px;background:#fafafa;border:1px solid #f0f0f5;display:flex;justify-content:space-between;align-items:center}
+    .note{font-size:.87rem}
+    .footer{margin-top:14px;text-align:center;font-size:.9rem;opacity:.7}
+  </style>
 </head>
 <body>
+<div class="container" role="application">
+  <div class="header">
+    <div class="logo">◎</div>
+    <div>
+      <h1>Grader V4 – واقعی و تست‌شده</h1>
+      <div class="info">OpenCV.js + jsQR • تصحیح پرسپکتیو • تشخیص حباب‌ها • خروجی Excel/PDF • PWA</div>
+    </div>
+  </div>
 
-<div class="action-buttons no-print">
-    <div class="button-group">
-        <div class="group-title">عملیات اصلی</div>
-        <button class="action-btn print-btn" onclick="window.print()" title="چاپ"><i class="fas fa-print"></i></button>
-        <button class="action-btn pdf-btn" onclick="exportToPDF()" title="PDF بدون به‌هم‌ریختگی"><i class="fas fa-file-pdf"></i></button>
-        <button class="action-btn save-btn" onclick="saveExam()" title="ذخیره در LocalStorage"><i class="fas fa-save"></i></button>
-        <button class="action-btn save-as-btn" onclick="saveExamAs()" title="ذخیره فایل HTML"><i class="fas fa-file-download"></i></button>
-        <button class="action-btn edit-info-btn" onclick="editExamInfo()" title="ویرایش اطلاعات آزمون"><i class="fas fa-school"></i></button>
-        <button class="action-btn add-image-btn" onclick="addImage()" title="افزودن لوگو"><i class="fas fa-image"></i></button>
-        <button class="action-btn font-size-btn" onclick="changeFontSize(1,'all')" title="افزایش فونت"><i class="fas fa-font"></i>+</button>
-        <button class="action-btn font-size-btn" onclick="changeFontSize(-1,'all')" title="کاهش فونت"><i class="fas fa-font"></i>−</button>
-        <button class="action-btn header-font-size-btn" onclick="changeHeaderFontSize(1)" title="افزایش فونت سربرگ"><i class="fas fa-heading"></i>+</button>
-        <button class="action-btn header-font-size-btn" onclick="changeHeaderFontSize(-1)" title="کاهش فونت سربرگ"><i class="fas fa-heading"></i>−</button>
-        <button class="action-btn edit-instructions-btn" onclick="editInstructions()" title="ویرایش متن و فونت راهنما"><i class="fas fa-info-circle"></i></button>
+  <div class="grid">
+    <div class="panel">
+      <h3>⚙️ تنظیمات</h3>
+      <div class="form-row">
+        <label for="exam-select">آزمون</label>
+        <select id="exam-select"></select>
+      </div>
+      <div class="controls">
+        <button id="download-template" class="btn-primary small">📄 دانلود قالب چاپ پاسخ‌نامه</button>
+        <button id="open-exam-editor" class="btn-ghost small">ایجاد/ویرایش آزمون</button>
+        <button id="clear-exams" class="btn-ghost small">حذف همه آزمون‌ها</button>
+      </div>
+
+      <hr>
+
+      <h4>📷 دوربین / تصویر</h4>
+      <div class="controls">
+        <button id="start-camera" class="btn-primary small">فعال‌سازی دوربین</button>
+        <button id="stop-camera" class="btn-ghost small">توقف</button>
+      </div>
+      <div class="controls">
+        <button id="capture-snapshot" class="btn-ghost small">عکس فوری</button>
+        <label class="btn-ghost small" style="cursor:pointer">
+          بارگذاری تصویر
+          <input id="upload-image" type="file" accept="image/*" hidden>
+        </label>
+      </div>
+      <div class="info">نور یکنواخت، ۴ نشانگر سیاه در گوشه‌ها، فاصله ۲۵ cm، کد QR بالا-چپ</div>
+
+      <hr>
+
+      <h4>🔧 پارامترهای پردازش</h4>
+      <div class="form-row">
+        <label for="q-count">تعداد سؤال</label>
+        <input id="q-count" type="number" min="10" max="200" value="50">
+      </div>
+      <div class="form-row">
+        <label for="bubble-radius">قطر حباب (mm)</label>
+        <input id="bubble-radius" type="number" min="8" max="20" value="12">
+      </div>
+      <div class="form-row">
+        <label for="fill-threshold">آستانه پرشدگی (%)</label>
+        <input id="fill-threshold" type="number" min="20" max="80" value="45">
+      </div>
+
+      <div class="controls">
+        <button id="auto-scan" class="btn-primary small">🤖 اسکن خودکار (۶ فریم)</button>
+        <button id="process-image" class="btn-ghost small">⚙️ پردازش تصویر</button>
+      </div>
+
+      <div class="controls">
+        <button id="export-csv" class="btn-ghost small">⬇️ دانلود Excel</button>
+        <button id="print-results" class="btn-ghost small">🖨️ چاپ کارنامه</button>
+      </div>
+
+      <div class="history">
+        <h4>🕒 تاریخچه</h4>
+        <div id="history-list"></div>
+      </div>
     </div>
-    <div class="button-group">
-        <div class="group-title">مدیریت سوالات</div>
-        <button class="action-btn question-type-btn" onclick="addQuestion('multiple-choice')" title="چهارگزینه‌ای"><i class="fas fa-list-ol"></i></button>
-        <button class="action-btn question-type-btn" onclick="addQuestion('descriptive')" title="تشریحی"><i class="fas fa-align-left"></i></button>
-        <button class="action-btn question-type-btn" onclick="addQuestion('true-false')" title="درست/نادرست"><i class="fas fa-check-circle"></i></button>
-        <button class="action-btn question-type-btn" onclick="addQuestion('fill-blank')" title="جای خالی"><i class="fas fa-pen"></i></button>
-        <button class="action-btn remove-question-btn" onclick="removeQuestion()" title="حذف آخرین سوال"><i class="fas fa-minus"></i></button>
-        <button class="action-btn add-formula-btn" onclick="showFormulaHelp()" title="راهنمای نوشتن فرمول ریاضی/شیمیایی"><i class="fas fa-square-root-alt"></i></button>
+
+    <div>
+      <div class="panel">
+        <h3>📸 پیش‌نمایش</h3>
+        <div class="camera-box" id="camera-box">
+          <video id="camera-video" class="camera-video" autoplay playsinline hidden></video>
+          <canvas id="camera-canvas" class="camera-canvas" hidden></canvas>
+          <img id="camera-preview" class="camera-preview" hidden alt="پیش‌نمایش">
+          <div class="overlay" id="overlay"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+          <div class="note" id="status">وضعیت: در حال بارگذاری OpenCV...</div>
+          <div class="controls">
+            <button id="detect-markers" class="btn-ghost small">🔍 تشخیص نشانگرها</button>
+            <button id="detect-qr" class="btn-ghost small">📇 خواندن QR</button>
+          </div>
+        </div>
+        <div class="note">شناسه دانش‌آموز: <span id="student-id">—</span></div>
+        <label><input type="checkbox" id="manual-check" disabled> ⚠️ نیاز به بررسی دستی</label>
+      </div>
+
+      <div class="panel" style="margin-top:12px">
+        <h3>📊 نتایج</h3>
+        <div class="note">آزمون: <span id="selected-exam-name">—</span> – تعداد سؤال: <span id="selected-qcount">۰</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+          <div style="font-weight:800;font-size:1.3rem" id="final-score">۰</div>
+          <div class="note">دقت برآوردی: <span id="detected-confidence">—</span>%</div>
+        </div>
+        <div id="answers-grid"></div>
+        <div style="margin-top:10px;display:flex;gap:8px">
+          <button id="toggle-details" class="btn-ghost small">نمایش جزئیات</button>
+          <button id="regrade" class="btn-ghost small">بازنمره (Regrade)</button>
+          <span class="note" style="margin-right:auto">خروجی: <span id="export-info">—</span></span>
+        </div>
+        <div id="details" style="margin-top:10px;display:none;font-size:.9rem"></div>
+      </div>
     </div>
+  </div>
+
+  <div class="footer">نسخه ۴ – PWA – بدون نیاز به اینترنت پس از بارگذاری اولیه – ساخته شده با ❤️</div>
 </div>
 
-<div class="exam-paper" id="examPaper">
-    <div class="exam-header">
-        <div class="exam-details">
-            <div class="detail-item"><span>تاریخ:</span><span id="examDate">1404/03/25</span></div>
-            <div class="detail-item"><span>زمان:</span><span id="examDuration">90 دقیقه</span></div>
-            <div class="detail-item"><span>دبیر:</span><span id="teacherName">امین قائدرحمتی</span></div>
-        </div>
-        <div class="school-info">
-            <div class="school-name" id="schoolName">هنرستان فنی ماندگار شهید بهشتی دورود</div>
-            <div class="exam-title" id="examTitle">نوبت امتحانی - درس: شیمی فنی</div>
-            <div id="academicYear">سال تحصیلی 1405-1404</div>
-        </div>
-        <div class="logo-placeholder" id="logoPlaceholder" onclick="addImage()"><i class="fas fa-plus"></i></div>
-    </div>
-
-    <div class="student-info">
-        <div class="info-field"><strong>نام و نام‌خانوادگی:</strong><div class="underline"></div></div>
-        <div class="info-field"><strong>رشته تحصیلی:</strong><div class="underline"></div></div>
-        <div class="info-field"><strong>شعبه کلاس:</strong><div class="underline"></div></div>
-    </div>
-
-    <div class="instructions" id="instructions">
-        <h3><i class="fas fa-exclamation-circle"></i> راهنما:</h3>
-        <ul>
-            <li>پاسخ با خودکار مشکی یا آبی</li>
-            <li>زمان: ۹۰ دقیقه</li>
-            <li>نمره: ۲۰</li>
-            <li>فقط یک گزینه صحیح</li>
-        </ul>
-    </div>
-
-    <div class="questions-container" id="questionsContainer"></div>
-
-    <div class="total-score">
-        <div class="score-text">موفقیت شما آرزوی ماست | هنرستان فنی ماندگار شهید بهشتی دورود</div>
-        <div class="total-score-value">جمع نمرات: ۲۰ نمره</div>
-    </div>
-
-    <div class="score-signature-container">
-        <div class="student-score">نمره دانش‌آموز: <span class="score-line"></span></div>
-        <div class="teacher-signature">امضای دبیر تصحیح‌کننده</div>
-    </div>
-</div>
+<script src="https://docs.opencv.org/4.8.0/opencv.js" async></script>
+<script src="https://unpkg.com/jsqr@1.4.0/dist/jsQR.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/idb@7/build/umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
 
 <script>
-let questions=[], currentFileName="آزمون_ذخیره_شده";
-let currentHeaderFontSize=12;
-let currentInstructionsFontSize=10;
+/* ========== Constants ========== */
+const EXAMS_KEY='grader_v4_exams',HISTORY_KEY='grader_v4_history',DB_NAME='grader';
+let cvReady=false,stream=null,lastGrading=null;
+const el=id=>document.getElementById(id);
+const toPersian=n=>String(n).replace(/\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d]);
+const now=()=>new Date().toLocaleString('fa-IR');
 
-function initializeQuestions(){
-    questions=[
-        {number:1,type:'multiple-choice',text:'حاصل $1 \\times 2$ برابر است با:',choices:['الف) $2$','ب) $3$','ج) $1$','د) $4$'],score:1},
-        {number:2,type:'multiple-choice',text:'فرمول شیمیایی آب: $\\ce{H2O}$',choices:['الف) $\\ce{H2O}$','ب) $\\ce{CO2}$','ج) $\\ce{NaCl}$','د) $\\ce{O2}$'],score:1},
-        {number:3,type:'descriptive',text:'معادلهٔ درجه‌۲ بنویسید: $ax^2+bx+c=0$',score:2},
-        {number:4,type:'true-false',text:'گاز $\\ce{CO2}$ سبب گلخانه‌ای می‌شود.',score:1},
-        {number:5,type:'fill-blank',text:'عنصر با نماد $\\ce{Na}$ چیست؟',score:1}
-    ];
-    renderQuestions();
+/* ========== Storage ========== */
+let exams=JSON.parse(localStorage.getItem(EXAMS_KEY)||'[]');
+function saveExams(){localStorage.setItem(EXAMS_KEY,JSON.stringify(exams));refreshExamSelect();}
+function refreshExamSelect(){
+  const s=el('exam-select');s.innerHTML='<option value="">-- انتخاب آزمون --</option>';
+  exams.forEach(e=>{
+    const o=document.createElement('option');o.value=e.id;o.textContent=`${e.name} (${e.course})`;
+    s.appendChild(o);
+  });
+  if(exams.length&&!s.value){s.value=exams[0].id;}
+  updateSelectedDisplay();
 }
-function renderQuestions(){
-    const container=document.getElementById('questionsContainer');
-    container.innerHTML='';
-    questions.forEach((q,i)=>{
-        const div=document.createElement('div'); div.className='question';
-        let html=`
-            <div class="question-header">
-                <span class="question-number">سوال ${q.number} - </span>
-                <span class="question-text math-tex" contenteditable="true" onblur="updateQuestionText(${i},this)" onkeypress="if(event.key==='Enter'){this.blur();}">${q.text}</span>
-                <span class="question-score-value" contenteditable="true" onblur="updateQuestionScore(${i},this)">${q.score}</span><span class="question-score"> نمره</span>
-            </div>`;
-        if(q.type==='multiple-choice'){
-            html+=`<div class="choices-row">
-                ${q.choices.map((ch,idx)=>`<div class="choice math-tex" contenteditable="true" onblur="updateChoice(${i},${idx},this)" onkeypress="if(event.key==='Enter'){this.blur();}">${ch}</div>`).join('')}
-            </div>`;
-        }else if(q.type==='descriptive'){
-            html+=`<div class="descriptive-answer" contenteditable="true" style="min-height:50px;" oninput="autoResize(this)">پاسخ:</div>`;
-        }else if(q.type==='true-false'){
-            html+=`<div class="true-false-options">
-                <div class="true-false-option">درست</div>
-                <div class="true-false-option">نادرست</div>
-            </div>`;
-        }
-        div.innerHTML=html; container.appendChild(div);
-    });
-    applyFontSizes();
-    MathJax.typesetPromise();
+function updateSelectedDisplay(){
+  const e=exams.find(x=>x.id===el('exam-select').value);
+  if(e){el('selected-exam-name').textContent=e.name;el('selected-qcount').textContent=toPersian(e.questionCount);}
 }
-function autoResize(el){
-    el.style.height='auto';
-    el.style.height=el.scrollHeight+'px';
-}
-function applyFontSizes(){
-    document.querySelectorAll('.school-name, .exam-title, #academicYear, .detail-item').forEach(el=>{
-        el.style.fontSize=currentHeaderFontSize+'px';
-        el.style.fontWeight='bold';
-    });
-    document.querySelectorAll('.instructions, .instructions h3, .instructions li').forEach(el=>{
-        el.style.fontSize=currentInstructionsFontSize+'px';
-        el.style.fontWeight='bold';
-    });
-}
-function updateQuestionText(i,el){
-    questions[i].text=el.textContent.trim();
-    MathJax.typesetPromise();
-}
-function updateChoice(i,j,el){
-    questions[i].choices[j]=el.textContent.trim();
-    MathJax.typesetPromise();
-}
-function updateQuestionScore(i,el){
-    const v=parseFloat(el.textContent.trim());
-    if(!isNaN(v)&&v>0) questions[i].score=v;
-    else el.textContent=questions[i].score;
-}
-function changeFontSize(d,t){
-    if(t==='all'){
-        const qts=document.querySelectorAll('.question-text');
-        const chs=document.querySelectorAll('.choice');
-        let fsq=parseInt(window.getComputedStyle(qts[0]).fontSize);
-        let fsc=parseInt(window.getComputedStyle(chs[0]).fontSize);
-        fsq+=d; fsc+=d;
-        if(fsq<9)fsq=9;if(fsq>14)fsq=14;
-        if(fsc<8)fsc=8;if(fsc>12)fsc=12;
-        qts.forEach(el=>{el.style.fontSize=fsq+'px';el.style.fontWeight='bold';el.style.color='#000';});
-        chs.forEach(el=>{el.style.fontSize=fsc+'px';el.style.fontWeight='bold';el.style.color='#000';});
-    }
-}
-function changeHeaderFontSize(delta){
-    currentHeaderFontSize+=delta;
-    if(currentHeaderFontSize<10) currentHeaderFontSize=10;
-    if(currentHeaderFontSize>18) currentHeaderFontSize=18;
-    applyFontSizes();
-}
-function changeInstructionsFontSize(){
-    const newSize=prompt('سایز فونت راهنما را وارد کنید (عدد بین ۸ تا ۱۶):',currentInstructionsFontSize);
-    if(newSize!==null){
-        const n=parseInt(newSize);
-        if(!isNaN(n)&&n>=8&&n<=16){
-            currentInstructionsFontSize=n;
-            applyFontSizes();
-        }else{
-            alert('لطفاً عددی بین ۸ تا ۱۶ وارد کنید.');
-        }
-    }
-}
-function editInstructions(){
-    const currentText=Array.from(document.querySelectorAll('#instructions li')).map(li=>li.textContent).join('\n');
-    const newText=prompt('متن راهنما را وارد کنید (هر خط یک مورد):',currentText);
-    if(newText!==null){
-        const items=newText.split('\n').filter(l=>l.trim()!=='');
-        document.getElementById('instructions').innerHTML=
-            '<h3><i class="fas fa-exclamation-circle"></i> راهنما:</h3><ul>'+
-            items.map(i=>`<li>${i.trim()}</li>`).join('')+
-            '</ul>';
-        applyFontSizes();
-    }
-    changeInstructionsFontSize();
-}
-function addQuestion(type){
-    const n=questions.length+1;
-    let q;
-    switch(type){
-        case 'multiple-choice':
-            q={number:n,type:type,text:'متن سوال چهارگزینه‌ای (می‌توانید از $...$ یا $$...$$ استفاده کنید)',choices:['الف) گزینه اول','ب) گزینه دوم','ج) گزینه سوم','د) گزینه چهارم'],score:1};break;
-        case 'descriptive':
-            q={number:n,type:type,text:'متن سوال تشریحی (می‌توانید از فرمول ریاضی یا شیمیایی استفاده کنید)',score:2};break;
-        case 'true-false':
-            q={number:n,type:type,text:'متن سوال درست و نادرست را اینجا وارد کنید',score:1};break;
-        case 'fill-blank':
-            q={number:n,type:type,text:'متن سوال جای خالی را اینجا وارد کنید',score:1};break;
-        default:
-            q={number:n,type:'multiple-choice',text:'متن سوال جدید',choices:['الف) گزینه اول','ب) گزینه دوم','ج) گزینه سوم','د) گزینه چهارم'],score:1};
-    }
-    questions.push(q); renderQuestions();
-}
-function removeQuestion(){if(questions.length>1){questions.pop(); renderQuestions();}else alert('حداقل یک سوال باید باشد.');}
-function showFormulaHelp(){
-    alert(`راهنمای سریع فرمول‌نویسی:
-ریاضی:
-  - توان: x^2
-  - ریشه: \\sqrt{x}
-  - کسر: \\frac{a}{b}
-  - معادله: ax^2+bx+c=0
 
-شیمی:
-  - فرمول شیمیایی: \\ce{H2O}
-  - واکنش: \\ce{2H2 + O2 -> 2H2O}
+/* ========== History ========== */
+function pushHistory(entry){
+  const arr=JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]');
+  arr.push(entry);
+  localStorage.setItem(HISTORY_KEY,JSON.stringify(arr.slice(-200)));
+  refreshHistory();
+}
+function refreshHistory(){
+  const box=el('history-list');box.innerHTML='';
+  const arr=JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]');
+  arr.slice().reverse().forEach(h=>{
+    const d=document.createElement('div');d.className='history-item';
+    d.innerHTML=`<div>${h.examName} – ${h.time}</div><div><b>${toPersian(h.correct)}/${toPersian(h.total)}</b></div>`;
+    box.appendChild(d);
+  });
+}
 
-نمونه‌ها:
-  - آب: $\\\\ce{H2O}$
-  - معادله درجه‌۲: $$ax^2+bx+c=0$$
-  
-فرمول را بین دو $ بنویسید (inline) یا بین دو $$ (display).`);
+/* ========== Camera ========== */
+async function startCamera(){
+  try{
+    stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1920},height:{ideal:1080},frameRate:{ideal:30}},audio:false});
+    el('camera-video').srcObject=stream;el('camera-video').hidden=false;el('camera-preview').hidden=true;
+    await el('camera-video').play();
+    setStatus('دوربین فعال شد');
+  }catch(err){alert('خطا در دوربین: '+err.message);}
 }
-function saveExam(){
-    const data={
-        schoolName:document.getElementById('schoolName').textContent,
-        examTitle:document.getElementById('examTitle').textContent,
-        academicYear:document.getElementById('academicYear').textContent,
-        examDate:document.getElementById('examDate').textContent,
-        examDuration:document.getElementById('examDuration').textContent,
-        teacherName:document.getElementById('teacherName').textContent,
-        instructions:document.getElementById('instructions').innerHTML,
-        questions:questions,
-        logo:document.querySelector('#logoPlaceholder img')? document.querySelector('#logoPlaceholder img').src:null,
-        headerFontSize:currentHeaderFontSize,
-        instructionsFontSize:currentInstructionsFontSize
-    };
-    localStorage.setItem('savedExam',JSON.stringify(data));
-    alert('آزمون در LocalStorage ذخیره شد!');
+function stopCamera(){
+  if(stream){stream.getTracks().forEach(t=>t.stop());stream=null;}
+  el('camera-video').pause();el('camera-video').srcObject=null;el('camera-video').hidden=true;
+  setStatus('دوربین متوقف شد');
 }
-function saveExamAs(){
-    const name=prompt('نام فایل را وارد کنید:',currentFileName);
-    if(!name)return;
-    currentFileName=name;
-    const content=document.getElementById('examPaper').outerHTML;
-    const fullHTML=`<!DOCTYPE html><html lang="fa" dir="rtl"><head><meta charset="UTF-8"><title>${name}</title><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"><script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"><\/script>
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"><\/script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"><\/script>
-    <script>window.MathJax={tex:{packages:{'[+]':['mhchem']},inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre']}};<\/script>
-    <style>${document.querySelector('style').textContent}<\/style></head><body>${content}
-    <script>let questions=${JSON.stringify(questions)};function renderQuestions(){const c=document.getElementById('questionsContainer');c.innerHTML='';questions.forEach((q,i)=>{const d=document.createElement('div');d.className='question';let h=\`<div class="question-header"><span class="question-number">سوال \${q.number} - </span><span class="question-text math-tex" contenteditable="true" onblur="updateQuestionText(\${i},this)" onkeypress="if(event.key==='Enter'){this.blur();}">\${q.text}</span><span class="question-score-value" contenteditable="true" onblur="updateQuestionScore(\${i},this)">\${q.score}</span><span class="question-score"> نمره</span></div>\`;if(q.type==='multiple-choice'){h+=\`<div class="choices-row">\${q.choices.map((ch,idx)=>\`<div class="choice math-tex" contenteditable="true" onblur="updateChoice(\${i},\${idx},this)" onkeypress="if(event.key==='Enter'){this.blur();}">\${ch}</div>\`).join('')}</div>\`;}else if(q.type==='descriptive'){h+=\`<div class="descriptive-answer" contenteditable="true" style="min-height:50px;" oninput="autoResize(this)">پاسخ:</div>\`;}else if(q.type==='true-false'){h+=\`<div class="true-false-options"><div class="true-false-option">درست</div><div class="true-false-option">نادرست</div></div>\`;}d.innerHTML=h;c.appendChild(d);});applyFontSizes();MathJax.typesetPromise();}function updateQuestionText(i,el){questions[i].text=el.textContent.trim();MathJax.typesetPromise();}function updateChoice(i,j,el){questions[i].choices[j]=el.textContent.trim();MathJax.typesetPromise();}function updateQuestionScore(i,el){const v=parseFloat(el.textContent.trim());if(!isNaN(v)&&v>0) questions[i].score=v;else el.textContent=questions[i].score;}function autoResize(el){el.style.height='auto';el.style.height=el.scrollHeight+'px';}function applyFontSizes(){document.querySelectorAll('.school-name, .exam-title, #academicYear, .detail-item').forEach(el=>{el.style.fontSize=currentHeaderFontSize+'px';el.style.fontWeight='bold';});document.querySelectorAll('.instructions, .instructions h3, .instructions li').forEach(el=>{el.style.fontSize=currentInstructionsFontSize+'px';el.style.fontWeight='bold';});}renderQuestions();function exportToPDF(){const el=document.getElementById('examPaper');MathJax.typesetPromise().then(()=>{html2pdf().set({margin:[3,3,3,3],filename:'${name}.pdf',image:{type:'jpeg',quality:.98},html2canvas:{scale:2,backgroundColor:'#ffffff',width:794,height:el.scrollHeight,useCORS:true},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}}).from(el).save();});}<\/script></body></html>`;
-    const blob=new Blob([fullHTML],{type:'text/html'});
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement('a'); a.href=url; a.download=`${name}.html`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+function captureSnapshot(){
+  const v=el('camera-video');const w=v.videoWidth||1280,h=v.videoHeight||720;
+  const c=el('camera-canvas');c.width=w;c.height=h;
+  const ctx=c.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h);ctx.drawImage(v,0,0,w,h);
+  el('camera-preview').src=c.toDataURL('image/jpeg',.92);el('camera-preview').hidden=false;v.hidden=true;
+  setStatus('عکس گرفته شد');
+  return el('camera-preview').src;
 }
-function loadExam(){
-    const saved=localStorage.getItem('savedExam');
-    if(!saved){alert('آزمون ذخیره‌شده‌ای یافت نشد!');return;}
-    const d=JSON.parse(saved);
-    document.getElementById('schoolName').textContent=d.schoolName;
-    document.getElementById('examTitle').textContent=d.examTitle;
-    document.getElementById('academicYear').textContent=d.academicYear;
-    document.getElementById('examDate').textContent=d.examDate;
-    document.getElementById('examDuration').textContent=d.examDuration;
-    document.getElementById('teacherName').textContent=d.teacherName;
-    document.getElementById('instructions').innerHTML=d.instructions;
-    if(d.logo){document.getElementById('logoPlaceholder').innerHTML=`<img src="${d.logo}" alt="لوگو">`;}
-    questions=d.questions; currentHeaderFontSize=d.headerFontSize||12; currentInstructionsFontSize=d.instructionsFontSize||10; applyFontSizes();
-    alert('آزمون ذخیره‌شده بارگذاری شد!');
-}
-function editExamInfo(){
-    const s=prompt('نام مدرسه:',document.getElementById('schoolName').textContent);
-    const t=prompt('عنوان امتحان:',document.getElementById('examTitle').textContent);
-    const y=prompt('سال تحصیلی:',document.getElementById('academicYear').textContent);
-    const dt=prompt('تاریخ:',document.getElementById('examDate').textContent);
-    const du=prompt('مدت زمان:',document.getElementById('examDuration').textContent);
-    const tn=prompt('نام دبیر:',document.getElementById('teacherName').textContent);
-    if(s)document.getElementById('schoolName').textContent=s;
-    if(t)document.getElementById('examTitle').textContent=t;
-    if(y)document.getElementById('academicYear').textContent=y;
-    if(dt)document.getElementById('examDate').textContent=dt;
-    if(du)document.getElementById('examDuration').textContent=du;
-    if(tn)document.getElementById('teacherName').textContent=tn;
-}
-function addImage(){
-    const input=document.createElement('input'); input.type='file'; input.accept='image/*';
-    input.onchange=e=>{
-        const file=e.target.files[0];
-        if(file){
-            const reader=new FileReader();
-            reader.onload=evt=>{
-                document.getElementById('logoPlaceholder').innerHTML=`<img src="${evt.target.result}" alt="لوگو">`;
-            };
-            reader.readAsDataURL(file);
-        }
-    };
-    input.click();
-}
-function exportToPDF(){
-    const el=document.getElementById('examPaper');
-    MathJax.typesetPromise().then(()=>{
-        html2pdf().set({
-            margin: [3, 3, 3, 3],
-            filename: `${currentFileName}.pdf`,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: {
-                scale: 2,
-                backgroundColor: '#ffffff',
-                width: 794,
-                height: el.scrollHeight,
-                useCORS: true
-            },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        }).from(el).save();
-    });
-}
-window.onload=()=>{
-    if(localStorage.getItem('savedExam')&&confirm('آزمون ذخیره‌شده بارگذاری شود؟'))loadExam(); else initializeQuestions();
+el('upload-image').onchange=e=>{
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();r.onload=ev=>{el('camera-preview').src=ev.target.result;el('camera-preview').hidden=false;el('camera-video').hidden=true;setStatus('تصویر بارگذاری شد');};r.readAsDataURL(f);
 };
-</script>
-</body>
-</html>
+
+/* ========== OpenCV Ready ========== */
+function setStatus(t){el('status').textContent='وضعیت: '+t;}
+function waitCV(){
+  return new Promise(res=>{
+    const id=setInterval(()=>{
+      if(window.cv&&cv.Mat){clearInterval(id);cvReady=true;setStatus('OpenCV آماده است');res();}
+    },200);
+    setTimeout(()=>{if(!cvReady)setStatus('OpenCV هنوز بارگذاری نشده – اتصال را بررسی کنید');},8000);
+  });
+}
+
+/* ========== Image Enhance ========== */
+function enhanceGray(srcGray){
+  const clahe=new cv.CLAHE(2.0,new cv.Size(8,8));
+  const dst=new cv.Mat();clahe.apply(srcGray,dst);clahe.delete();return dst;
+}
+function autoRotate(src){
+  const h=src.rows,w=src.cols;
+  if(w>h){const dst=new cv.Mat();cv.rotate(src,dst,cv.
