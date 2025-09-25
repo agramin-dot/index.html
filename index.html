@@ -24,17 +24,17 @@
         .results-section{background:#f0f9ff;padding:20px;border-radius:10px;margin-top:20px;display:none}
         .answer-item{display:inline-block;margin:5px;padding:10px;border-radius:5px;font-weight:bold;min-width:40px;text-align:center}
         .correct{background:#d4edda;color:#155724}.incorrect{background:#f8d7da;color:#721c24}.empty{background:#f8f9fa;color:#6c757d}
-        .a5-container{width:148mm;height:210mm;padding:8mm;margin:auto;background:white;box-shadow:0 0 10px rgba(0,0,0,.1);position:relative;page-break-inside:avoid;box-sizing:border-box}
+        .a5-container{width:148mm;height:210mm;padding:15mm;margin:auto;background:white;box-shadow:0 0 10px rgba(0,0,0,.1);position:relative;page-break-inside:avoid;box-sizing:border-box}
         .sheet-marker{position:absolute;width:15px;height:15px;background:black;border:2px solid white;box-shadow:0 0 0 2px black;z-index:10}
         .sheet-marker.tl{top:5mm;left:5mm}.sheet-marker.tr{top:5mm;right:5mm}.sheet-marker.bl{bottom:5mm;left:5mm}.sheet-marker.br{bottom:5mm;right:5mm}
-        .student-info{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:10px;font-size:12px}
-        .info-item{display:flex;align-items:center}.info-item label{width:100px;font-weight:bold}.info-item span{flex:1;border-bottom:1px dashed #999;height:18px}
-        .questions-grid{display:grid;grid-template-columns:repeat(5, 1fr);gap:5px;margin-top:15px}
-        .question-cell{text-align:center;padding:5px;border:1px solid #ddd;border-radius:4px;font-size:12px}
-        .question-number{font-weight:bold;margin-bottom:5px}
-        .option-bubbles{display:flex;justify-content:center;gap:3px}
-        .option-bubble{width:16px;height:16px;border:1px solid #333;border-radius:50%;display:inline-flex;justify-content:center;align-items:center;font-size:9px}
-        .option-bubble.filled::after{content:'';width:10px;height:10px;background:black;border-radius:50%}
+        .student-info{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:15px;font-size:14px}
+        .info-item{display:flex;align-items:center}.info-item label{width:100px;font-weight:bold}.info-item span{flex:1;border-bottom:1px dashed #999;height:20px}
+        .questions-grid{display:grid;grid-template-columns:repeat(4, 1fr);gap:8px;margin-top:20px}
+        .question-cell{text-align:center;padding:8px;border:1px solid #ddd;border-radius:4px;font-size:14px;min-height:60px;display:flex;flex-direction:column;justify-content:space-between}
+        .question-number{font-weight:bold;margin-bottom:8px;font-size:16px}
+        .option-bubbles{display:flex;justify-content:center;gap:5px}
+        .option-bubble{width:20px;height:20px;border:1px solid #333;border-radius:50%;display:inline-flex;justify-content:center;align-items:center;font-size:12px}
+        .option-bubble.filled::after{content:'';width:14px;height:14px;background:black;border-radius:50%}
         .results-summary{margin-top:10px;padding:10px;border:1px solid #ddd;border-radius:4px;background:#f9f9f9;font-size:12px}
         .summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
         .file-input-container{margin:15px 0}
@@ -69,10 +69,10 @@
         .printable-sheet{display:none}
         @media print{
             .no-print{display:none}
-            .a5-container{box-shadow:none;margin:0}
-            .printable-sheet{display:block}
-            body{background:white;padding:0}
-            .container{max-width:100%;box-shadow:none;border-radius:0}
+            body, html{width:100%;height:100%;margin:0;padding:0;background:white}
+            .container{max-width:100%;box-shadow:none;border-radius:0;background:white}
+            .printable-sheet{display:block;width:148mm;height:210mm;margin:0 auto}
+            .a5-container{box-shadow:none;margin:0;width:100%;height:100%}
         }
         @media (max-width:768px){.tabs{flex-direction:column}.settings-grid{grid-template-columns:1fr}.questions-grid{grid-template-columns:repeat(3, 1fr)}.camera-options{flex-direction:column}}
     </style>
@@ -169,8 +169,6 @@
                             <option value="B">ب</option>
                             <option value="C">ج</option>
                             <option value="D">د</option>
-                            <option value="E">ه</option>
-                            <option value="F">و</option>
                         </select>
                     </div>
                 </div>
@@ -197,11 +195,15 @@
             <div class="settings-grid">
                 <div class="setting-item">
                     <label for="num-questions">تعداد سوالات</label>
-                    <input type="number" id="num-questions" value="20" min="1" max="200">
+                    <input type="number" id="num-questions" value="20" min="1" max="50">
                 </div>
                 <div class="setting-item">
                     <label for="options-per-question">تعداد گزینه‌های هر سوال</label>
-                    <input type="number" id="options-per-question" value="4" min="2" max="6">
+                    <select id="options-per-question">
+                        <option value="2">2 گزینه</option>
+                        <option value="3">3 گزینه</option>
+                        <option value="4" selected>4 گزینه</option>
+                    </select>
                 </div>
                 <div class="setting-item">
                     <label for="correct-score">نمره هر پاسخ صحیح</label>
@@ -235,7 +237,7 @@
                 <div class="sheet-marker bl"></div>
                 <div class="sheet-marker br"></div>
                 
-                <h3 style="text-align: center; margin-bottom: 10px;">پاسخنامه استاندارد</h3>
+                <h3 style="text-align: center; margin-bottom: 15px; font-size: 18px;">پاسخنامه استاندارد</h3>
                 
                 <div class="student-info">
                     <div class="info-item">
@@ -318,7 +320,7 @@
         let ocrResults = {};
         let settings = {
             numQuestions: 20, // پیش‌فرض 20 سوال
-            optionsPerQuestion: 4,
+            optionsPerQuestion: 4, // فقط 4 گزینه
             correctScore: 1,
             wrongScore: -0.25
         };
@@ -527,8 +529,8 @@
                 return;
             }
             
-            if (!value.match(/^[A-F]$/)) {
-                alert('لطفاً یک گزینه صحیح انتخاب کنید.');
+            if (!value.match(/^[A-D]$/)) {
+                alert('لطفاً یک گزینه صحیح انتخاب کنید (فقط الف تا د).');
                 return;
             }
             
@@ -554,9 +556,7 @@
                 'A': 'الف',
                 'B': 'ب',
                 'C': 'ج',
-                'D': 'د',
-                'E': 'ه',
-                'F': 'و'
+                'D': 'د'
             };
             return optionsMap[option] || option;
         }
@@ -576,8 +576,6 @@
                         <option value="B">ب</option>
                         <option value="C">ج</option>
                         <option value="D">د</option>
-                        <option value="E">ه</option>
-                        <option value="F">و</option>
                     </select>
                 `;
                 container.appendChild(answerItem);
@@ -591,7 +589,7 @@
                     
                     if (value === '') {
                         delete correctAnswers[questionNum];
-                    } else if (value.match(/^[A-F]$/)) {
+                    } else if (value.match(/^[A-D]$/)) {
                         correctAnswers[questionNum] = value;
                     }
                 });
@@ -808,7 +806,34 @@
             const originalContents = document.body.innerHTML;
             const printableSheet = document.querySelector('.printable-sheet').innerHTML;
             
-            document.body.innerHTML = printableSheet;
+            document.body.innerHTML = `
+                <!DOCTYPE html>
+                <html dir="rtl">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>پاسخنامه استاندارد</title>
+                    <style>
+                        body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+                        .a5-container { width: 148mm; height: 210mm; padding: 15mm; margin: 0 auto; background: white; box-sizing: border-box; }
+                        .sheet-marker { position: absolute; width: 15px; height: 15px; background: black; border: 2px solid white; box-shadow: 0 0 0 2px black; z-index: 10; }
+                        .sheet-marker.tl { top: 5mm; left: 5mm; } .sheet-marker.tr { top: 5mm; right: 5mm; }
+                        .sheet-marker.bl { bottom: 5mm; left: 5mm; } .sheet-marker.br { bottom: 5mm; right: 5mm; }
+                        .student-info { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 15px; font-size: 14px; }
+                        .info-item { display: flex; align-items: center; } .info-item label { width: 100px; font-weight: bold; } .info-item span { flex: 1; border-bottom: 1px dashed #999; height: 20px; }
+                        .questions-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 20px; }
+                        .question-cell { text-align: center; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; min-height: 60px; display: flex; flex-direction: column; justify-content: space-between; }
+                        .question-number { font-weight: bold; margin-bottom: 8px; font-size: 16px; }
+                        .option-bubbles { display: flex; justify-content: center; gap: 5px; }
+                        .option-bubble { width: 20px; height: 20px; border: 1px solid #333; border-radius: 50%; display: inline-flex; justify-content: center; align-items: center; font-size: 12px; }
+                        @media print { body { margin: 0; padding: 0; } .a5-container { box-shadow: none; margin: 0; width: 100%; height: 100%; } }
+                    </style>
+                </head>
+                <body>
+                    ${printableSheet}
+                </body>
+                </html>
+            `;
+            
             window.print();
             document.body.innerHTML = originalContents;
             
@@ -891,7 +916,7 @@
             const container = document.getElementById('questions-container');
             container.innerHTML = '';
             
-            const options = ['A', 'B', 'C', 'D', 'E', 'F'].slice(0, settings.optionsPerQuestion);
+            const options = ['A', 'B', 'C', 'D'].slice(0, settings.optionsPerQuestion);
             
             for (let i = 1; i <= settings.numQuestions; i++) {
                 const questionCell = document.createElement('div');
@@ -914,7 +939,7 @@
             const container = document.getElementById('printable-questions-container');
             container.innerHTML = '';
             
-            const options = ['A', 'B', 'C', 'D', 'E', 'F'].slice(0, settings.optionsPerQuestion);
+            const options = ['A', 'B', 'C', 'D'].slice(0, settings.optionsPerQuestion);
             
             for (let i = 1; i <= settings.numQuestions; i++) {
                 const questionCell = document.createElement('div');
@@ -936,19 +961,19 @@
                 <div style="text-align: center; margin: 20px 0;">
                     <p>پاسخنامه استاندارد شامل ${settings.numQuestions} سوال با ${settings.optionsPerQuestion} گزینه</p>
                     <div style="display: inline-block; border: 2px solid #333; padding: 20px; margin: 10px; background: white;">
-                        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;">
-                            ${Array.from({length: Math.min(20, settings.numQuestions)}, (_, i) => `
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+                            ${Array.from({length: Math.min(16, settings.numQuestions)}, (_, i) => `
                                 <div style="text-align: center; border: 1px solid #ccc; padding: 5px;">
                                     <div style="font-weight: bold;">${i+1}</div>
                                     <div style="display: flex; justify-content: center; gap: 3px;">
-                                        ${['A','B','C','D','E','F'].slice(0, settings.optionsPerQuestion).map(opt => 
+                                        ${['A','B','C','D'].slice(0, settings.optionsPerQuestion).map(opt => 
                                             `<div style="width: 15px; height: 15px; border: 1px solid #000; border-radius: 50%;">${getPersianOption(opt)}</div>`
                                         ).join('')}
                                     </div>
                                 </div>
                             `).join('')}
                         </div>
-                        ${settings.numQuestions > 20 ? `<p style="margin-top: 10px;">... و ${settings.numQuestions - 20} سوال دیگر</p>` : ''}
+                        ${settings.numQuestions > 16 ? `<p style="margin-top: 10px;">... و ${settings.numQuestions - 16} سوال دیگر</p>` : ''}
                     </div>
                     <p style="margin-top: 10px;">برای بهترین نتایج، از پاسخنامه با این فرمت استفاده کنید.</p>
                 </div>
