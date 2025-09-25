@@ -24,17 +24,17 @@
         .results-section{background:#f0f9ff;padding:20px;border-radius:10px;margin-top:20px;display:none}
         .answer-item{display:inline-block;margin:5px;padding:10px;border-radius:5px;font-weight:bold;min-width:40px;text-align:center}
         .correct{background:#d4edda;color:#155724}.incorrect{background:#f8d7da;color:#721c24}.empty{background:#f8f9fa;color:#6c757d}
-        .a5-container{width:148mm;height:210mm;padding:15mm;margin:auto;background:white;box-shadow:0 0 10px rgba(0,0,0,.1);position:relative;page-break-inside:avoid;box-sizing:border-box}
-        .sheet-marker{position:absolute;width:15px;height:15px;background:black;border:2px solid white;box-shadow:0 0 0 2px black;z-index:10}
-        .sheet-marker.tl{top:5mm;left:5mm}.sheet-marker.tr{top:5mm;right:5mm}.sheet-marker.bl{bottom:5mm;left:5mm}.sheet-marker.br{bottom:5mm;right:5mm}
-        .student-info{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:15px;font-size:14px}
-        .info-item{display:flex;align-items:center}.info-item label{width:100px;font-weight:bold}.info-item span{flex:1;border-bottom:1px dashed #999;height:20px}
-        .questions-grid{display:grid;grid-template-columns:repeat(4, 1fr);gap:8px;margin-top:20px}
-        .question-cell{text-align:center;padding:8px;border:1px solid #ddd;border-radius:4px;font-size:14px;min-height:60px;display:flex;flex-direction:column;justify-content:space-between}
-        .question-number{font-weight:bold;margin-bottom:8px;font-size:16px}
-        .option-bubbles{display:flex;justify-content:center;gap:5px}
-        .option-bubble{width:20px;height:20px;border:1px solid #333;border-radius:50%;display:inline-flex;justify-content:center;align-items:center;font-size:12px}
-        .option-bubble.filled::after{content:'';width:14px;height:14px;background:black;border-radius:50%}
+        .a5-container{width:148mm;height:210mm;padding:10mm;margin:20px auto;background:white;box-shadow:0 0 10px rgba(0,0,0,.1);position:relative;page-break-inside:avoid;box-sizing:border-box}
+        .sheet-marker{position:absolute;width:10px;height:10px;background:black;border:2px solid white;box-shadow:0 0 0 2px black;z-index:10}
+        .sheet-marker.tl{top:3mm;left:3mm}.sheet-marker.tr{top:3mm;right:3mm}.sheet-marker.bl{bottom:3mm;left:3mm}.sheet-marker.br{bottom:3mm;right:3mm}
+        .student-info{display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-bottom:8px;font-size:11px}
+        .info-item{display:flex;align-items:center}.info-item label{width:80px;font-weight:bold}.info-item span{flex:1;border-bottom:1px dashed #999;height:15px}
+        .questions-grid{display:grid;grid-template-columns:repeat(4, 1fr);gap:4px;margin-top:10px}
+        .question-cell{text-align:center;padding:3px;border:1px solid #ddd;border-radius:3px;font-size:10px;min-height:45px;display:flex;flex-direction:column;justify-content:space-between}
+        .question-number{font-weight:bold;margin-bottom:3px;font-size:11px}
+        .option-bubbles{display:flex;justify-content:center;gap:2px}
+        .option-bubble{width:14px;height:14px;border:1px solid #333;border-radius:50%;display:inline-flex;justify-content:center;align-items:center;font-size:9px}
+        .option-bubble.filled::after{content:'';width:10px;height:10px;background:black;border-radius:50%}
         .results-summary{margin-top:10px;padding:10px;border:1px solid #ddd;border-radius:4px;background:#f9f9f9;font-size:12px}
         .summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
         .file-input-container{margin:15px 0}
@@ -68,11 +68,31 @@
         .answer-input input,.answer-input select{width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;text-align:center}
         .printable-sheet{display:none}
         @media print{
-            .no-print{display:none}
-            body, html{width:100%;height:100%;margin:0;padding:0;background:white}
-            .container{max-width:100%;box-shadow:none;border-radius:0;background:white}
-            .printable-sheet{display:block;width:148mm;height:210mm;margin:0 auto}
-            .a5-container{box-shadow:none;margin:0;width:100%;height:100%}
+            body * {
+                visibility: hidden;
+                margin: 0;
+                padding: 0;
+            }
+            .printable-sheet, .printable-sheet * {
+                visibility: visible;
+            }
+            .printable-sheet {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 148mm;
+                height: 210mm;
+                display: block;
+                margin: 0;
+                padding: 0;
+                box-shadow: none;
+            }
+            .a5-container {
+                box-shadow: none;
+                margin: 0;
+                width: 100%;
+                height: 100%;
+            }
         }
         @media (max-width:768px){.tabs{flex-direction:column}.settings-grid{grid-template-columns:1fr}.questions-grid{grid-template-columns:repeat(3, 1fr)}.camera-options{flex-direction:column}}
     </style>
@@ -237,7 +257,7 @@
                 <div class="sheet-marker bl"></div>
                 <div class="sheet-marker br"></div>
                 
-                <h3 style="text-align: center; margin-bottom: 15px; font-size: 18px;">پاسخنامه استاندارد</h3>
+                <h3 style="text-align: center; margin-bottom: 8px; font-size: 16px;">پاسخنامه استاندارد</h3>
                 
                 <div class="student-info">
                     <div class="info-item">
@@ -262,7 +282,7 @@
                     <!-- سوالات به صورت دینامیک ایجاد می‌شوند -->
                 </div>
                 
-                <div style="margin-top: 20px; text-align: center; font-size: 12px;">
+                <div style="margin-top: 10px; text-align: center; font-size: 10px;">
                     <p>برای علامت‌گذاری پاسخ صحیح، دایره مربوط به گزینه مورد نظر را کاملاً پر کنید.</p>
                 </div>
             </div>
@@ -803,42 +823,7 @@
             createPrintableSheet();
             
             // چاپ فقط پاسخنامه استاندارد
-            const originalContents = document.body.innerHTML;
-            const printableSheet = document.querySelector('.printable-sheet').innerHTML;
-            
-            document.body.innerHTML = `
-                <!DOCTYPE html>
-                <html dir="rtl">
-                <head>
-                    <meta charset="UTF-8">
-                    <title>پاسخنامه استاندارد</title>
-                    <style>
-                        body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-                        .a5-container { width: 148mm; height: 210mm; padding: 15mm; margin: 0 auto; background: white; box-sizing: border-box; }
-                        .sheet-marker { position: absolute; width: 15px; height: 15px; background: black; border: 2px solid white; box-shadow: 0 0 0 2px black; z-index: 10; }
-                        .sheet-marker.tl { top: 5mm; left: 5mm; } .sheet-marker.tr { top: 5mm; right: 5mm; }
-                        .sheet-marker.bl { bottom: 5mm; left: 5mm; } .sheet-marker.br { bottom: 5mm; right: 5mm; }
-                        .student-info { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 15px; font-size: 14px; }
-                        .info-item { display: flex; align-items: center; } .info-item label { width: 100px; font-weight: bold; } .info-item span { flex: 1; border-bottom: 1px dashed #999; height: 20px; }
-                        .questions-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 20px; }
-                        .question-cell { text-align: center; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; min-height: 60px; display: flex; flex-direction: column; justify-content: space-between; }
-                        .question-number { font-weight: bold; margin-bottom: 8px; font-size: 16px; }
-                        .option-bubbles { display: flex; justify-content: center; gap: 5px; }
-                        .option-bubble { width: 20px; height: 20px; border: 1px solid #333; border-radius: 50%; display: inline-flex; justify-content: center; align-items: center; font-size: 12px; }
-                        @media print { body { margin: 0; padding: 0; } .a5-container { box-shadow: none; margin: 0; width: 100%; height: 100%; } }
-                    </style>
-                </head>
-                <body>
-                    ${printableSheet}
-                </body>
-                </html>
-            `;
-            
             window.print();
-            document.body.innerHTML = originalContents;
-            
-            // بازگرداندن رویدادها
-            window.location.reload();
         }
         
         // خروجی Excel از نتایج
