@@ -3,696 +3,266 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>سیستم مدیریت و تصحیح خودکار پاسخنامه</title>
+    <title>اپلیکیشن تصحیح خودکار پاسخنامه استاندارد</title>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        :root {
-            --primary: #4a00e0;
-            --secondary: #8e2de2;
-            --accent: #00b09b;
-            --danger: #dc3545;
-            --warning: #ffc107;
-            --light: #f5f7fa;
-            --dark: #333;
-            --success: #28a745;
-            --info: #17a2b8;
-        }
-        
-        body {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            color: var(--dark);
-            min-height: 100vh;
-            padding: 20px;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-            overflow: hidden;
-        }
-        
-        header {
-            background: linear-gradient(to right, var(--primary), var(--secondary));
-            color: white;
-            text-align: center;
-            padding: 25px 20px;
-            position: relative;
-        }
-        
-        header h1 {
-            font-size: 1.8rem;
-            margin-bottom: 10px;
-        }
-        
-        header p {
-            font-size: 1rem;
-            opacity: 0.9;
-        }
-        
-        .tabs {
-            display: flex;
-            background: var(--light);
-            flex-wrap: wrap;
-        }
-        
-        .tab-btn {
-            flex: 1;
-            padding: 15px;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            min-width: 120px;
-        }
-        
-        .tab-btn:hover {
-            background: rgba(255, 255, 255, 0.7);
-        }
-        
-        .tab-btn.active {
-            background: white;
-            color: var(--primary);
-            border-bottom: 3px solid var(--primary);
-        }
-        
-        .tab-content {
-            display: none;
-            padding: 25px;
-        }
-        
-        .tab-content.active {
-            display: block;
-        }
-        
-        .exam-management {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-        
-        .exam-form, .exam-list {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
-        }
-        
-        .form-group {
-            margin-bottom: 15px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-        }
-        
-        .form-group input, .form-group select, .form-group textarea {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        
-        .exam-item {
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .exam-item:hover {
-            background: #e9ecef;
-            transform: translateX(5px);
-        }
-        
-        .exam-item.active {
-            border-color: var(--primary);
-            background: #e6f7ff;
-        }
-        
-        #camera-view {
-            width: 100%;
-            height: 400px;
-            background: #000;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            border-radius: 8px;
-            overflow: hidden;
-            margin-bottom: 15px;
-        }
-        
-        .controls {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-            flex-wrap: wrap;
-        }
-        
-        button {
-            padding: 10px 15px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-        
-        .btn-success {
-            background: var(--accent);
-            color: white;
-        }
-        
-        .btn-danger {
-            background: var(--danger);
-            color: white;
-        }
-        
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
-        }
-        
-        .btn-info {
-            background: var(--info);
-            color: white;
-        }
-        
-        .a5-container {
-            width: 210mm;
-            height: 148mm;
-            padding: 15mm;
-            margin: 20px auto;
-            background: white;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            position: relative;
-            page-break-inside: avoid;
-            box-sizing: border-box;
-            text-align: center;
-        }
-        
-        .sheet-marker {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background: black;
-            border: 2px solid white;
-            box-shadow: 0 0 0 2px black;
-            z-index: 10;
-        }
-        
-        .sheet-marker.tl {
-            top: 3mm;
-            left: 3mm;
-        }
-        
-        .sheet-marker.tr {
-            top: 3mm;
-            right: 3mm;
-        }
-        
-        .sheet-marker.bl {
-            bottom: 3mm;
-            left: 3mm;
-        }
-        
-        .sheet-marker.br {
-            bottom: 3mm;
-            right: 3mm;
-        }
-        
-        .student-info {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 15px;
-            text-align: right;
-        }
-        
-        .info-item {
-            display: flex;
-            align-items: center;
-        }
-        
-        .info-item label {
-            width: 100px;
-            font-weight: bold;
-            text-align: left;
-        }
-        
-        .info-item span {
-            flex: 1;
-            border-bottom: 1px dashed #999;
-            height: 20px;
-            text-align: center;
-        }
-        
-        .questions-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 8px;
-            margin-top: 15px;
-        }
-        
-        .question-cell {
-            text-align: center;
-            padding: 5px;
-            border: 1px solid #ddd;
-            border-radius: 3px;
-            min-height: 50px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-        
-        .question-number {
-            font-weight: bold;
-            margin-bottom: 3px;
-            font-size: 12px;
-        }
-        
-        .option-bubbles {
-            display: flex;
-            justify-content: center;
-            gap: 3px;
-        }
-        
-        .option-bubble {
-            width: 16px;
-            height: 16px;
-            border: 1px solid #333;
-            border-radius: 50%;
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 10px;
-        }
-        
-        .option-bubble.filled::after {
-            content: '';
-            width: 12px;
-            height: 12px;
-            background: black;
-            border-radius: 50%;
-        }
-        
-        .results-summary {
-            margin-top: 10px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background: #f9f9f9;
-        }
-        
-        .summary-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 5px;
-        }
-        
-        .correct {
-            background: #d4edda;
-            color: #155724;
-        }
-        
-        .incorrect {
-            background: #f8d7da;
-            color: #721c24;
-        }
-        
-        .empty {
-            background: #f8f9fa;
-            color: #6c757d;
-        }
-        
-        .printable-sheet {
-            display: none;
-        }
-        
-        .file-input-container {
-            margin: 15px 0;
-        }
-        
-        .file-input-container label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-        }
-        
-        .file-input-container input {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        
-        .progress-container {
-            margin: 15px 0;
-        }
-        
-        .progress-bar {
-            width: 100%;
-            height: 20px;
-            background: #eee;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-        
-        .progress {
-            height: 100%;
-            background: var(--accent);
-            width: 0%;
-            transition: width 0.3s;
-        }
-        
-        .status-text {
-            margin-top: 5px;
-            font-size: 0.9rem;
-            text-align: center;
-        }
-        
-        .manual-answers-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-            gap: 10px;
-            margin-top: 10px;
-        }
-        
-        .manual-answer-item {
-            text-align: center;
-        }
-        
-        .manual-answer-item select {
-            width: 100%;
-            text-align: center;
-            font-weight: bold;
-            padding: 5px;
-        }
-        
-        .answer-inputs {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        
-        .answer-input {
-            flex: 1;
-            text-align: center;
-        }
-        
-        .answer-input label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-        }
-        
-        .answer-input input, .answer-input select {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            text-align: center;
-        }
-        
-        .camera-options {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-        }
-        
-        .camera-option-btn {
-            flex: 1;
-            min-width: 120px;
-        }
-        
-        .answer-sheet-preview {
-            text-align: center;
-            margin: 20px 0;
-        }
-        
-        .results-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-        
-        .results-table th, .results-table td {
-            padding: 10px;
-            text-align: center;
-            border: 1px solid #ddd;
-        }
-        
-        .results-table th {
-            background: var(--light);
-        }
-        
-        @media print {
+        *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
+        :root{--primary:#4a00e0;--secondary:#8e2de2;--accent:#00b09b;--danger:#dc3545;--light:#f5f7fa;--dark:#333}
+        body{background:linear-gradient(135deg,var(--primary) 0%,var(--secondary) 100%);color:var(--dark);min-height:100vh;padding:20px}
+        .container{max-width:1200px;margin:0 auto;background:rgba(255,255,255,.95);border-radius:15px;box-shadow:0 10px 30px rgba(0,0,0,.15);overflow:hidden}
+        header{background:linear-gradient(to right,var(--primary),var(--secondary));color:white;text-align:center;padding:25px 20px;position:relative}
+        header h1{font-size:1.8rem;margin-bottom:10px}header p{font-size:1rem;opacity:.9}
+        .tabs{display:flex;background:var(--light)}.tab-btn{flex:1;padding:15px;border:none;cursor:pointer;font-weight:600;transition:all .3s ease}
+        .tab-btn.active{background:white;color:var(--primary);border-bottom:3px solid var(--primary)}
+        .tab-content{display:none;padding:25px}.tab-content.active{display:block}
+        #camera-view{width:100%;height:400px;background:#000;position:relative;display:flex;justify-content:center;align-items:center;color:white}
+        .controls{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap}
+        button{padding:10px 15px;border:none;border-radius:8px;cursor:pointer;font-weight:600}
+        .btn-primary{background:var(--primary);color:white}.btn-success{background:var(--accent);color:white}
+        .btn-danger{background:var(--danger);color:white}.btn-secondary{background:#6c757d;color:white}
+        .results-section{background:#f0f9ff;padding:20px;border-radius:10px;margin-top:20px;display:none}
+        .answer-item{display:inline-block;margin:5px;padding:10px;border-radius:5px;font-weight:bold;min-width:40px;text-align:center}
+        .correct{background:#d4edda;color:#155724}.incorrect{background:#f8d7da;color:#721c24}.empty{background:#f8f9fa;color:#6c757d}
+        .a5-container{width:148mm;height:210mm;padding:10mm;margin:20px auto;background:white;box-shadow:0 0 10px rgba(0,0,0,.1);position:relative;page-break-inside:avoid;box-sizing:border-box}
+        .sheet-marker{position:absolute;width:10px;height:10px;background:black;border:2px solid white;box-shadow:0 0 0 2px black;z-index:10}
+        .sheet-marker.tl{top:3mm;left:3mm}.sheet-marker.tr{top:3mm;right:3mm}.sheet-marker.bl{bottom:3mm;left:3mm}.sheet-marker.br{bottom:3mm;right:3mm}
+        .student-info{display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-bottom:8px;font-size:11px}
+        .info-item{display:flex;align-items:center}.info-item label{width:80px;font-weight:bold}.info-item span{flex:1;border-bottom:1px dashed #999;height:15px}
+        .questions-grid{display:grid;grid-template-columns:repeat(4, 1fr);gap:4px;margin-top:10px}
+        .question-cell{text-align:center;padding:3px;border:1px solid #ddd;border-radius:3px;font-size:10px;min-height:45px;display:flex;flex-direction:column;justify-content:space-between}
+        .question-number{font-weight:bold;margin-bottom:3px;font-size:11px}
+        .option-bubbles{display:flex;justify-content:center;gap:2px}
+        .option-bubble{width:14px;height:14px;border:1px solid #333;border-radius:50%;display:inline-flex;justify-content:center;align-items:center;font-size:9px}
+        .option-bubble.filled::after{content:'';width:10px;height:10px;background:black;border-radius:50%}
+        .results-summary{margin-top:10px;padding:10px;border:1px solid #ddd;border-radius:4px;background:#f9f9f9;font-size:12px}
+        .summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+        .file-input-container{margin:15px 0}
+        .file-input-container label{display:block;margin-bottom:5px;font-weight:600}
+        .file-input-container input{width:100%;padding:8px;border:1px solid #ddd;border-radius:4px}
+        .progress-container{margin:15px 0}
+        .progress-bar{width:100%;height:20px;background:#eee;border-radius:10px;overflow:hidden}
+        .progress{height:100%;background:var(--accent);width:0%;transition:width .3s}
+        .status-text{margin-top:5px;font-size:.9rem;text-align:center}
+        .results-table{width:100%;border-collapse:collapse;margin-top:15px}
+        .results-table th,.results-table td{padding:10px;text-align:center;border:1px solid #ddd}
+        .results-table th{background:var(--light)}
+        .settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+        .setting-item{margin-bottom:15px}
+        .setting-item label{display:block;margin-bottom:5px;font-weight:600}
+        .setting-item input,.setting-item select{width:100%;padding:8px;border:1px solid #ddd;border-radius:4px}
+        .instructions{background:#f0f9ff;padding:15px;border-radius:8px;margin-top:20px;font-size:.9rem}
+        .instructions ol{padding-right:20px;margin-top:10px}
+        .instructions li{margin-bottom:5px}
+        .manual-answers{background:#f8f9fa;padding:15px;border-radius:8px;margin-top:15px}
+        .manual-answers-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(80px, 1fr));gap:10px;margin-top:10px}
+        .manual-answer-item{text-align:center}
+        .manual-answer-item select{width:100%;text-align:center;font-weight:bold;padding:5px}
+        .camera-options{display:flex;gap:10px;margin-bottom:15px;flex-wrap:wrap}
+        .camera-option-btn{flex:1;min-width:120px}
+        .answer-sheet-preview{text-align:center;margin:20px 0}
+        .answer-sheet-preview img{max-width:100%;border:1px solid #ddd;border-radius:8px;box-shadow:0 3px 10px rgba(0,0,0,.1)}
+        .answer-inputs{display:flex;gap:10px;margin-top:10px}
+        .answer-input{flex:1;text-align:center}
+        .answer-input label{display:block;margin-bottom:5px;font-weight:600}
+        .answer-input input,.answer-input select{width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;text-align:center}
+        .printable-sheet{display:none}
+        .auto-process{display:flex;align-items:center;gap:10px;margin:10px 0}
+        @media print{
             body * {
                 visibility: hidden;
                 margin: 0;
                 padding: 0;
             }
-            
             .printable-sheet, .printable-sheet * {
                 visibility: visible;
             }
-            
             .printable-sheet {
                 position: absolute;
                 left: 0;
                 top: 0;
-                width: 210mm;
-                height: 148mm;
+                width: 148mm;
+                height: 210mm;
                 display: block;
                 margin: 0;
                 padding: 0;
                 box-shadow: none;
             }
-            
             .a5-container {
                 box-shadow: none;
                 margin: 0;
                 width: 100%;
                 height: 100%;
             }
-            
-            .no-print {
-                display: none !important;
-            }
         }
-        
-        @media (max-width: 768px) {
-            .tabs {
-                flex-direction: column;
-            }
-            
-            .exam-management {
-                grid-template-columns: 1fr;
-            }
-            
-            .questions-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-            
-            .student-info {
-                grid-template-columns: 1fr;
-            }
-            
-            .answer-inputs {
-                flex-direction: column;
-            }
-        }
-        
-        .persian-numbers {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            direction: ltr;
-            display: inline-block;
-        }
+        @media (max-width:768px){.tabs{flex-direction:column}.settings-grid{grid-template-columns:1fr}.questions-grid{grid-template-columns:repeat(3, 1fr)}.camera-options{flex-direction:column}}
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>سیستم مدیریت و تصحیح خودکار پاسخنامه</h1>
-            <p>مدیریت آزمون‌ها، تصحیح خودکار و تولید پاسخنامه استاندارد</p>
+            <h1>اپلیکیشن تصحیح خودکار پاسخنامه استاندارد</h1>
+            <p>با استفاده از هوش مصنوعی و پردازش تصویر، پاسخنامه‌های شما را به صورت خودکار تصحیح می‌کند</p>
         </header>
         
         <div class="tabs">
-            <button class="tab-btn active" data-tab="exams">مدیریت آزمون‌ها</button>
-            <button class="tab-btn" data-tab="answer-key">تعیین کلید پاسخ</button>
-            <button class="tab-btn" data-tab="correction">تصحیح پاسخنامه</button>
-            <button class="tab-btn" data-tab="results">نتایج و گزارش‌ها</button>
+            <button class="tab-btn active" data-tab="camera">دوربین</button>
+            <button class="tab-btn" data-tab="upload">آپلود تصویر</button>
+            <button class="tab-btn" data-tab="answers">پاسخ‌های صحیح</button>
+            <button class="tab-btn" data-tab="results">نتایج</button>
+            <button class="tab-btn" data-tab="settings">تنظیمات</button>
         </div>
         
-        <div class="tab-content active" id="exams-tab">
-            <div class="exam-management">
-                <div class="exam-form">
-                    <h3>ایجاد آزمون جدید</h3>
-                    <div class="form-group">
-                        <label for="exam-name">نام آزمون</label>
-                        <input type="text" id="exam-name" placeholder="مثلاً: امتحان میان ترم ریاضی">
-                    </div>
-                    <div class="form-group">
-                        <label for="exam-questions">تعداد سوالات</label>
-                        <input type="number" id="exam-questions" value="20" min="1" max="100">
-                    </div>
-                    <div class="form-group">
-                        <label for="exam-options">تعداد گزینه‌های هر سوال</label>
-                        <select id="exam-options">
-                            <option value="2">2 گزینه</option>
-                            <option value="3">3 گزینه</option>
-                            <option value="4" selected>4 گزینه</option>
-                            <option value="5">5 گزینه</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="exam-description">توضیحات (اختیاری)</label>
-                        <textarea id="exam-description" rows="3" placeholder="توضیحات درباره آزمون"></textarea>
-                    </div>
-                    <button id="create-exam" class="btn-primary">ایجاد آزمون</button>
-                </div>
-                
-                <div class="exam-list">
-                    <h3>آزمون‌های موجود</h3>
-                    <div id="exams-container">
-                        <!-- لیست آزمون‌ها در اینجا نمایش داده می‌شود -->
-                    </div>
-                </div>
+        <div class="tab-content active" id="camera-tab">
+            <div class="camera-options">
+                <button id="start-camera-back" class="btn-primary camera-option-btn">دوربین اصلی (عقب)</button>
+                <button id="start-camera-front" class="btn-secondary camera-option-btn">دوربین سلفی (جلو)</button>
             </div>
+            
+            <div id="camera-view">
+                <p>برای شروع، دوربین را فعال کنید</p>
+            </div>
+            <div class="controls">
+                <button id="capture-btn" class="btn-success" disabled>عکس‌برداری</button>
+                <button id="stop-camera" class="btn-danger" disabled>توقف دوربین</button>
+                <button id="reset-btn" class="btn-secondary">بازنشانی</button>
+            </div>
+            
+            <div class="auto-process">
+                <input type="checkbox" id="auto-process" checked>
+                <label for="auto-process">پردازش خودکار پس از عکس‌برداری</label>
+            </div>
+            
+            <div class="progress-container no-print">
+                <div class="progress-bar">
+                    <div class="progress" id="progress-bar"></div>
+                </div>
+                <div class="status-text" id="status-text">آماده</div>
+            </div>
+            
+            <button id="process-camera" class="btn-primary" disabled>پردازش تصویر</button>
             
             <div class="answer-sheet-preview">
-                <h3>پیش‌نمایش پاسخنامه</h3>
-                <p>پاسخنامه استاندارد برای چاپ و توزیع بین دانشجویان</p>
-                <button id="print-answer-sheet" class="btn-success no-print">چاپ پاسخنامه</button>
-                <div id="answer-sheet-preview">
-                    <!-- پاسخنامه در اینجا نمایش داده می‌شود -->
+                <h3>پاسخنامه استاندارد</h3>
+                <p>برای بهترین نتایج، از پاسخنامه استاندارد زیر استفاده کنید:</p>
+                <button id="print-standard-sheet" class="btn-primary no-print">چاپ پاسخنامه استاندارد</button>
+                <div id="standard-sheet-preview">
+                    <!-- پاسخنامه استاندارد در اینجا نمایش داده می‌شود -->
                 </div>
             </div>
         </div>
         
-        <div class="tab-content" id="answer-key-tab">
-            <div class="exam-selection">
-                <h3>انتخاب آزمون</h3>
-                <div class="form-group">
-                    <label for="select-exam">آزمون مورد نظر</label>
-                    <select id="select-exam">
-                        <option value="">-- لطفاً یک آزمون انتخاب کنید --</option>
-                    </select>
-                </div>
+        <div class="tab-content" id="upload-tab">
+            <div class="file-input-container">
+                <label for="image-file">آپلود تصویر پاسخنامه</label>
+                <input type="file" id="image-file" accept="image/*">
             </div>
             
-            <div id="answer-key-section" style="display: none;">
-                <h3>تعیین کلید پاسخ صحیح</h3>
-                <p>برای آزمون: <span id="selected-exam-name"></span></p>
+            <div class="progress-container no-print">
+                <div class="progress-bar">
+                    <div class="progress" id="progress-bar-upload"></div>
+                </div>
+                <div class="status-text" id="status-text-upload">آماده</div>
+            </div>
+            
+            <button id="process-upload" class="btn-primary" disabled>پردازش تصویر</button>
+        </div>
+        
+        <div class="tab-content" id="answers-tab">
+            <div class="file-input-container">
+                <label for="excel-file">آپلود فایل پاسخ‌های صحیح (Excel)</label>
+                <input type="file" id="excel-file" accept=".xlsx, .xls">
+            </div>
+            
+            <div class="manual-answers">
+                <h3>ورود دستی پاسخ‌های صحیح</h3>
+                <p>می‌توانید پاسخ‌های صحیح را به صورت دستی وارد کنید:</p>
                 
                 <div class="answer-inputs">
                     <div class="answer-input">
-                        <label for="answer-start">از سوال شماره</label>
-                        <input type="number" id="answer-start" value="1" min="1">
+                        <label for="manual-answer-start">از سوال شماره</label>
+                        <input type="number" id="manual-answer-start" value="1" min="1">
                     </div>
                     <div class="answer-input">
-                        <label for="answer-end">تا سوال شماره</label>
-                        <input type="number" id="answer-end" value="20" min="1">
+                        <label for="manual-answer-end">تا سوال شماره</label>
+                        <input type="number" id="manual-answer-end" value="20" min="1">
                     </div>
                     <div class="answer-input">
-                        <label for="answer-value">پاسخ صحیح</label>
-                        <select id="answer-value">
+                        <label for="manual-answer-value">پاسخ صحیح</label>
+                        <select id="manual-answer-value">
                             <option value="">-- انتخاب کنید --</option>
                             <option value="A">الف</option>
                             <option value="B">ب</option>
                             <option value="C">ج</option>
                             <option value="D">د</option>
-                            <option value="E">ه (برای 5 گزینه)</option>
                         </select>
                     </div>
                 </div>
                 
-                <button id="set-answers" class="btn-primary">اعمال پاسخ‌ها</button>
-                <button id="clear-answers" class="btn-secondary">پاک کردن همه پاسخ‌ها</button>
-                <button id="save-answer-key" class="btn-success">ذخیره کلید پاسخ</button>
-                
-                <div class="manual-answers-grid" id="answers-container">
-                    <!-- پاسخ‌ها در اینجا نمایش داده می‌شوند -->
-                </div>
+                <button id="set-manual-answers" class="btn-primary">اعمال پاسخ‌ها</button>
+                <button id="clear-manual-answers" class="btn-secondary">پاک کردن همه پاسخ‌ها</button>
             </div>
-        </div>
-        
-        <div class="tab-content" id="correction-tab">
-            <div class="correction-options">
-                <h3>تصحیح پاسخنامه</h3>
-                <div class="form-group">
-                    <label for="select-exam-correction">انتخاب آزمون برای تصحیح</label>
-                    <select id="select-exam-correction">
-                        <option value="">-- لطفاً یک آزمون انتخاب کنید --</option>
-                    </select>
-                </div>
-                
-                <div class="camera-options">
-                    <button id="start-camera" class="btn-primary">فعال کردن دوربین اصلی (عقب)</button>
-                    <button id="upload-image" class="btn-secondary">آپلود تصویر</button>
-                </div>
-                
-                <div id="camera-view" style="display: none;">
-                    <video id="video" autoplay playsinline style="width: 100%; height: 100%; background: #000;"></video>
-                    <div class="controls">
-                        <button id="capture-btn" class="btn-success">عکس‌برداری</button>
-                        <button id="stop-camera" class="btn-danger">توقف دوربین</button>
-                    </div>
-                </div>
-                
-                <div id="upload-section" style="display: none;">
-                    <div class="form-group">
-                        <label for="image-file">آپلود تصویر پاسخنامه</label>
-                        <input type="file" id="image-file" accept="image/*">
-                    </div>
-                    <div id="uploaded-image"></div>
-                </div>
-                
-                <div class="progress-container no-print">
-                    <div class="progress-bar">
-                        <div class="progress" id="progress-bar"></div>
-                    </div>
-                    <div class="status-text" id="status-text">آماده</div>
-                </div>
-                
-                <button id="process-correction" class="btn-primary" style="display: none; margin-top: 15px;">شروع تصحیح خودکار</button>
+            
+            <div class="manual-answers-grid" id="manual-answers-container">
+                <!-- پاسخ‌های دستی در اینجا نمایش داده می‌شوند -->
             </div>
         </div>
         
         <div class="tab-content" id="results-tab">
             <div class="results-section" id="results-section">
                 <h3>نتایج تصحیح</h3>
-                <div id="results-container">
-                    <!-- نتایج در اینجا نمایش داده می‌شوند -->
-                </div>
+                <div id="results-container"></div>
                 <button id="print-results" class="btn-primary no-print">چاپ نتایج</button>
                 <button id="export-results" class="btn-success no-print">خروجی Excel</button>
             </div>
         </div>
         
-        <!-- پاسخنامه قابل چاپ -->
+        <div class="tab-content" id="settings-tab">
+            <div class="settings-grid">
+                <div class="setting-item">
+                    <label for="num-questions">تعداد سوالات</label>
+                    <input type="number" id="num-questions" value="20" min="1" max="50">
+                </div>
+                <div class="setting-item">
+                    <label for="options-per-question">تعداد گزینه‌های هر سوال</label>
+                    <select id="options-per-question">
+                        <option value="2">2 گزینه</option>
+                        <option value="3">3 گزینه</option>
+                        <option value="4" selected>4 گزینه</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label for="correct-score">نمره هر پاسخ صحیح</label>
+                    <input type="number" id="correct-score" value="1" step="0.1" min="0">
+                </div>
+                <div class="setting-item">
+                    <label for="wrong-score">نمره هر پاسخ غلط</label>
+                    <input type="number" id="wrong-score" value="-0.25" step="0.1" max="0">
+                </div>
+            </div>
+            
+            <button id="save-settings" class="btn-primary">ذخیره تنظیمات</button>
+            
+            <div class="instructions">
+                <h3>راهنمای استفاده:</h3>
+                <ol>
+                    <li>ابتدا تعداد سوالات و گزینه‌ها را در بخش تنظیمات مشخص کنید</li>
+                    <li>پاسخ‌های صحیح را از طریق تب "پاسخ‌های صحیح" وارد کنید (اکسل یا دستی)</li>
+                    <li>از طریق دوربین یا آپلود تصویر، پاسخنامه را وارد سیستم کنید</li>
+                    <li>بر روی دکمه پردازش کلیک کنید تا تصحیح خودکار انجام شود</li>
+                    <li>نتایج را مشاهده و در صورت نیاز چاپ یا ذخیره کنید</li>
+                </ol>
+                <p><strong>نکات مهم برای دقت بیشتر:</strong></p>
+                <ul>
+                    <li>از پاسخنامه استاندارد با نشانگرهای سیاه استفاده کنید</li>
+                    <li>تصویر باید با وضوح بالا و نور مناسب گرفته شود</li>
+                    <li>پاسخنامه باید در مرکز تصویر و بدون چرخش باشد</li>
+                    <li>از پر کردن کامل دایره‌های پاسخ اطمینان حاصل کنید</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- پاسخنامه استاندارد قابل چاپ -->
         <div class="printable-sheet">
             <div class="a5-container">
                 <div class="sheet-marker tl"></div>
@@ -700,12 +270,11 @@
                 <div class="sheet-marker bl"></div>
                 <div class="sheet-marker br"></div>
                 
-                <h3 style="text-align: center; margin-bottom: 10px; font-size: 18px;">پاسخنامه آزمون</h3>
-                <p id="print-exam-name" style="text-align: center; margin-bottom: 15px; font-size: 14px;"></p>
+                <h3 style="text-align: center; margin-bottom: 8px; font-size: 16px;">پاسخنامه استاندارد</h3>
                 
                 <div class="student-info">
                     <div class="info-item">
-                        <label>نام و نام خانوادگی:</label>
+                        <label>نام دانشجو:</label>
                         <span></span>
                     </div>
                     <div class="info-item">
@@ -717,17 +286,60 @@
                         <span></span>
                     </div>
                     <div class="info-item">
-                        <label>نام درس:</label>
+                        <label>درس:</label>
                         <span></span>
                     </div>
                 </div>
                 
-                <div class="questions-grid" id="print-questions-container">
+                <div class="questions-grid" id="printable-questions-container">
                     <!-- سوالات به صورت دینامیک ایجاد می‌شوند -->
                 </div>
                 
-                <div style="margin-top: 15px; text-align: center; font-size: 11px;">
-                    <p>لطفاً دایره مربوط به گزینه صحیح را کاملاً پر کنید. از نوشتن هرگونه علامت خارج از دایره خودداری نمایید.</p>
+                <div style="margin-top: 10px; text-align: center; font-size: 10px;">
+                    <p>برای علامت‌گذاری پاسخ صحیح، دایره مربوط به گزینه مورد نظر را کاملاً پر کنید.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="a5-container no-print" id="answer-sheet-template" style="display: none;">
+            <div class="sheet-marker tl"></div>
+            <div class="sheet-marker tr"></div>
+            <div class="sheet-marker bl"></div>
+            <div class="sheet-marker br"></div>
+            
+            <h3 style="text-align: center; margin-bottom: 10px;">پاسخنامه نمونه</h3>
+            
+            <div class="student-info">
+                <div class="info-item">
+                    <label>نام دانشجو:</label>
+                    <span></span>
+                </div>
+                <div class="info-item">
+                    <label>شماره دانشجویی:</label>
+                    <span></span>
+                </div>
+                <div class="info-item">
+                    <label>تاریخ امتحان:</label>
+                    <span></span>
+                </div>
+                <div class="info-item">
+                    <label>درس:</label>
+                    <span></span>
+                </div>
+            </div>
+            
+            <div class="questions-grid" id="questions-container">
+                <!-- سوالات به صورت دینامیک ایجاد می‌شوند -->
+            </div>
+            
+            <div class="results-summary">
+                <h4>خلاصه نتایج:</h4>
+                <div class="summary-grid">
+                    <div>تعداد سوالات: <span id="total-questions">0</span></div>
+                    <div>پاسخ‌های صحیح: <span id="correct-count">0</span></div>
+                    <div>پاسخ‌های غلط: <span id="wrong-count">0</span></div>
+                    <div>پاسخ‌های خالی: <span id="empty-count">0</span></div>
+                    <div>نمره کل: <span id="total-score">0</span></div>
                 </div>
             </div>
         </div>
@@ -735,295 +347,102 @@
 
     <script>
         // متغیرهای جهانی
-        let exams = [];
-        let currentExam = null;
-        let correctAnswers = {};
         let stream = null;
+        let currentCamera = 'environment'; // پیش‌فرض دوربین عقب
+        let correctAnswers = {};
         let ocrResults = {};
-        
-        // بارگذاری داده‌ها از localStorage
-        function loadExams() {
-            const savedExams = localStorage.getItem('exams');
-            if (savedExams) {
-                exams = JSON.parse(savedExams);
-            }
-            updateExamList();
-            updateExamSelectors();
-        }
-        
-        // ذخیره داده‌ها در localStorage
-        function saveExams() {
-            localStorage.setItem('exams', JSON.stringify(exams));
-        }
-        
-        // ایجاد شناسه یکتا برای آزمون‌ها
-        function generateId() {
-            return Date.now().toString();
-        }
-        
-        // به روزرسانی لیست آزمون‌ها
-        function updateExamList() {
-            const container = document.getElementById('exams-container');
-            container.innerHTML = '';
-            
-            if (exams.length === 0) {
-                container.innerHTML = '<p>هیچ آزمونی ایجاد نشده است.</p>';
-                return;
-            }
-            
-            exams.forEach(exam => {
-                const examItem = document.createElement('div');
-                examItem.className = 'exam-item';
-                if (currentExam && currentExam.id === exam.id) {
-                    examItem.classList.add('active');
-                }
-                
-                examItem.innerHTML = `
-                    <h4>${exam.name}</h4>
-                    <p>تعداد سوالات: <span class="persian-numbers">${exam.questionCount}</span> | گزینه‌ها: <span class="persian-numbers">${exam.optionCount}</span></p>
-                    <p>${exam.description || 'بدون توضیحات'}</p>
-                    <small>ایجاد شده در: ${new Date(exam.createdAt).toLocaleDateString('fa-IR')}</small>
-                `;
-                
-                examItem.addEventListener('click', () => {
-                    selectExam(exam);
-                });
-                
-                container.appendChild(examItem);
-            });
-        }
-        
-        // به روزرسانی dropdownهای انتخاب آزمون
-        function updateExamSelectors() {
-            const selectors = ['select-exam', 'select-exam-correction'];
-            
-            selectors.forEach(selectorId => {
-                const selector = document.getElementById(selectorId);
-                selector.innerHTML = '<option value="">-- لطفاً یک آزمون انتخاب کنید --</option>';
-                
-                exams.forEach(exam => {
-                    const option = document.createElement('option');
-                    option.value = exam.id;
-                    option.textContent = exam.name;
-                    selector.appendChild(option);
-                });
-            });
-        }
-        
-        // انتخاب یک آزمون
-        function selectExam(exam) {
-            currentExam = exam;
-            correctAnswers = exam.answerKey || {};
-            updateExamList();
-            updateAnswerKeyUI();
-            updateAnswerSheetPreview();
-            
-            // نمایش نام آزمون انتخاب شده
-            document.getElementById('selected-exam-name').textContent = exam.name;
-            document.getElementById('answer-key-section').style.display = 'block';
-        }
-        
-        // به روزرسانی UI کلید پاسخ
-        function updateAnswerKeyUI() {
-            if (!currentExam) return;
-            
-            const container = document.getElementById('answers-container');
-            container.innerHTML = '';
-            
-            // تنظیم محدوده سوالات
-            document.getElementById('answer-end').max = currentExam.questionCount;
-            document.getElementById('answer-end').value = currentExam.questionCount;
-            
-            // ایجاد شبکه پاسخ‌ها
-            for (let i = 1; i <= currentExam.questionCount; i++) {
-                const answerItem = document.createElement('div');
-                answerItem.className = 'manual-answer-item';
-                answerItem.style.textAlign = 'center';
-                answerItem.innerHTML = `
-                    <label for="answer-${i}">سوال <span class="persian-numbers">${i}</span></label>
-                    <select id="answer-${i}" class="answer-input" data-question="${i}">
-                        <option value="">--</option>
-                        ${generateOptionElements(currentExam.optionCount)}
-                    </select>
-                `;
-                
-                // تنظیم پاسخ ذخیره شده
-                const select = answerItem.querySelector('select');
-                if (correctAnswers[i]) {
-                    select.value = correctAnswers[i];
-                }
-                
-                // افزودن event listener برای تغییر پاسخ
-                select.addEventListener('change', function() {
-                    const questionNum = parseInt(this.getAttribute('data-question'));
-                    const value = this.value;
+        let settings = {
+            numQuestions: 20, // پیش‌فرض 20 سوال
+            optionsPerQuestion: 4, // فقط 4 گزینه
+            correctScore: 1,
+            wrongScore: -0.25,
+            autoProcess: true // پردازش خودکار پس از عکس‌برداری
+        };
+
+        // رویدادهای پس از بارگیری صفحه
+        document.addEventListener('DOMContentLoaded', function() {
+            // مدیریت تب‌ها
+            document.querySelectorAll('.tab-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    // حذف کلاس active از همه تب‌ها
+                    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
                     
-                    if (value) {
-                        correctAnswers[questionNum] = value;
-                    } else {
-                        delete correctAnswers[questionNum];
-                    }
+                    // اضافه کردن کلاس active به تب انتخاب شده
+                    this.classList.add('active');
+                    const tabId = this.getAttribute('data-tab') + '-tab';
+                    document.getElementById(tabId).classList.add('active');
                 });
-                
-                container.appendChild(answerItem);
-            }
-        }
-        
-        // تولید optionهای select بر اساس تعداد گزینه‌ها
-        function generateOptionElements(optionCount) {
-            const options = ['A', 'B', 'C', 'D', 'E'];
-            let html = '';
+            });
             
-            for (let i = 0; i < optionCount; i++) {
-                const persianOption = convertToPersianOption(options[i]);
-                html += `<option value="${options[i]}">${persianOption}</option>`;
-            }
+            // بارگذاری تنظیمات از localStorage
+            loadSettings();
             
-            return html;
-        }
-        
-        // تبدیل حروف لاتین به فارسی
-        function convertToPersianOption(option) {
-            const map = {
-                'A': 'الف',
-                'B': 'ب',
-                'C': 'ج',
-                'D': 'د',
-                'E': 'ه'
-            };
-            return map[option] || option;
-        }
-        
-        // به روزرسانی پیش‌نمایش پاسخنامه
-        function updateAnswerSheetPreview() {
-            if (!currentExam) return;
+            // به‌روزرسانی فرم‌های تنظیمات
+            updateSettingsForm();
             
-            const container = document.getElementById('answer-sheet-preview');
-            container.innerHTML = '';
+            // ایجاد نمونه پاسخنامه
+            createAnswerSheetTemplate();
+            createPrintableSheet();
+            createStandardSheetPreview();
+            createManualAnswersGrid();
             
-            // ایجاد کانتینر پاسخنامه
-            const answerSheet = document.createElement('div');
-            answerSheet.className = 'a5-container';
+            // رویدادهای دوربین
+            document.getElementById('start-camera-back').addEventListener('click', () => startCamera('environment'));
+            document.getElementById('start-camera-front').addEventListener('click', () => startCamera('user'));
+            document.getElementById('stop-camera').addEventListener('click', stopCamera);
+            document.getElementById('capture-btn').addEventListener('click', captureImage);
+            document.getElementById('reset-btn').addEventListener('click', resetCamera);
+            document.getElementById('process-camera').addEventListener('click', () => processImage('camera'));
             
-            // اضافه کردن نشانگرهای صفحه
-            answerSheet.innerHTML = `
-                <div class="sheet-marker tl"></div>
-                <div class="sheet-marker tr"></div>
-                <div class="sheet-marker bl"></div>
-                <div class="sheet-marker br"></div>
-                
-                <h3 style="text-align: center; margin-bottom: 10px; font-size: 18px;">پاسخنامه آزمون</h3>
-                <p style="text-align: center; margin-bottom: 15px; font-size: 14px;">${currentExam.name}</p>
-                
-                <div class="student-info">
-                    <div class="info-item">
-                        <label>نام و نام خانوادگی:</label>
-                        <span></span>
-                    </div>
-                    <div class="info-item">
-                        <label>شماره دانشجویی:</label>
-                        <span></span>
-                    </div>
-                    <div class="info-item">
-                        <label>تاریخ امتحان:</label>
-                        <span></span>
-                    </div>
-                    <div class="info-item">
-                        <label>نام درس:</label>
-                        <span></span>
-                    </div>
-                </div>
-                
-                <div class="questions-grid" id="preview-questions-container">
-                </div>
-                
-                <div style="margin-top: 15px; text-align: center; font-size: 11px;">
-                    <p>لطفاً دایره مربوط به گزینه صحیح را کاملاً پر کنید. از نوشتن هرگونه علامت خارج از دایره خودداری نمایید.</p>
-                </div>
-            `;
+            // رویدادهای آپلود
+            document.getElementById('image-file').addEventListener('change', handleImageUpload);
+            document.getElementById('process-upload').addEventListener('click', () => processImage('upload'));
             
-            // ایجاد سوالات
-            const questionsContainer = answerSheet.querySelector('#preview-questions-container');
-            for (let i = 1; i <= currentExam.questionCount; i++) {
-                const questionCell = document.createElement('div');
-                questionCell.className = 'question-cell';
-                
-                let optionsHtml = '';
-                for (let j = 0; j < currentExam.optionCount; j++) {
-                    const optionLetter = ['A', 'B', 'C', 'D', 'E'][j];
-                    const persianOption = convertToPersianOption(optionLetter);
-                    optionsHtml += `<span class="option-bubble">${persianOption}</span>`;
-                }
-                
-                questionCell.innerHTML = `
-                    <div class="question-number"><span class="persian-numbers">${i}</span></div>
-                    <div class="option-bubbles">${optionsHtml}</div>
-                `;
-                
-                questionsContainer.appendChild(questionCell);
-            }
+            // رویدادهای پاسخ‌های صحیح
+            document.getElementById('excel-file').addEventListener('change', handleExcelUpload);
+            document.getElementById('set-manual-answers').addEventListener('click', setManualAnswers);
+            document.getElementById('clear-manual-answers').addEventListener('click', clearManualAnswers);
             
-            container.appendChild(answerSheet);
+            // رویدادهای نتایج
+            document.getElementById('print-results').addEventListener('click', printResults);
+            document.getElementById('export-results').addEventListener('click', exportResults);
+            document.getElementById('print-standard-sheet').addEventListener('click', printStandardSheet);
             
-            // همچنین به روزرسانی پاسخنامه قابل چاپ
-            updatePrintableSheet();
-        }
-        
-        // به روزرسانی پاسخنامه قابل چاپ
-        function updatePrintableSheet() {
-            if (!currentExam) return;
-            
-            const container = document.getElementById('print-questions-container');
-            container.innerHTML = '';
-            
-            // تنظیم نام آزمون در چاپ
-            document.getElementById('print-exam-name').textContent = currentExam.name;
-            
-            // ایجاد سوالات برای چاپ
-            for (let i = 1; i <= currentExam.questionCount; i++) {
-                const questionCell = document.createElement('div');
-                questionCell.className = 'question-cell';
-                
-                let optionsHtml = '';
-                for (let j = 0; j < currentExam.optionCount; j++) {
-                    const optionLetter = ['A', 'B', 'C', 'D', 'E'][j];
-                    const persianOption = convertToPersianOption(optionLetter);
-                    optionsHtml += `<span class="option-bubble">${persianOption}</span>`;
-                }
-                
-                questionCell.innerHTML = `
-                    <div class="question-number"><span class="persian-numbers">${i}</span></div>
-                    <div class="option-bubbles">${optionsHtml}</div>
-                `;
-                
-                container.appendChild(questionCell);
-            }
-        }
+            // رویدادهای تنظیمات
+            document.getElementById('save-settings').addEventListener('click', saveSettings);
+            document.getElementById('auto-process').addEventListener('change', function() {
+                settings.autoProcess = this.checked;
+                localStorage.setItem('answerSheetSettings', JSON.stringify(settings));
+            });
+        });
         
         // توابع مربوط به دوربین
-        async function startCamera() {
+        async function startCamera(cameraType) {
+            currentCamera = cameraType;
+            
             try {
-                document.getElementById('upload-section').style.display = 'none';
-                document.getElementById('camera-view').style.display = 'block';
-                
-                // استفاده از دوربین اصلی (عقب)
                 const constraints = {
                     video: { 
-                        facingMode: 'environment', // دوربین اصلی (عقب)
+                        facingMode: cameraType,
                         width: { ideal: 1280 },
                         height: { ideal: 720 }
                     }
                 };
                 
                 stream = await navigator.mediaDevices.getUserMedia(constraints);
+                const cameraView = document.getElementById('camera-view');
+                cameraView.innerHTML = '<video id="video" autoplay playsinline style="width:100%;height:100%;object-fit:contain;"></video>';
                 const video = document.getElementById('video');
                 video.srcObject = stream;
                 
-                // فعال کردن دکمه‌ها
-                document.getElementById('capture-btn').disabled = false;
+                // فعال/غیرفعال کردن دکمه‌ها
+                document.getElementById('start-camera-back').disabled = true;
+                document.getElementById('start-camera-front').disabled = true;
                 document.getElementById('stop-camera').disabled = false;
-                document.getElementById('start-camera').disabled = true;
+                document.getElementById('capture-btn').disabled = false;
                 
+                // نمایش پیام راهنما
                 document.getElementById('status-text').textContent = 'دوربین فعال شد. پاسخنامه را در مرکز تصویر قرار دهید.';
             } catch (err) {
                 console.error('خطا در دسترسی به دوربین:', err);
@@ -1041,10 +460,11 @@
             cameraView.innerHTML = '<p>دوربین متوقف شد</p>';
             
             // فعال/غیرفعال کردن دکمه‌ها
-            document.getElementById('start-camera').disabled = false;
+            document.getElementById('start-camera-back').disabled = false;
+            document.getElementById('start-camera-front').disabled = false;
             document.getElementById('stop-camera').disabled = true;
             document.getElementById('capture-btn').disabled = true;
-            document.getElementById('process-correction').style.display = 'none';
+            document.getElementById('process-camera').disabled = true;
             
             document.getElementById('status-text').textContent = 'دوربین متوقف شد';
         }
@@ -1064,29 +484,198 @@
             img.src = canvas.toDataURL('image/png');
             
             // فعال کردن دکمه پردازش
-            document.getElementById('process-correction').style.display = 'block';
+            document.getElementById('process-camera').disabled = false;
             document.getElementById('status-text').textContent = 'تصویر با موفقیت گرفته شد. اکنون می‌توانید پردازش را آغاز کنید.';
+            
+            // اگر پردازش خودکار فعال باشد، بلافاصله پردازش شروع می‌شود
+            if (settings.autoProcess) {
+                processImage('camera');
+            }
         }
         
-        function showUploadSection() {
-            document.getElementById('camera-view').style.display = 'none';
-            document.getElementById('upload-section').style.display = 'block';
+        function resetCamera() {
+            stopCamera();
+            document.getElementById('camera-view').innerHTML = '<p>برای شروع، دوربین را فعال کنید</p>';
+            document.getElementById('status-text').textContent = 'آماده';
+        }
+        
+        // توابع مربوط به آپلود فایل
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // نمایش تصویر آپلود شده در تب آپلود (برای اطمینان کاربر)
+                    const uploadTab = document.getElementById('upload-tab');
+                    let imgPreview = uploadTab.querySelector('#uploaded-image-preview');
+                    if (!imgPreview) {
+                        imgPreview = document.createElement('img');
+                        imgPreview.id = 'uploaded-image-preview';
+                        imgPreview.style.maxWidth = '100%';
+                        imgPreview.style.maxHeight = '400px';
+                        imgPreview.style.marginTop = '15px';
+                        uploadTab.insertBefore(imgPreview, uploadTab.querySelector('.progress-container'));
+                    }
+                    imgPreview.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+                
+                // فعال کردن دکمه پردازش
+                document.getElementById('process-upload').disabled = false;
+                document.getElementById('status-text-upload').textContent = 'تصویر با موفقیت آپلود شد. اکنون می‌توانید پردازش را آغاز کنید.';
+            }
+        }
+        
+        function handleExcelUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                        const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+                        
+                        // تبدیل داده‌های Excel به فرمت پاسخ‌های صحیح
+                        correctAnswers = {};
+                        jsonData.forEach(row => {
+                            const questionNum = Object.values(row)[0];
+                            const correctAnswer = Object.values(row)[1];
+                            if (questionNum && correctAnswer) {
+                                correctAnswers[questionNum] = correctAnswer.toString().toUpperCase();
+                            }
+                        });
+                        
+                        console.log('پاسخ‌های صحیح بارگذاری شد:', correctAnswers);
+                        alert(`فایل پاسخ‌های صحیح با ${Object.keys(correctAnswers).length} سوال بارگذاری شد.`);
+                        
+                        // به‌روزرسانی شبکه پاسخ‌های دستی
+                        updateManualAnswersGrid();
+                    } catch (err) {
+                        console.error('خطا در خواندن فایل Excel:', err);
+                        alert('خطا در خواندن فایل Excel. لطفاً فرمت فایل را بررسی کنید.');
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+            }
+        }
+        
+        // توابع مربوط به پاسخ‌های دستی
+        function setManualAnswers() {
+            const start = parseInt(document.getElementById('manual-answer-start').value);
+            const end = parseInt(document.getElementById('manual-answer-end').value);
+            const value = document.getElementById('manual-answer-value').value.toUpperCase();
             
-            if (stream) {
-                stream.getTracks().forEach(track => track.stop());
+            if (isNaN(start) || isNaN(end) || start > end || start < 1 || end > settings.numQuestions) {
+                alert('مقادیر وارد شده معتبر نیستند.');
+                return;
             }
             
-            document.getElementById('process-correction').style.display = 'block';
+            if (!value.match(/^[A-D]$/)) {
+                alert('لطفاً یک گزینه صحیح انتخاب کنید (فقط الف تا د).');
+                return;
+            }
+            
+            for (let i = start; i <= end; i++) {
+                correctAnswers[i] = value;
+            }
+            
+            alert(`پاسخ‌های سوالات ${start} تا ${end} به "${getPersianOption(value)}" تنظیم شد.`);
+            updateManualAnswersGrid();
+        }
+        
+        function clearManualAnswers() {
+            if (confirm('آیا از پاک کردن همه پاسخ‌های صحیح اطمینان دارید؟')) {
+                correctAnswers = {};
+                updateManualAnswersGrid();
+                alert('همه پاسخ‌های صحیح پاک شدند.');
+            }
+        }
+        
+        // تبدیل حروف انگلیسی به فارسی
+        function getPersianOption(option) {
+            const optionsMap = {
+                'A': 'الف',
+                'B': 'ب',
+                'C': 'ج',
+                'D': 'د'
+            };
+            return optionsMap[option] || option;
+        }
+        
+        function createManualAnswersGrid() {
+            const container = document.getElementById('manual-answers-container');
+            container.innerHTML = '';
+            
+            for (let i = 1; i <= settings.numQuestions; i++) {
+                const answerItem = document.createElement('div');
+                answerItem.className = 'manual-answer-item';
+                answerItem.innerHTML = `
+                    <label for="answer-${i}">سوال ${i}</label>
+                    <select id="answer-${i}" class="manual-answer-input" data-question="${i}">
+                        <option value="">--</option>
+                        <option value="A">الف</option>
+                        <option value="B">ب</option>
+                        <option value="C">ج</option>
+                        <option value="D">د</option>
+                    </select>
+                `;
+                container.appendChild(answerItem);
+            }
+            
+            // افزودن رویداد تغییر به فیلدهای ورودی
+            document.querySelectorAll('.manual-answer-input').forEach(select => {
+                select.addEventListener('change', function() {
+                    const questionNum = parseInt(this.getAttribute('data-question'));
+                    const value = this.value.toUpperCase();
+                    
+                    if (value === '') {
+                        delete correctAnswers[questionNum];
+                    } else if (value.match(/^[A-D]$/)) {
+                        correctAnswers[questionNum] = value;
+                    }
+                });
+            });
+        }
+        
+        function updateManualAnswersGrid() {
+            document.querySelectorAll('.manual-answer-input').forEach(select => {
+                const questionNum = parseInt(select.getAttribute('data-question'));
+                select.value = correctAnswers[questionNum] || '';
+            });
+        }
+        
+        // پیش‌پردازش تصویر برای بهبود دقت OCR
+        function preprocessImage(canvas) {
+            const ctx = canvas.getContext('2d');
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+            
+            // تبدیل به灰度 و اعمال آستانه
+            for (let i = 0; i < data.length; i += 4) {
+                const avg = (data[i] + data[i+1] + data[i+2]) / 3;
+                // آستانه ساده: اگر زیر 128 باشد، سیاه می‌شود، در غیر این صورت سفید
+                const value = avg < 128 ? 0 : 255;
+                data[i] = value;     // قرمز
+                data[i+1] = value;   // سبز
+                data[i+2] = value;   // آبی
+                // آلفا بدون تغییر باقی می‌ماند
+            }
+            ctx.putImageData(imageData, 0, 0);
         }
         
         // توابع مربوط به پردازش تصویر با OCR
-        async function processImage() {
+        async function processImage(source) {
             let imageSrc;
-            const progressBar = document.getElementById('progress-bar');
-            const statusText = document.getElementById('status-text');
+            const progressBar = source === 'camera' ? 
+                document.getElementById('progress-bar') : 
+                document.getElementById('progress-bar-upload');
+            const statusText = source === 'camera' ? 
+                document.getElementById('status-text') : 
+                document.getElementById('status-text-upload');
             
-            // تعیین منبع تصویر (دوربین یا آپلود)
-            if (document.getElementById('camera-view').style.display !== 'none') {
+            if (source === 'camera') {
                 const capturedImage = document.getElementById('captured-image');
                 if (!capturedImage) {
                     alert('لطفاً ابتدا تصویری از پاسخنامه بگیرید.');
@@ -1102,23 +691,45 @@
                 imageSrc = URL.createObjectURL(imageFile);
             }
             
-            if (!currentExam || Object.keys(correctAnswers).length === 0) {
-                alert('لطفاً ابتدا یک آزمون انتخاب کرده و پاسخ‌های صحیح را وارد کنید.');
+            if (Object.keys(correctAnswers).length === 0) {
+                alert('لطفاً ابتدا پاسخ‌های صحیح را وارد کنید.');
                 return;
             }
             
             // غیرفعال کردن دکمه پردازش
-            document.getElementById('process-correction').disabled = true;
+            if (source === 'camera') {
+                document.getElementById('process-camera').disabled = true;
+            } else {
+                document.getElementById('process-upload').disabled = true;
+            }
             
             // شروع پردازش OCR
             statusText.textContent = 'در حال پردازش تصویر...';
             progressBar.style.width = '10%';
             
             try {
-                // استفاده از Tesseract.js برای OCR
+                // ایجاد یک تصویر از منبع
+                const img = new Image();
+                img.src = imageSrc;
+                
+                await new Promise((resolve) => {
+                    img.onload = resolve;
+                });
+                
+                // ایجاد کانواس برای پیش‌پردازش
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                
+                // پیش‌پردازش تصویر برای بهبود دقت
+                preprocessImage(canvas);
+                
+                // استفاده از Tesseract.js برای OCR با تنظیمات بهبود یافته
                 const { data: { text } } = await Tesseract.recognize(
-                    imageSrc,
-                    'fas+eng', // فارسی و انگلیسی
+                    canvas,
+                    'fas+eng',
                     {
                         logger: progress => {
                             if (progress.status === 'recognizing text') {
@@ -1126,7 +737,9 @@
                                 progressBar.style.width = `${10 + percent * 0.8}%`;
                                 statusText.textContent = `در حال تشخیص متن: ${percent}%`;
                             }
-                        }
+                        },
+                        tessedit_pageseg_mode: '6', // حالت قطعه‌بندی صفحه برای متن یکنواخت
+                        tessedit_char_whitelist: '0123456789ABCD' // محدود کردن کاراکترها به اعداد و حروف A-D
                     }
                 );
                 
@@ -1152,24 +765,22 @@
                 console.error('خطا در پردازش OCR:', err);
                 statusText.textContent = 'خطا در پردازش تصویر';
                 alert('خطا در پردازش تصویر. لطفاً از وضوح تصویر اطمینان حاصل کنید.');
-                
-                // فعال کردن دکمه پردازش
-                document.getElementById('process-correction').disabled = false;
             }
         }
         
         // تجزیه و تحلیل متن استخراج شده توسط OCR
         function parseOCRText(text) {
             const results = {};
+            // الگوی بهبود یافته برای تشخیص پاسخ‌ها
             const lines = text.split('\n');
             
             lines.forEach(line => {
-                // الگوهای مختلف برای تشخیص پاسخ‌ها
+                // الگوهای مختلف برای تشخیص شماره سوال و گزینه انتخابی
                 const patterns = [
-                    /(\d+)[:\-\s]*([A-E])/i,        // شماره سوال و سپس گزینه
-                    /سوال\s*(\d+)[:\-\s]*([A-E])/i, // سوال شماره X و سپس گزینه
-                    /(\d+)\s*-\s*([A-E])/i,         // شماره سوال - گزینه
-                    /Q\s*(\d+)[:\-\s]*([A-E])/i     // Q شماره سوال و سپس گزینه
+                    /(\d+)[:\-\s]*([A-D])/i,        // فرمت: 1: A یا 1-A یا 1 A
+                    /سوال\s*(\d+)[:\-\s]*([A-D])/i, // فرمت: سوال 1: A
+                    /(\d+)[\.\s]*([A-D])/i,         // فرمت: 1. A
+                    /(\d+)\s*گزینه\s*([A-D])/i      // فرمت: 1 گزینه A
                 ];
                 
                 for (const pattern of patterns) {
@@ -1177,7 +788,7 @@
                     if (match) {
                         const questionNum = parseInt(match[1]);
                         const selectedAnswer = match[2].toUpperCase();
-                        if (questionNum >= 1 && questionNum <= currentExam.questionCount) {
+                        if (questionNum >= 1 && questionNum <= settings.numQuestions) {
                             results[questionNum] = selectedAnswer;
                             break;
                         }
@@ -1197,7 +808,7 @@
                 details: {}
             };
             
-            for (let i = 1; i <= currentExam.questionCount; i++) {
+            for (let i = 1; i <= settings.numQuestions; i++) {
                 const detectedAnswer = detected[i];
                 const correctAnswer = correct[i];
                 
@@ -1213,8 +824,8 @@
                 }
             }
             
-            // محاسبه نمره (می‌توانید این بخش را بر اساس نیاز خود سفارشی کنید)
-            results.score = results.correct * 1; // هر پاسخ صحیح 1 نمره
+            // محاسبه نمره
+            results.score = (results.correct * settings.correctScore) + (results.wrong * settings.wrongScore);
             
             return results;
         }
@@ -1230,7 +841,7 @@
             summary.innerHTML = `
                 <h4>خلاصه نتایج:</h4>
                 <div class="summary-grid">
-                    <div>تعداد سوالات: <span>${currentExam.questionCount}</span></div>
+                    <div>تعداد سوالات: <span>${settings.numQuestions}</span></div>
                     <div>پاسخ‌های صحیح: <span class="correct">${results.correct}</span></div>
                     <div>پاسخ‌های غلط: <span class="incorrect">${results.wrong}</span></div>
                     <div>پاسخ‌های خالی: <span class="empty">${results.empty}</span></div>
@@ -1258,7 +869,7 @@
                             <tr>
                                 <td>${qNum}</td>
                                 <td>${detail.detected || '---'}</td>
-                                <td>${convertToPersianOption(detail.correct)}</td>
+                                <td>${getPersianOption(detail.correct)}</td>
                                 <td class="${detail.status}">${detail.status === 'correct' ? 'صحیح' : detail.status === 'incorrect' ? 'غلط' : 'خالی'}</td>
                             </tr>
                         `;
@@ -1269,6 +880,9 @@
             
             // نمایش بخش نتایج
             document.getElementById('results-section').style.display = 'block';
+            
+            // به‌روزرسانی نمونه پاسخنامه
+            updateAnswerSheetTemplate(results);
         }
         
         // چاپ نتایج
@@ -1276,8 +890,12 @@
             window.print();
         }
         
-        // چاپ پاسخنامه
-        function printAnswerSheet() {
+        // چاپ پاسخنامه استاندارد
+        function printStandardSheet() {
+            // به‌روزرسانی پاسخنامه قابل چاپ
+            createPrintableSheet();
+            
+            // چاپ فقط پاسخنامه استاندارد
             window.print();
         }
         
@@ -1295,7 +913,7 @@
             data.push(['شماره سوال', 'پاسخ تشخیص داده شده', 'پاسخ صحیح', 'وضعیت']);
             
             // داده‌ها
-            for (let i = 1; i <= currentExam.questionCount; i++) {
+            for (let i = 1; i <= settings.numQuestions; i++) {
                 const detected = ocrResults[i] || '';
                 const correct = correctAnswers[i] || '';
                 const status = detected === correct ? 'صحیح' : (detected ? 'غلط' : 'خالی');
@@ -1306,10 +924,10 @@
             // خلاصه نتایج
             data.push([]);
             data.push(['خلاصه نتایج', '', '', '']);
-            data.push(['تعداد سوالات', currentExam.questionCount, '', '']);
+            data.push(['تعداد سوالات', settings.numQuestions, '', '']);
             data.push(['پاسخ‌های صحیح', Object.values(ocrResults).filter((val, idx) => val === correctAnswers[idx+1]).length, '', '']);
             data.push(['پاسخ‌های غلط', Object.values(ocrResults).filter((val, idx) => val && val !== correctAnswers[idx+1]).length, '', '']);
-            data.push(['پاسخ‌های خالی', currentExam.questionCount - Object.keys(ocrResults).length, '', '']);
+            data.push(['پاسخ‌های خالی', settings.numQuestions - Object.keys(ocrResults).length, '', '']);
             
             // ایجاد workbook و worksheet
             const ws = XLSX.utils.aoa_to_sheet(data);
@@ -1317,184 +935,138 @@
             XLSX.utils.book_append_sheet(wb, ws, 'نتایج تصحیح');
             
             // ذخیره فایل
-            XLSX.writeFile(wb, `نتایج_${currentExam.name}_${new Date().toLocaleDateString('fa-IR')}.xlsx`);
+            XLSX.writeFile(wb, 'نتایج_تصحیح_پاسخنامه.xlsx');
         }
         
-        // مدیریت رویدادهای صفحه
-        document.addEventListener('DOMContentLoaded', function() {
-            // بارگذاری آزمون‌ها
-            loadExams();
+        // مدیریت تنظیمات
+        function loadSettings() {
+            const savedSettings = localStorage.getItem('answerSheetSettings');
+            if (savedSettings) {
+                const parsedSettings = JSON.parse(savedSettings);
+                settings = { ...settings, ...parsedSettings };
+            }
+        }
+        
+        function saveSettings() {
+            settings.numQuestions = parseInt(document.getElementById('num-questions').value) || 20;
+            settings.optionsPerQuestion = parseInt(document.getElementById('options-per-question').value) || 4;
+            settings.correctScore = parseFloat(document.getElementById('correct-score').value) || 1;
+            settings.wrongScore = parseFloat(document.getElementById('wrong-score').value) || -0.25;
             
-            // مدیریت تب‌ها
-            document.querySelectorAll('.tab-btn').forEach(button => {
-                button.addEventListener('click', function() {
-                    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-                    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-                    
-                    this.classList.add('active');
-                    const tabId = this.getAttribute('data-tab') + '-tab';
-                    document.getElementById(tabId).classList.add('active');
-                });
+            localStorage.setItem('answerSheetSettings', JSON.stringify(settings));
+            
+            createAnswerSheetTemplate();
+            createPrintableSheet();
+            createStandardSheetPreview();
+            createManualAnswersGrid();
+            
+            alert('تنظیمات با موفقیت ذخیره شد.');
+        }
+        
+        function updateSettingsForm() {
+            document.getElementById('num-questions').value = settings.numQuestions;
+            document.getElementById('options-per-question').value = settings.optionsPerQuestion;
+            document.getElementById('correct-score').value = settings.correctScore;
+            document.getElementById('wrong-score').value = settings.wrongScore;
+            document.getElementById('auto-process').checked = settings.autoProcess;
+        }
+        
+        // ایجاد نمونه پاسخنامه
+        function createAnswerSheetTemplate() {
+            const container = document.getElementById('questions-container');
+            container.innerHTML = '';
+            
+            const options = ['A', 'B', 'C', 'D'].slice(0, settings.optionsPerQuestion);
+            
+            for (let i = 1; i <= settings.numQuestions; i++) {
+                const questionCell = document.createElement('div');
+                questionCell.className = 'question-cell';
+                questionCell.innerHTML = `
+                    <div class="question-number">${i}</div>
+                    <div class="option-bubbles">
+                        ${options.map(opt => `<span class="option-bubble" data-question="${i}" data-option="${opt}">${getPersianOption(opt)}</span>`).join('')}
+                    </div>
+                `;
+                container.appendChild(questionCell);
+            }
+            
+            // به‌روزرسانی تعداد سوالات در خلاصه
+            document.getElementById('total-questions').textContent = settings.numQuestions;
+        }
+        
+        // ایجاد پاسخنامه قابل چاپ
+        function createPrintableSheet() {
+            const container = document.getElementById('printable-questions-container');
+            container.innerHTML = '';
+            
+            const options = ['A', 'B', 'C', 'D'].slice(0, settings.optionsPerQuestion);
+            
+            for (let i = 1; i <= settings.numQuestions; i++) {
+                const questionCell = document.createElement('div');
+                questionCell.className = 'question-cell';
+                questionCell.innerHTML = `
+                    <div class="question-number">${i}</div>
+                    <div class="option-bubbles">
+                        ${options.map(opt => `<span class="option-bubble">${getPersianOption(opt)}</span>`).join('')}
+                    </div>
+                `;
+                container.appendChild(questionCell);
+            }
+        }
+        
+        // ایجاد پیش‌نمایش پاسخنامه استاندارد
+        function createStandardSheetPreview() {
+            const container = document.getElementById('standard-sheet-preview');
+            container.innerHTML = `
+                <div style="text-align: center; margin: 20px 0;">
+                    <p>پاسخنامه استاندارد شامل ${settings.numQuestions} سوال با ${settings.optionsPerQuestion} گزینه</p>
+                    <div style="display: inline-block; border: 2px solid #333; padding: 20px; margin: 10px; background: white;">
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+                            ${Array.from({length: Math.min(16, settings.numQuestions)}, (_, i) => `
+                                <div style="text-align: center; border: 1px solid #ccc; padding: 5px;">
+                                    <div style="font-weight: bold;">${i+1}</div>
+                                    <div style="display: flex; justify-content: center; gap: 3px;">
+                                        ${['A','B','C','D'].slice(0, settings.optionsPerQuestion).map(opt => 
+                                            `<div style="width: 15px; height: 15px; border: 1px solid #000; border-radius: 50%;">${getPersianOption(opt)}</div>`
+                                        ).join('')}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        ${settings.numQuestions > 16 ? `<p style="margin-top: 10px;">... و ${settings.numQuestions - 16} سوال دیگر</p>` : ''}
+                    </div>
+                    <p style="margin-top: 10px;">برای بهترین نتایج، از پاسخنامه با این فرمت استفاده کنید.</p>
+                </div>
+            `;
+        }
+        
+        // به‌روزرسانی نمونه پاسخنامه با نتایج
+        function updateAnswerSheetTemplate(results) {
+            // حذف پرکردگی‌های قبلی
+            document.querySelectorAll('.option-bubble.filled').forEach(bubble => {
+                bubble.classList.remove('filled');
             });
             
-            // ایجاد آزمون جدید
-            document.getElementById('create-exam').addEventListener('click', function() {
-                const name = document.getElementById('exam-name').value.trim();
-                const questionCount = parseInt(document.getElementById('exam-questions').value);
-                const optionCount = parseInt(document.getElementById('exam-options').value);
-                const description = document.getElementById('exam-description').value.trim();
-                
-                if (!name) {
-                    alert('لطفاً نام آزمون را وارد کنید.');
-                    return;
-                }
-                
-                if (isNaN(questionCount) || questionCount < 1) {
-                    alert('تعداد سوالات باید عددی مثبت باشد.');
-                    return;
-                }
-                
-                const newExam = {
-                    id: generateId(),
-                    name: name,
-                    questionCount: questionCount,
-                    optionCount: optionCount,
-                    description: description,
-                    createdAt: new Date().toISOString(),
-                    answerKey: {}
-                };
-                
-                exams.push(newExam);
-                saveExams();
-                updateExamList();
-                updateExamSelectors();
-                
-                // پاک کردن فرم
-                document.getElementById('exam-name').value = '';
-                document.getElementById('exam-questions').value = '20';
-                document.getElementById('exam-options').value = '4';
-                document.getElementById('exam-description').value = '';
-                
-                alert('آزمون جدید با موفقیت ایجاد شد.');
-            });
-            
-            // انتخاب آزمون برای تعیین کلید پاسخ
-            document.getElementById('select-exam').addEventListener('change', function() {
-                const examId = this.value;
-                if (!examId) {
-                    document.getElementById('answer-key-section').style.display = 'none';
-                    return;
-                }
-                
-                const exam = exams.find(e => e.id === examId);
-                if (exam) {
-                    selectExam(exam);
-                }
-            });
-            
-            // اعمال پاسخ‌ها به صورت گروهی
-            document.getElementById('set-answers').addEventListener('click', function() {
-                if (!currentExam) {
-                    alert('لطفاً ابتدا یک آزمون انتخاب کنید.');
-                    return;
-                }
-                
-                const start = parseInt(document.getElementById('answer-start').value);
-                const end = parseInt(document.getElementById('answer-end').value);
-                const value = document.getElementById('answer-value').value;
-                
-                if (isNaN(start) || isNaN(end) || start < 1 || end > currentExam.questionCount || start > end) {
-                    alert('محدوده سوالات معتبر نیست.');
-                    return;
-                }
-                
-                if (!value) {
-                    alert('لطفاً یک گزینه صحیح انتخاب کنید.');
-                    return;
-                }
-                
-                for (let i = start; i <= end; i++) {
-                    correctAnswers[i] = value;
-                }
-                
-                updateAnswerKeyUI();
-                alert(`پاسخ سوالات ${start} تا ${end} به "${convertToPersianOption(value)}" تنظیم شد.`);
-            });
-            
-            // پاک کردن همه پاسخ‌ها
-            document.getElementById('clear-answers').addEventListener('click', function() {
-                if (!currentExam) {
-                    alert('لطفاً ابتدا یک آزمون انتخاب کنید.');
-                    return;
-                }
-                
-                if (confirm('آیا از پاک کردن همه پاسخ‌ها اطمینان دارید؟')) {
-                    correctAnswers = {};
-                    updateAnswerKeyUI();
-                    alert('همه پاسخ‌ها پاک شدند.');
-                }
-            });
-            
-            // ذخیره کلید پاسخ
-            document.getElementById('save-answer-key').addEventListener('click', function() {
-                if (!currentExam) {
-                    alert('لطفاً ابتدا یک آزمون انتخاب کنید.');
-                    return;
-                }
-                
-                currentExam.answerKey = {...correctAnswers};
-                saveExams();
-                alert('کلید پاسخ با موفقیت ذخیره شد.');
-            });
-            
-            // چاپ پاسخنامه
-            document.getElementById('print-answer-sheet').addEventListener('click', function() {
-                if (!currentExam) {
-                    alert('لطفاً ابتدا یک آزمون ایجاد یا انتخاب کنید.');
-                    return;
-                }
-                
-                printAnswerSheet();
-            });
-            
-            // دوربین و آپلود تصویر
-            document.getElementById('start-camera').addEventListener('click', startCamera);
-            document.getElementById('upload-image').addEventListener('click', showUploadSection);
-            document.getElementById('capture-btn').addEventListener('click', captureImage);
-            document.getElementById('stop-camera').addEventListener('click', stopCamera);
-            
-            // پردازش تصویر
-            document.getElementById('process-correction').addEventListener('click', processImage);
-            
-            // انتخاب آزمون برای تصحیح
-            document.getElementById('select-exam-correction').addEventListener('change', function() {
-                const examId = this.value;
-                if (!examId) return;
-                
-                const exam = exams.find(e => e.id === examId);
-                if (exam) {
-                    currentExam = exam;
-                    correctAnswers = exam.answerKey || {};
+            // پر کردن گزینه‌های تشخیص داده شده
+            Object.keys(results.details).forEach(qNum => {
+                const detail = results.details[qNum];
+                if (detail.detected) {
+                    const bubble = document.querySelector(`.option-bubble[data-question="${qNum}"][data-option="${detail.detected}"]`);
+                    if (bubble) {
+                        bubble.classList.add('filled');
+                    }
                 }
             });
             
-            // چاپ نتایج و خروجی اکسل
-            document.getElementById('print-results').addEventListener('click', printResults);
-            document.getElementById('export-results').addEventListener('click', exportResults);
+            // به‌روزرسانی خلاصه نتایج
+            document.getElementById('correct-count').textContent = results.correct;
+            document.getElementById('wrong-count').textContent = results.wrong;
+            document.getElementById('empty-count').textContent = results.empty;
+            document.getElementById('total-score').textContent = results.score.toFixed(2);
             
-            // مدیریت آپلود تصویر
-            document.getElementById('image-file').addEventListener('change', function(event) {
-                const file = event.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        const uploadedImage = document.getElementById('uploaded-image');
-                        uploadedImage.innerHTML = `<img src="${e.target.result}" style="max-width:100%;max-height:400px;border-radius:8px;">`;
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
-        });
+            // نمایش نمونه پاسخنامه
+            document.getElementById('answer-sheet-template').style.display = 'block';
+        }
     </script>
 </body>
 </html>
